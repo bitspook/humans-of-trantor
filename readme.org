@@ -1,0 +1,50 @@
+#+TITLE: Humans of Trantor
+
+#+BEGIN_QUOTE
+A history of events happening with [H]umans [o]f [T]rantor Software Private Ltd
+#+END_QUOTE
+
+Humans of Trantor aims to be a backbone on which Engineers of Trantor can build
+products for development of our colleagues.
+
+Technically, HoT is an experiment implementation of an [[https://martinfowler.com/eaaDev/EventSourcing.html][event-sourced]] system
+employing [[https://www.martinfowler.com/bliki/CQRS.html][CQRS]], recording and publishing *all* events that happen with humans
+(not just employees) of Trantor. We want to encourage developers of Trantor to
+hack their lives here at Trantor. If you feel something needs fixing in your
+everyday lives at Trantor (attendance system anyone?), get creative and fix it.
+Or just play around with data.
+
+HoT itself just keeps track of all the events that happen with humans of
+Trantor.
+
+** HoT provides:
+
+1. A list of events
+2. API to post events into the system
+3. A connection to (Postgre)SQL to read historic events
+4. A connection to Redis where future events can be consumed via Redis streams
+
+** [[https://www.martinfowler.com/bliki/CQRS.html][CQRS]]
+
+HoT judicially employs Command and Query Segregation.
+
+- *Commands*
+
+  An application that want to make a change in its state shall record an event
+  in the event-bus. *No* changes that the application can't live without shall
+  be made directly into its state. Ideally, the application's state should be a
+  read-only snapshot of events recorded in HoT normalized as application's
+  requirements.
+
+- *Queries*
+
+  The application's own state (e.g database) shall be a snapshot derived from
+  the events recorded in HoT. Any data required by application should be read
+  from this source and shouldn't require a new query made to HoT.
+
+  On creation of a new app, application state snapshot shall be created by
+  reading the entire history of events application is interested in.
+  Subsequently, application should keep its state in sync by subscribing to new
+  events from the event bus.
+
+  Application should treat its own state to be ephemeral.
