@@ -48,3 +48,88 @@ HoT judicially employs Command and Query Segregation.
   events from the event bus.
 
   Application should treat its own state to be ephemeral.
+
+
+* Usage
+
+** Prerequisites
+
+HoT is a cloud of independent components. Each component is a containerized
+docker application. HoT cloud can be created locally using docker-compose.
+
+So basic knowledge of docker (to containerize your application) and
+docker-compose (to interact with rest of the cloud) is required.
+
+To add your application to the cloud (to reach the core HoT services), please
+make add an entry to the docker-compose.yml file.
+
+[[https://docs.docker.com/install/][docker]] and [[https://docs.docker.com/compose/install/][docker-compose]] should be installed on your system to work with HoT.
+To bring up the HoT cloud, you can simply execute:
+
+#+BEGIN_SRC sh
+docker-compose up
+#+END_SRC
+
+** Overview
+
+HoT has 3 primary components:
+
+1. Event History
+
+   Event History is stored in a single *PostgreSQL* table.
+
+2. Event Bus
+
+   HoT uses *Redis* streams for distributing events to any application that
+   might be interested.
+
+3. Event Distributor Side Car
+
+   A sidecar application is included which:
+
+   - Emits events into the Event Bus when a new event row is inserted in PostgreSQL
+   - Provides a single HTTP endpoint to which applications can make POST
+     requests, and the sidecar inserts them into the Event History
+
+** The Event
+
+Events are integral to HoT. A single event is a JSON object which should have following structure:
+
+#+BEGIN_SRC json
+  {
+    "id": "a-valid-uuid-v4",
+    "name": "VERY_IMPORTANT_EVENT",
+    "version": 1,
+    "data": any
+  }
+#+END_SRC
+
+1. *id*: Every event can be uniquely identified with its =id=
+2. *name* is a string which identifies this event
+3. *version* is a number. *type + version* together uniquely identifies the type
+   of an event
+4. *data* can be any valid JSON type
+
+** Maintaining Application state
+
+1. *Creating initial State*
+
+   When building a new application for HoT, you might want create an initial
+   state from the events already present in Event history. You can directly
+   connect with HoT Event History database and read from the =event_history=
+   table. Please refer to =docker-compose.yml= file for the hostname to which to
+   make the connection should be made.
+
+2. *Maintaining state*
+
+   During the application runtime, you should make changes only on reception of
+   an event you are interested via a Redis stream. Connection to redis can be
+   made using the hostname mentioned in =docker-compose.yml=. If you want to
+   make a change to the application state, ask HoT side card to record an event
+   for you instead.
+
+** Creating new Events
+
+New events shall be created by making an HTTP POST request to =/emit= endpoint
+of HoT Event Distributor Sidecar; which can be reached at the hostname mentioned
+in =docker-compose.yml= file.
