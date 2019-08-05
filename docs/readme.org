@@ -1,0 +1,13 @@
+#+title: HoT Docs
+
+HoT docs are written as a [[https://gohugo.io/][Hugo]] site using. To start the docs site locally,
+please install hugo following [[https://gohugo.io/getting-started/installing/][installation instructions]], and run:
+
+#+begin_src sh
+cd docs
+hugo serve
+#+end_src
+
+If you are comfortable with reading markdown and/or don't want to run the hugo
+static site, you can find all the documentation written in
+=docs/content/**/*.[md|org]= files.
