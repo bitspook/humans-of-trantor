@@ -11,7 +11,7 @@ So basic knowledge of docker (to containerize your application) and
 docker-compose (to interact with rest of the cloud) is required.
 
 To add your application to the cloud (to reach the core HoT services), please
-make add an entry to the docker-compose.yml file.
+add an entry to the docker-compose.yml file.
 
 Following should be installed on your system to work with HoT.
 
