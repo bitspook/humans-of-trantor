@@ -27,10 +27,14 @@ services:
     volumes:
       - ./data/hot/redis:/data
 
-  # hotsidecar:
-  #   image: hotsidecar:latest
-  #   build: ./sidecar
-  #   volumes:
-  #     - ./sidecar:/app
-  #     - ./sidecar/node_modules:/app/node_modules
-  #   command: npm run start:dev
+  ei:
+    image: hot-ei:latest
+    build: ./ei
+    environment:
+      PORT: 80
+    volumes:
+      - ./ei:/app
+      - ./ei/node_modules:/app/node_modules
+    command: yarn start:dev
+    ports:
+     - 3001:80

@@ -27,4 +27,4 @@ Following fields can be present in the event payload:
 | phoneNumber | No           |                               |
 | dateOfBirth | No           |                               |
 | designation | No           |                               |
-| reports_to  | No           | ECode of immediate supervisor |
+| reportsTo   | No           | ECode of immediate supervisor |
