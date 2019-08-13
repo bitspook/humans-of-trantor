@@ -5,6 +5,7 @@
       "options": [100]
     },
     "quotemark": [true, "single"],
-    "import-name": [false]
+    "import-name": [false],
+    "ter-arrow-parens": false
   }
 }

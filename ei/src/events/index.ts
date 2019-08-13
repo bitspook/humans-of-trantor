@@ -20,14 +20,18 @@ router.get('/', (_, res) => {
   res.json(events.map((e) => e.type));
 });
 
-router.post('/:eventName', (req, res) => {
-  const { eventName } = req.params;
+router.post('/:name/:version', (req, res) => {
+  const { name, version } = req.params;
   const payload = req.body.payload;
 
-  const eventConstructor = events.find((e) => e.type === eventName);
+  if (version !== 'v1') {
+    throw new Error('UnsupportedVersion: Supported versions [ "v1" ]');
+  }
+
+  const eventConstructor = events.find((e) => e.type === name);
 
   if (!eventConstructor) {
-    throw new Error(`UnknownEvent: ${eventName} is not a valid event`);
+    throw new Error(`UnsupportedEvent: "${name}" is not a valid event`);
   }
 
   const event = new eventConstructor(payload);
