@@ -14,7 +14,7 @@ test(`[GET] ${urlPrefix}/`, async (t) => {
   t.is((res.body as string[]).every((e) => typeof e === 'string'), true);
 });
 
-test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type}/v2019 returns BadRequest error for invalid event version`, async (t) => {
+test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type}/v2019 returns error for invalid event version`, async (t) => {
   const res = await request(app)
     .post(`${urlPrefix}/${DiscoveredEmployee.type}/v2019`)
     .set('Content-type', 'application/json')

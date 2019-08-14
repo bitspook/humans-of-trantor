@@ -1,14 +1,15 @@
-import { Router } from 'express';
+import Router from 'express-promise-router';
 import DiscoveredEmployee from './discoveredEmployee';
 
 export interface EventI {
   type: string;
+  version: string;
   validate: () => Promise<void>;
   payload?: any;
 }
 
 interface Event {
-  new (payload?: any): EventI;
+  new (version: string, payload?: any): EventI;
   type: string;
 }
 
@@ -20,13 +21,9 @@ router.get('/', (_, res) => {
   res.json(events.map((e) => e.type));
 });
 
-router.post('/:name/:version', (req, res) => {
+router.post('/:name/:version', async (req, res) => {
   const { name, version } = req.params;
   const payload = req.body.payload;
-
-  if (version !== 'v1') {
-    throw new Error('UnsupportedVersion: Supported versions [ "v1" ]');
-  }
 
   const eventConstructor = events.find((e) => e.type === name);
 
@@ -34,9 +31,10 @@ router.post('/:name/:version', (req, res) => {
     throw new Error(`UnsupportedEvent: "${name}" is not a valid event`);
   }
 
-  const event = new eventConstructor(payload);
+  const event = new eventConstructor(version, payload);
+  await event.validate();
 
-  res.send(event.validate());
+  res.send(event);
 });
 
 export default router;
