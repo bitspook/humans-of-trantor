@@ -1,5 +1,6 @@
 import { EventI } from '@src/events';
 import { ObjectSchema } from 'yup';
+// tslint:disable-next-line:no-duplicate-imports
 import * as yup from 'yup';
 
 interface DiscoveredEmployeePayloadI {
@@ -42,6 +43,7 @@ class DiscoveredEmployee implements EventI {
     if (!DiscoveredEmployee.versions.find((v) => v === this.version)) {
       throw new Error(
         `UnsupportedVersion: Supported versions [ ${DiscoveredEmployee.versions
+          // tslint:disable-next-line:prefer-template
           .map((v) => '"' + v + '"')
           .join(', ')} ]`,
       );
