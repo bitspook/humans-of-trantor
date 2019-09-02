@@ -14,7 +14,7 @@ HoT is an experimental implementation of an
 employing [CQRS](https://www.martinfowler.com/bliki/CQRS.html), recording and
 publishing **all** events that happen with humans (not just employees) of
 Trantor. We want to encourage developers of Trantor to hack their lives here at
-Trantor. If you feel something needs fixing in your live at Trantor (attendance
+Trantor. If you feel something needs fixing in your life at Trantor (attendance
 system anyone?), get creative and fix it. Or just play around with data.
 
 HoT itself just keeps track of all the events that happen with humans of
@@ -23,22 +23,23 @@ Trantor.
 ## HoT provides:
 
 1. A list of events
-2. API to post events into the system
+2. API to publish events into the system
 3. A connection to (Postgre)SQL to read historic events
-4. A connection to Redis where future events can be consumed via Redis streams
+4. A connection to broadcasting message bus (Redis) where future events can be
+   consumed via (Redis) streams
 
 ## CQRS
 
 HoT judicially employs Command and Query Segregation.
 
 - **Commands**<br />
-  An application that want to make a change in its state shall record an event
+  An application that want to make a change in its state shall publish an event
   in the event-bus. *No* changes that the application can't live without shall
   be made directly into its state. Ideally, the application's state should be a
   read-only snapshot of events recorded in HoT projected to meet application's
   requirements.
 
-  {{% notice tip %}}
+  {{% notice note %}}
   State is any form of mutable data that your application needs. Most backend applications keep their primary state in database.
   {{% /notice %}}
 
@@ -62,8 +63,12 @@ sequenceDiagram
     participant Messaging Bus
     participant Application 2
 
-    Application 1 ->> Event Injector: Emits an Event
+    Application 1 ->> Event Injector: Publishes an Event
     Event Injector ->> Store: Validates the event and put it in the store
     Store ->> Messaging Bus: Store drops the event into messaging bus
-    Messaging Bus -->> Application 2: Messaging Bus broadcasts the event that any other application in the cloud can see.
+
+    activate Messaging Bus
+    Messaging Bus -->> Application 1: Messaging Bus broadcasts the event to all applications
+    Messaging Bus -->> Application 2: -
+    deactivate Messaging Bus
 {{</mermaid>}}

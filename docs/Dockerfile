@@ -8,7 +8,7 @@
   RUN apk update && apk add hugo git
 
   ENV HUGO_THEME_URL='https://github.com/matcornic/hugo-theme-learn'
-  ENV HUGO_THEME_COMMIT='b304bb47f61d06101b310e44700bdb7dd4bfb35c'
+  ENV HUGO_THEME_COMMIT='HEAD'
 
   RUN mkdir -p /themes/current \
   && cd /themes/current \
