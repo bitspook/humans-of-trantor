@@ -36,7 +36,7 @@ class DiscoveredEmployee implements EventI {
 
   type = 'DISCOVERED_EMPLOYEE';
 
-  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) {}
+  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) { }
 
   async validate() {
     if (!DiscoveredEmployee.versions.find((v) => v === this.version)) {
@@ -56,6 +56,7 @@ class DiscoveredEmployee implements EventI {
     return {
       type: this.type,
       version: this.version,
+      payload: this.payload
     };
   }
 }

@@ -1,5 +1,6 @@
 import Router from 'express-promise-router';
-import DiscoveredEmployee from './discoveredEmployee';
+import DiscoveredEmployee from './DiscoveredEmployee';
+import { sql } from 'slonik';
 
 export interface EventI {
   type: string;
@@ -9,7 +10,7 @@ export interface EventI {
 }
 
 interface Event {
-  new (version: string, payload?: any): EventI;
+  new(version: string, payload?: any): EventI;
   type: string;
 }
 
@@ -21,9 +22,10 @@ router.get('/', (_, res) => {
   res.json(events.map((e) => e.type));
 });
 
-router.post('/:name/:version', async (req, res) => {
-  const { name, version } = req.params;
-  const payload = req.body.payload;
+router.post('/:name', async (req, res) => {
+  const { name } = req.params;
+  const { version, payload } = req.body;
+  const { db } = req.context;
 
   const eventConstructor = events.find((e) => e.type === name);
 
@@ -34,7 +36,9 @@ router.post('/:name/:version', async (req, res) => {
   const event = new eventConstructor(version, payload);
   await event.validate();
 
-  res.send(event);
+  const result = await db.query(sql`INSERT INTO store.events (name, version, payload) VALUES (${'name'}, ${'version'}, ${sql.json(payload)} )}`);
+
+  res.send(result);
 });
 
 export default router;

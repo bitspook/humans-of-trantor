@@ -31,6 +31,8 @@
       "@src": ["./src/index"]
     },
 
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+
+    "typeRoots": ["src/types"]
   }
 }
