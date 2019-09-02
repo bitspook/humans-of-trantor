@@ -27,14 +27,23 @@ services:
     volumes:
       - ./data/hot/redis:/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hot@hot.com
+      PGADMIN_DEFAULT_PASSWORD: hot
+    ports:
+      - 3001:80
+
   ei:
     image: hot-ei:latest
     build: ./ei
     environment:
       PORT: 80
+      ROARR_LOG: 'true'
     volumes:
       - ./ei:/app
       - ./ei/node_modules:/app/node_modules
     command: yarn start:dev
     ports:
-     - 3001:80
+     - 3002:80
