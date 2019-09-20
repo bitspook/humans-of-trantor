@@ -6,13 +6,14 @@ services:
     volumes:
       - ./docs:/app
     ports:
-     - 3000:80
+     - 3000:3000
 
   store:
     image: hot-store
     build: ./store
     volumes:
       - ./docker-volumes/store:/var/lib/postgresql/data
+      - ./store/migrations:/migrations
     ports:
       - 5432:5432
     environment:
@@ -32,6 +33,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: hot@hot.com
       PGADMIN_DEFAULT_PASSWORD: hot
+    logging:
+      driver: none
     ports:
       - 3001:80
 
