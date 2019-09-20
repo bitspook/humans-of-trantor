@@ -8,7 +8,11 @@ import { NextFunction } from 'express-serve-static-core';
 
 const port: string = process.env.PORT || '3000';
 
-const contextMiddleware = async (req: Express.Request, _res: Express.Response, next: NextFunction) => {
+const contextMiddleware = async (
+  req: Express.Request,
+  _res: Express.Response,
+  next: NextFunction,
+) => {
   try {
     const db = await getDb();
 

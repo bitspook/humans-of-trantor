@@ -3,6 +3,7 @@ import DiscoveredEmployee from './DiscoveredEmployee';
 import { sql } from 'slonik';
 
 export interface EventI {
+  id?: string;
   type: string;
   version: string;
   validate: () => Promise<void>;
@@ -10,7 +11,7 @@ export interface EventI {
 }
 
 interface Event {
-  new(version: string, payload?: any): EventI;
+  new (version: string, payload?: any): EventI;
   type: string;
 }
 
@@ -36,9 +37,14 @@ router.post('/:name', async (req, res) => {
   const event = new eventConstructor(version, payload);
   await event.validate();
 
-  const result = await db.query(sql`INSERT INTO store.events (name, version, payload) VALUES (${'name'}, ${'version'}, ${sql.json(payload)} )}`);
+  const id = (await db.oneFirst(
+    sql`INSERT INTO store.store (name, version, payload) VALUES (${'name'}, ${'version'}, ${sql.json(
+      payload,
+    )}) RETURNING (id)`,
+  )) as string;
+  event.id = id;
 
-  res.send(result);
+  res.json(event);
 });
 
 export default router;

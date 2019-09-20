@@ -21,7 +21,7 @@ const errorHandler = (err: Error, _: Request, res: Response, next: NextFunction)
     return res.status(400).json({
       status: 400,
       error: 'ValidationError',
-      message: err.message
+      message: err.message,
     });
   }
 

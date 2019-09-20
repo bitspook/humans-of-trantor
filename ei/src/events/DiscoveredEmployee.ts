@@ -36,8 +36,9 @@ class DiscoveredEmployee implements EventI {
   static versions = Object.keys(DiscoveredEmployee.schema);
 
   type = 'DISCOVERED_EMPLOYEE';
+  public id?: string;
 
-  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) { }
+  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) {}
 
   async validate() {
     if (!DiscoveredEmployee.versions.find((v) => v === this.version)) {
@@ -56,9 +57,10 @@ class DiscoveredEmployee implements EventI {
 
   toJSON() {
     return {
+      id: this.id,
       type: this.type,
       version: this.version,
-      payload: this.payload
+      payload: this.payload,
     };
   }
 }

@@ -56,8 +56,7 @@ test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type} should return validation er
   });
 });
 
-test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type} adds event to the store`, async () => {
+// TODO: Find a way to implement these tests
+// test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type} adds event to the store`, async () => {});
 
-});
-
-test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type} emits event through messaging bus`, async () => { });
+// test(`[POST] ${urlPrefix}/${DiscoveredEmployee.type} emits event through messaging bus`, async () => {});
