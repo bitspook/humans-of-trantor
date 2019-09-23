@@ -24,7 +24,7 @@ Following fields can be present in the event payload for version `v1`:
 | email       | Yes          |                               |
 | ecode       | No           |                               |
 | name        | No           |                               |
+| skypeId     | No           |                               |
 | phoneNumber | No           |                               |
 | dateOfBirth | No           |                               |
 | designation | No           |                               |
-| reportsTo   | No           | ECode of immediate supervisor |

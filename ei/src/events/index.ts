@@ -11,7 +11,7 @@ export interface EventI {
 }
 
 interface Event {
-  new (version: string, payload?: any): EventI;
+  new(version: string, payload?: any): EventI;
   type: string;
 }
 
@@ -38,7 +38,7 @@ router.post('/:name', async (req, res) => {
   await event.validate();
 
   const id = (await db.oneFirst(
-    sql`INSERT INTO store.store (name, version, payload) VALUES (${'name'}, ${'version'}, ${sql.json(
+    sql`INSERT INTO store.store (name, version, payload) VALUES (${name}, ${version}, ${sql.json(
       payload,
     )}) RETURNING (id)`,
   )) as string;

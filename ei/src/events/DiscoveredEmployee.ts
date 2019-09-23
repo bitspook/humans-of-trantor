@@ -7,10 +7,10 @@ interface DiscoveredEmployeePayloadI {
   email: string;
   ecode?: string;
   name?: string;
+  skypeId?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
   designation?: string;
-  reportsTo?: string;
 }
 
 interface EventSchema {
@@ -27,10 +27,10 @@ class DiscoveredEmployee implements EventI {
         .required(),
       ecode: yup.string(),
       name: yup.string(),
+      skypeId: yup.string(),
       phoneNumber: yup.string(),
       dateOfBirth: yup.date(),
       designation: yup.string(),
-      reportsTo: yup.string(),
     }),
   };
   static versions = Object.keys(DiscoveredEmployee.schema);
@@ -38,7 +38,7 @@ class DiscoveredEmployee implements EventI {
   type = 'DISCOVERED_EMPLOYEE';
   public id?: string;
 
-  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) {}
+  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) { }
 
   async validate() {
     if (!DiscoveredEmployee.versions.find((v) => v === this.version)) {
