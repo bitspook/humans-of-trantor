@@ -1,5 +1,6 @@
 import Router from 'express-promise-router';
 import DiscoveredEmployee from './DiscoveredEmployee';
+import ReceivedStandupUpdate from './ReceivedStandupUpdate';
 import { sql } from 'slonik';
 
 export interface EventI {
@@ -11,11 +12,11 @@ export interface EventI {
 }
 
 interface Event {
-  new(version: string, payload?: any): EventI;
+  new (version: string, payload?: any): EventI;
   type: string;
 }
 
-const events: Event[] = [DiscoveredEmployee];
+const events: Event[] = [DiscoveredEmployee, ReceivedStandupUpdate];
 
 const router = Router();
 
