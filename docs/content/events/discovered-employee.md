@@ -17,14 +17,14 @@ employee-code as unique ID of an employee, and merge rest of the employee
 details on every event.
 {{% /notice %}}
 
-Following fields can be present in the event payload:
+Following fields can be present in the event payload for version `v1`:
 
 | Field       | Is Required? | Description                   |
 | :--         | :--          | :--                           |
 | email       | Yes          |                               |
 | ecode       | No           |                               |
 | name        | No           |                               |
+| skypeId     | No           |                               |
 | phoneNumber | No           |                               |
 | dateOfBirth | No           |                               |
 | designation | No           |                               |
-| reports_to  | No           | ECode of immediate supervisor |
