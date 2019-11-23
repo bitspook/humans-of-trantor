@@ -162,6 +162,7 @@ const asyncTimeout = (time: number) =>
 module.exports = {
   name: 'discover-employees',
   alias: 'de',
+  description: 'Discover new/updated employees from Trantor Synergy portal',
   run: async (toolbox: GluegunToolbox) => {
     const { print, prompt } = toolbox;
 

@@ -33,6 +33,7 @@
     "form-data": "^2.5.1",
     "global-agent": "^2.1.1",
     "gluegun": "^2.1.0",
+    "googleapis": "^45.0.0",
     "got": "^9.6.0",
     "tough-cookie": "^3.0.1",
     "ts-node": "^7.0.1",

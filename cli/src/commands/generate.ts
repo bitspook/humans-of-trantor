@@ -3,6 +3,7 @@ import { GluegunToolbox } from 'gluegun';
 module.exports = {
   name: 'generate',
   alias: ['g'],
+  description: 'Generate stuff for HoT. Run: hot g event EVENT_NAME',
   run: async (toolbox: GluegunToolbox) => {
     const {
       parameters,
