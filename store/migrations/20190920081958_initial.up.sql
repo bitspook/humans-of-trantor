@@ -8,5 +8,6 @@ CREATE TABLE store (
   name VARCHAR (200) NOT NULL,
   version VARCHAR (16),
   payload JSON,
+  created_at TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY (ID)
 );
