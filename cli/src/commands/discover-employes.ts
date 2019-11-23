@@ -78,7 +78,7 @@ const synergyLogin = async (
       accum.append(inp.name, inp.value);
 
       return accum;
-    }, new FormData());
+    },      new FormData());
 
   formData.append(csrfHeader.name, csrfHeader.value);
 
