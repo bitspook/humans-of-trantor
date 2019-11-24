@@ -1,0 +1,8 @@
+logs
+node_modules
+.nyc_output
+coverage
+.idea
+.tern-port
+.vscode/*
+.hotrc

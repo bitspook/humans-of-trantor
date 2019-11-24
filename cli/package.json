@@ -1,0 +1,59 @@
+{
+  "name": "hot",
+  "version": "0.0.1",
+  "description": "hot CLI",
+  "private": true,
+  "bin": {
+    "hot": "bin/hot"
+  },
+  "scripts": {
+    "fmt": "prettier-tslint fix 'src/**/*.ts'",
+    "lint": "tslint -p .",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates"
+  },
+  "files": [
+    "tsconfig.json",
+    "tslint.json",
+    "build",
+    "LICENSE",
+    "readme.md",
+    "docs",
+    "bin"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@types/cheerio": "^0.22.13",
+    "@types/form-data": "^2.5.0",
+    "@types/got": "^9.6.7",
+    "@types/tough-cookie": "^2.3.5",
+    "cheerio": "^1.0.0-rc.3",
+    "fecha": "^3.0.3",
+    "form-data": "^2.5.1",
+    "global-agent": "^2.1.1",
+    "gluegun": "^2.1.0",
+    "googleapis": "^45.0.0",
+    "got": "^9.6.0",
+    "slonik": "^21.4.1",
+    "tough-cookie": "^3.0.1",
+    "ts-node": "^7.0.1",
+    "typescript": "3.2.2"
+  },
+  "devDependencies": {
+    "@types/fecha": "^2.3.1",
+    "@types/node": "^10.12.12",
+    "@types/slonik": "^19.0.2",
+    "prettier": "^1.12.1",
+    "prettier-tslint": "^0.4.2",
+    "tslint": "^5.12.0",
+    "tslint-config-airbnb": "^5.11.2",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-config-standard": "^8.0.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}
