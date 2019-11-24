@@ -35,12 +35,14 @@
     "gluegun": "^2.1.0",
     "googleapis": "^45.0.0",
     "got": "^9.6.0",
+    "slonik": "^21.4.1",
     "tough-cookie": "^3.0.1",
     "ts-node": "^7.0.1",
     "typescript": "3.2.2"
   },
   "devDependencies": {
     "@types/node": "^10.12.12",
+    "@types/slonik": "^19.0.2",
     "prettier": "^1.12.1",
     "prettier-tslint": "^0.4.2",
     "tslint": "^5.12.0",

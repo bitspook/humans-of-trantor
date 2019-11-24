@@ -1,5 +1,9 @@
 import { GluegunToolbox } from 'gluegun';
 import { promisify } from 'util';
+import { DatabaseConnectionType, sql } from 'slonik';
+
+const eventName = 'RECEIVED_STANDUP_UPDATE';
+const eventVersion = 'v1';
 
 module.exports = {
   name: 'update-timesheet',
@@ -43,7 +47,20 @@ module.exports = {
       return -1;
     }
 
-    print.colors.muted('Accessing google sheets...');
+    const areEmployeesValid = employeesToUpdate.every(
+      emp => emp.ecode && emp.sheetName && emp.project,
+    );
+
+    if (!areEmployeesValid) {
+      print.error(
+        'All standup employees should have required fields: ecode, sheetName, project',
+      );
+      return -1;
+    }
+
+    const db: DatabaseConnectionType = await toolbox.hotCloud().db();
+
+    print.colors.muted('Authorizing with google sheets...');
     const sheets = await toolbox.googleSheet();
 
     const getRows = (...args) =>
@@ -53,7 +70,23 @@ module.exports = {
 
     for (const emp of employeesToUpdate) {
       const spinnerPermaText = `Working for ${emp.sheetName}`;
-      const spinner = print.spin(spinnerPermaText);
+
+      const spinner = print.spin(
+        `${spinnerPermaText}: Requesting recorded standup updates`,
+      );
+      const standupUpdates = await db.many(sql`
+        SELECT
+          payload->>'date' AS date,
+          payload->>'standup' AS standup
+        FROM store.store
+          WHERE name = ${eventName}
+            AND version = ${eventVersion}
+            AND payload->>'ecode' = ${emp.ecode}
+            AND (payload->>'isEod')::boolean IS true
+            AND payload->>'project' = ${emp.project}
+            AND date_part('month', (payload->>'date')::Timestamp) = ${month}
+        `);
+      print.info(`\nFound ${standupUpdates.length} standup updates`);
 
       spinner.text = `${spinnerPermaText}: Obtaining sheet headers`;
       const [headers] = await getRows({

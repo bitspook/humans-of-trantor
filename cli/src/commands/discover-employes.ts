@@ -12,7 +12,6 @@ const baseHeaders = {
   'User-Agent':
     'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0',
 };
-const eiUrl = 'http://localhost:3002';
 
 const collectCookies = async (res: got.Response<any>) => {
   const cookies = new CookieJar();
@@ -136,7 +135,7 @@ const searchEmployees = async ({ cookieJar }: { cookieJar: CookieJar }) => {
   }
 };
 
-const emitDiscoveredEmployee = employee => {
+const emitDiscoveredEmployee = (employee: any, eiUrl: string) => {
   const publishEventUrl = `${eiUrl}/events/DISCOVERED_EMPLOYEE`;
 
   return got(publishEventUrl, {
@@ -164,7 +163,15 @@ module.exports = {
   alias: 'de',
   description: 'Discover new/updated employees from Trantor Synergy portal',
   run: async (toolbox: GluegunToolbox) => {
-    const { print, prompt } = toolbox;
+    const { print, prompt, config } = toolbox;
+
+    const eiUrl =
+      config.hotCloud && config.hotCloud.urls && config.hotCloud.urls.ei;
+    if (!eiUrl) {
+      print.error('Please add `hotCloud.urls.ei` to your .hotrc');
+
+      return -1;
+    }
 
     print.info('Will search for employees via Trantor Synergy Portal.');
     print.info('Please provide your Trantor Synergy Credentials: ');
@@ -200,7 +207,7 @@ module.exports = {
     );
     for (const emp of employees.data) {
       try {
-        await emitDiscoveredEmployee(emp);
+        await emitDiscoveredEmployee(emp, eiUrl);
         await asyncTimeout(50);
         spinner.text = print.colors.cyan(`${remaining} remaining`);
         remaining -= 1;
