@@ -8,7 +8,7 @@ interface ReceivedStandupUpdatePayloadI {
   project: string;
   standup: string;
   date: string;
-  isEod: boolean;
+  type: 'committed' | 'delivered';
 }
 
 interface EventSchema {
@@ -22,7 +22,7 @@ class ReceivedStandupUpdate implements EventI {
       ecode: yup.string().required(),
       project: yup.string().required(),
       standup: yup.string().required(),
-      isEod: yup.boolean().required(),
+      type: yup.string().oneOf(['committed', 'delivered']).required(),
       date: yup.date().required(),
     }),
   };
@@ -31,7 +31,7 @@ class ReceivedStandupUpdate implements EventI {
   type = ReceivedStandupUpdate.type;
   public id?: string;
 
-  constructor(public version: string, public payload: ReceivedStandupUpdatePayloadI) {}
+  constructor(public version: string, public payload: ReceivedStandupUpdatePayloadI) { }
 
   async validate() {
     if (!ReceivedStandupUpdate.versions.find((v) => v === this.version)) {

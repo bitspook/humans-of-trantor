@@ -81,23 +81,25 @@ module.exports = {
       sheets.spreadsheets.values.update.bind(sheets),
     );
 
-    for (const employee of employeesToUpdate) {
+    for (const employee of (employeesToUpdate as StandupEmployee[])) {
       const spinnerPermaText = `[${employee.sheetName}]`;
 
       let spinner = print.spin(
         `${spinnerPermaText}: Requesting recorded standup updates`,
       );
       const standupRows = await db.many(sql`
-        SELECT
-          payload->>'date' AS date,
-          payload->>'standup' AS standup
-        FROM store.store
-          WHERE name = ${eventName}
-            AND version = ${eventVersion}
-            AND payload->>'ecode' = ${employee.ecode}
-            AND (payload->>'isEod')::boolean IS true
-            AND payload->>'project' = ${employee.project}
-            AND date_part('month', (payload->>'date')::Timestamp) = ${month}
+        SELECT DISTINCT ON (payload->>'date', payload->>'type')
+          payload->>'date' as date,
+          payload->>'standup' as standup
+          FROM (
+            SELECT payload from store.store
+            WHERE name = ${eventName}
+              AND version = ${eventVersion}
+              AND payload->>'type' = 'delivered'
+              AND payload->>'ecode' = ${employee.ecode}
+              AND date_part('month', (payload->>'date')::Timestamp) = ${month}
+              ORDER BY created_at DESC
+          ) AS store
         `);
       spinner.succeed(
         `${spinnerPermaText}: Found ${standupRows.length} updates`,
