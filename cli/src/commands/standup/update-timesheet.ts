@@ -134,15 +134,15 @@ module.exports = {
               );
 
               // print only those rows which have a new value to update
-              return r.length ? row : [];
+              return r.join('') ? row : [];
             })
-            .filter(r => r.join('')),
+            .filter(r => r.length),
         ],
         { format: 'lean', border: true },
       );
 
       spinner = print.spin(`${spinnerPermaText}: Updating timesheet`);
-      updateSheet({
+      await updateSheet({
         spreadsheetId,
         range: `${employee.sheetName}!A1:Z50`,
         valueInputOption: 'RAW',
