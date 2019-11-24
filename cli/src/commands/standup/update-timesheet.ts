@@ -1,9 +1,19 @@
 import { GluegunToolbox } from 'gluegun';
 import { promisify } from 'util';
 import { DatabaseConnectionType, sql } from 'slonik';
+const fecha = require('fecha');
+
+const { format } = fecha;
 
 const eventName = 'RECEIVED_STANDUP_UPDATE';
 const eventVersion = 'v1';
+
+interface StandupEmployee {
+  ecode: string;
+  sheetName: string;
+  project: string;
+  hoursSpent: string;
+}
 
 module.exports = {
   name: 'update-timesheet',
@@ -48,12 +58,12 @@ module.exports = {
     }
 
     const areEmployeesValid = employeesToUpdate.every(
-      emp => emp.ecode && emp.sheetName && emp.project,
+      emp => emp.ecode && emp.sheetName && emp.project && emp.hoursSpent,
     );
 
     if (!areEmployeesValid) {
       print.error(
-        'All standup employees should have required fields: ecode, sheetName, project',
+        'All standup employees should have required fields: ecode, sheetName, project, hoursSpent',
       );
       return -1;
     }
@@ -63,53 +73,135 @@ module.exports = {
     print.colors.muted('Authorizing with google sheets...');
     const sheets = await toolbox.googleSheet();
 
-    const getRows = (...args) =>
+    const getSheetRows = (...args) =>
       promisify(sheets.spreadsheets.values.get.bind(sheets))(...args).then(
         (v: any) => v.data.values,
       );
+    const updateSheet = promisify(
+      sheets.spreadsheets.values.update.bind(sheets),
+    );
 
-    for (const emp of employeesToUpdate) {
-      const spinnerPermaText = `Working for ${emp.sheetName}`;
+    for (const employee of employeesToUpdate) {
+      const spinnerPermaText = `[${employee.sheetName}]`;
 
-      const spinner = print.spin(
+      let spinner = print.spin(
         `${spinnerPermaText}: Requesting recorded standup updates`,
       );
-      const standupUpdates = await db.many(sql`
+      const standupRows = await db.many(sql`
         SELECT
           payload->>'date' AS date,
           payload->>'standup' AS standup
         FROM store.store
           WHERE name = ${eventName}
             AND version = ${eventVersion}
-            AND payload->>'ecode' = ${emp.ecode}
+            AND payload->>'ecode' = ${employee.ecode}
             AND (payload->>'isEod')::boolean IS true
-            AND payload->>'project' = ${emp.project}
+            AND payload->>'project' = ${employee.project}
             AND date_part('month', (payload->>'date')::Timestamp) = ${month}
         `);
-      print.info(`\nFound ${standupUpdates.length} standup updates`);
+      spinner.succeed(
+        `${spinnerPermaText}: Found ${standupRows.length} updates`,
+      );
 
-      spinner.text = `${spinnerPermaText}: Obtaining sheet headers`;
-      const [headers] = await getRows({
+      spinner = print.spin(`${spinnerPermaText}: Downloading timesheet`);
+      const sheetRows = await getSheetRows({
         spreadsheetId,
-        range: `${emp.sheetName}!A1:Z1`,
+        range: `${employee.sheetName}!A1:Z50`,
+      });
+      spinner.succeed(`${spinnerPermaText}: Downloaded timesheet!`);
+
+      spinner = print.spin(
+        `${spinnerPermaText}: Preparing payload to update standup sheet`,
+      );
+      const sheetUpdatePayload = buildGSheetUpdatePayload({
+        toolbox,
+        sheetRows,
+        standupRows,
+        employee,
       });
 
-      const dateCol = String.fromCharCode(
-        65 + headers.findIndex((h: any) => /date/i.test(h)),
-      );
-      const taskCol = String.fromCharCode(
-        65 + headers.findIndex((h: any) => /task/i.test(h)),
-      );
-      const isBillableCol = String.fromCharCode(
-        65 + headers.findIndex((h: any) => /type/i.test(h)),
-      );
-      const hoursCol = String.fromCharCode(
-        65 + headers.findIndex((h: any) => /hours/i.test(h)),
+      spinner.succeed(`${spinnerPermaText}: Timesheet update payload ready!`);
+
+      print.table(
+        [
+          sheetRows[0],
+          ...sheetUpdatePayload
+            .map((r, ri) => {
+              const row = sheetRows[0].map((x, i) =>
+                /s.*no/i.test(x) ? ri : r[i] || '',
+              );
+
+              // print only those rows which have a new value to update
+              return r.length ? row : [];
+            })
+            .filter(r => r.join('')),
+        ],
+        { format: 'lean', border: true },
       );
 
-      spinner.text = `${spinnerPermaText}: Found columns: ${dateCol} ${taskCol} ${isBillableCol} ${hoursCol}`;
+      spinner = print.spin(`${spinnerPermaText}: Updating timesheet`);
+      updateSheet({
+        spreadsheetId,
+        range: `${employee.sheetName}!A1:Z50`,
+        valueInputOption: 'RAW',
+        resource: { values: sheetUpdatePayload },
+      });
 
-      spinner.succeed(`${spinnerPermaText}: Done!`);
+      spinner.succeed(`${spinnerPermaText}: Timesheet updated!`);
     }
   },
+};
+
+const buildGSheetUpdatePayload = ({
+  toolbox,
+  sheetRows,
+  standupRows,
+  employee,
+}: {
+  toolbox: GluegunToolbox
+  sheetRows: any[]
+  standupRows: any[]
+  employee: StandupEmployee,
+}) => {
+  const headers = sheetRows[0];
+
+  const dateColIndex = headers.findIndex((h: any) => /date/i.test(h));
+  const taskColIndex = headers.findIndex((h: any) => /task/i.test(h));
+  const isBillableColIndex = headers.findIndex((h: any) => /type/i.test(h));
+  const hoursColIndex = headers.findIndex((h: any) => /hours/i.test(h));
+
+  const values = sheetRows.map((cols, index) => {
+    if (index === 0) {
+      // do nothing for header row
+      return [];
+    }
+
+    const date = new Date(cols[dateColIndex]);
+
+    if (date.toString() === 'Invalid Date') {
+      toolbox.print.colors.warning(
+        `\nInvalid date: ${date} found in timesheet for row: ${index + 1}`,
+      );
+      return [];
+    }
+
+    const standup = standupRows.find(
+      ({ date: d }) => d === format(date, 'YYYY-MM-DD'),
+    );
+
+    if (!standup) {
+      toolbox.print.colors.dim(`Could not find standup for date: ${date}`);
+
+      return [];
+    }
+
+    const valuesRow = [];
+    valuesRow[taskColIndex] = cols[taskColIndex] ? null : standup.standup;
+    valuesRow[isBillableColIndex] = cols[isBillableColIndex] ? null : 'Billable';
+    valuesRow[hoursColIndex] = cols[hoursColIndex] ? null : employee.hoursSpent;
+
+    return valuesRow;
+  });
+
+  return values;
 };

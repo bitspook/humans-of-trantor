@@ -30,6 +30,7 @@
     "@types/got": "^9.6.7",
     "@types/tough-cookie": "^2.3.5",
     "cheerio": "^1.0.0-rc.3",
+    "fecha": "^3.0.3",
     "form-data": "^2.5.1",
     "global-agent": "^2.1.1",
     "gluegun": "^2.1.0",
@@ -41,6 +42,7 @@
     "typescript": "3.2.2"
   },
   "devDependencies": {
+    "@types/fecha": "^2.3.1",
     "@types/node": "^10.12.12",
     "@types/slonik": "^19.0.2",
     "prettier": "^1.12.1",
