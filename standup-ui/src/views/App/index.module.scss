@@ -1,0 +1,30 @@
+$color-sep-border: rgba(0,0,0,.2);
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  min-height: calc(100vh - 4em);
+  width: 95%;
+  margin: 2em auto;
+  border: 1px solid $color-sep-border;
+  border-radius: 0.8em;
+}
+
+.employeesListSidebar {
+  flex-grow: 0.2;
+  border-right: 1px solid $color-sep-border;
+}
+
+.standupForm {
+  flex-grow: 0.5;
+  padding: 1em;
+}
+
+.employeeTimeline {
+  flex-grow: 3;
+}
