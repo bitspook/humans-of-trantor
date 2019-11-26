@@ -1,19 +1,19 @@
 import { createAction, createSlice } from 'redux-starter-kit';
 
-const searchContacts = createAction('searchContacts');
+const selectEmployee = createAction('selectEmployee');
 
 export interface AppState {
-  contactsSearchFor: string
+  selectedEmployee: string;
 }
 
 export default createSlice({
   initialState: {
-    contactsSearchFor: '',
+    selectedEmployee: 'E00916'
   },
   reducers: {
-    [searchContacts.type]: (state: any, action) => {
-      state.contactsSearchFor = action.payload;
-    },
+    [selectEmployee.type]: (state: any, action) => {
+      state.selectedEmployee = action.payload.ecode;
+    }
   },
   name: 'app'
 });

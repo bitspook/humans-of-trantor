@@ -1,21 +1,28 @@
 import { createSlice } from 'redux-starter-kit';
 
 export interface Employee {
-  eCode: string;
+  ecode: string;
   name: string;
   avatar?: string;
 }
 
 const cloudEmployees: Employee[] = [
   {
-    eCode: 'E00916',
+    ecode: 'E00916',
     name: 'Charanjit Singh'
+  },
+  {
+    ecode: 'E00911',
+    name: 'Krishan Saini'
+  },
+  {
+    ecode: 'E00958',
+    name: 'Kajal Rani'
   }
 ];
 
 export default createSlice({
   name: 'employees',
   initialState: cloudEmployees,
-  reducers: {
-  },
+  reducers: {}
 });
