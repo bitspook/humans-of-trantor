@@ -1,13 +1,5 @@
 version: '3'
 services:
-  docs:
-    image: hot-docs
-    build: ./docs
-    volumes:
-      - ./docs:/app
-    ports:
-     - 3000:3000
-
   store:
     image: hot-store
     build: ./store
@@ -28,6 +20,14 @@ services:
     volumes:
       - ./data/hot/redis:/data
 
+  docs:
+    image: hot-docs
+    build: ./docs
+    volumes:
+      - ./docs:/app
+    ports:
+     - 7000:3000
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -36,7 +36,7 @@ services:
     logging:
       driver: none
     ports:
-      - 3001:80
+      - 7001:80
 
   ei:
     image: hot-ei:latest
@@ -49,4 +49,16 @@ services:
       - ./ei/node_modules:/app/node_modules
     command: yarn start:dev
     ports:
-     - 3002:80
+     - 7002:80
+
+  standup-ui:
+    image: standup-ui:latest
+    build: ./standup-ui
+    environment:
+      PORT: 80
+    volumes:
+      - ./standup-ui:/app
+      - ./standup-ui/node_modules:/app/node_modules
+    command: yarn start
+    ports:
+     - 7003:80
