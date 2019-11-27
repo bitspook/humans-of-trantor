@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+
 import EmployeesList from 'src/components/EmployeesList';
-import StandupForm from 'src/components/StandupForm';
+import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import { Employee } from 'src/ducks/employees';
-import { State } from '../../reducer';
+import { State } from 'src/reducer';
+
 import c from './index.module.scss';
 import { Dispatch, bindActionCreators } from 'redux';
 import duck from './duck';
@@ -15,6 +17,33 @@ interface AppDataProps {
 
 interface AppCbProps {
   selectEmployee: (e: Employee) => void;
+}
+
+const handleSaveStandup = (employee?: Employee) => (standup: StandupFormValues) => {
+  if (!employee) {
+    throw new Error('Employee is needed to save standup');
+  }
+
+  const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
+
+  return Promise.all(Object.keys(standup).map((type) => {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        version: 'v1',
+        payload: {
+          ecode: employee.ecode,
+          date: type === 'delivered' ? standup.delivered.date : standup.committed.date,
+          type,
+          standup: type === 'delivered' ? standup.delivered.standup : standup.committed.standup,
+          project: 'Veriown'
+        }
+      })
+    });
+  }));
 }
 
 const App: React.FC<AppDataProps & AppCbProps> = ({
@@ -34,7 +63,7 @@ const App: React.FC<AppDataProps & AppCbProps> = ({
         </div>
 
         <div className={c.standupForm}>
-          <StandupForm onSave={v => console.log(v)} />
+          <StandupForm onSave={handleSaveStandup(employees.find((e) => e.ecode === selectedEmployee))} />
         </div>
       </div>
     </div>
