@@ -1,6 +1,7 @@
 import 'module-alias/register';
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors'
 import events from '@src/events';
 import errorHandler from '@src/errorHandler';
 import getDb from '@src/db';
@@ -26,6 +27,7 @@ const contextMiddleware = async (
 const app: Express = express();
 app.use(bodyParser.json());
 app.use(contextMiddleware);
+app.use(cors())
 
 app.use('/events', events);
 app.use(errorHandler);
