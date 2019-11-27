@@ -67,7 +67,12 @@ const SemanticInputField = (props: FieldProps & SemanticFieldProps) => {
   return (
     <Form.Field error={Boolean(error)}>
       <label>{props.label}</label>
-      <Input {...props.field} fluid={props.fluid} type={props.type} />
+      <Input
+        {...props.field}
+        fluid={props.fluid}
+        type={props.type}
+        disabled={props.form.isSubmitting}
+      />
       {error && <span className={c.error}>{error}</span>}
     </Form.Field>
   );
@@ -81,14 +86,18 @@ const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
   return (
     <Form.Field error={Boolean(error)}>
       <label>{props.label}</label>
-      <TextArea {...props.field} fluid={props.fluid} />
+      <TextArea
+        {...props.field}
+        fluid={props.fluid}
+        disabled={props.form.isSubmitting}
+      />
       {error && <span className={c.error}>{error}</span>}
     </Form.Field>
   );
 };
 
 const InnerForm: React.FC<FormikProps<StandupFormValues>> = props => (
-  <Form onSubmit={props.handleSubmit}>
+  <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
     <h2>Delivered</h2>
     <Field
       component={SemanticInputField}
@@ -115,7 +124,7 @@ const InnerForm: React.FC<FormikProps<StandupFormValues>> = props => (
       label="Standup"
     />
 
-    <Button primary={true} type="submit">
+    <Button primary={true} type="submit" disabled={props.isSubmitting}>
       Save
     </Button>
   </Form>
