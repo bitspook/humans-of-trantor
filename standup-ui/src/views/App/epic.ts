@@ -59,10 +59,11 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
 
         return duck.actions.fullfillSaveStandup();
       } catch (err) {
+        console.error('Error while saving standup', err);
         helpers.setSubmitting(false);
 
         return duck.actions.failSaveStandup(
-          `${err.error} (${err.status}): ${err.message}`
+          `${err.message}`
         );
       }
     })
