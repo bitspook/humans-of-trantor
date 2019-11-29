@@ -1,40 +1,57 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Message } from 'semantic-ui-react';
+
 import EmployeesList from 'src/components/EmployeesList';
-import StandupForm from 'src/components/StandupForm';
+import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import { Employee } from 'src/ducks/employees';
-import { State } from '../../reducer';
+import { State } from 'src/reducer';
+
 import c from './index.module.scss';
 import { Dispatch, bindActionCreators } from 'redux';
-import duck from './duck';
+import duck, { SaveStandupPayload } from './duck';
+import { FormikHelpers } from 'formik';
 
 interface AppDataProps {
   employees: Employee[];
   selectedEmployee: string;
+  saveStandupError: string;
 }
 
 interface AppCbProps {
   selectEmployee: (e: Employee) => void;
+  startSaveStandup: (payload: SaveStandupPayload) => void;
 }
 
-const App: React.FC<AppDataProps & AppCbProps> = ({
-  employees,
-  selectEmployee,
-  selectedEmployee
-}) => {
+const App: React.FC<AppDataProps & AppCbProps> = p => {
+  const handleSaveStandup = (ecode: string) => (
+    standup: StandupFormValues,
+    helpers: FormikHelpers<StandupFormValues>
+  ) => {
+    p.startSaveStandup({ ecode, standup, helpers });
+  };
+
   return (
     <div className={c.root}>
       <div className={c.container}>
         <div className={c.employeesListSidebar}>
           <EmployeesList
-            selectedEmployee={selectedEmployee}
-            employees={employees}
-            onSelect={selectEmployee}
+            selectedEmployee={p.selectedEmployee}
+            employees={p.employees}
+            onSelect={p.selectEmployee}
           />
         </div>
 
         <div className={c.standupForm}>
-          <StandupForm onSave={v => console.log(v)} />
+          <StandupForm onSave={handleSaveStandup(p.selectedEmployee)} />
+
+          {p.saveStandupError && (
+            <Message
+              error
+              header="Failed to save standup 😞"
+              content={p.saveStandupError}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -42,7 +59,7 @@ const App: React.FC<AppDataProps & AppCbProps> = ({
 };
 
 const mapState = (state: State): AppDataProps => ({
-  selectedEmployee: state.app.selectedEmployee,
+  ...state.app,
   employees: state.employees
 });
 

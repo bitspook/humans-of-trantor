@@ -2,14 +2,25 @@ import { History } from 'history';
 import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { combineReducers } from 'redux';
 import { configureStore } from 'redux-starter-kit';
+import { createEpicMiddleware } from 'redux-observable';
+import rootEpic from './epic';
 import reducers from './reducer';
 
-const createReducers = (history: History<any>) => combineReducers({
-  router: connectRouter(history),
-  ...reducers,
-});
+const epicMiddleware = createEpicMiddleware();
 
-export default (history: History<any>) => configureStore({
-  middleware: [routerMiddleware(history)],
-  reducer: createReducers(history),
-});
+const createReducers = (history: History<any>) =>
+  combineReducers({
+    router: connectRouter(history),
+    ...reducers
+  });
+
+export default (history: History<any>) => {
+  const store = configureStore({
+    middleware: [routerMiddleware(history), epicMiddleware],
+    reducer: createReducers(history)
+  });
+
+  epicMiddleware.run(rootEpic);
+
+  return store;
+};
