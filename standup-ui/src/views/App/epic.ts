@@ -34,7 +34,7 @@ const saveStandup = (ecode: string, standup: StandupFormValues) => {
       })
         .then(res => res.json())
         .then(res => {
-          if (!!res.id) {
+          if (!res.id) {
             throw res;
           }
         });
