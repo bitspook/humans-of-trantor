@@ -6,5 +6,5 @@ import com.typesafe.scalalogging.StrictLogging
 class StandupService(
     standupModel: StandupModel
 ) extends StrictLogging {
-  def find(ecode: Option[String]): ConnectionIO[List[Standup]] = standupModel.find(ecode)
+  def find(ecode: Option[String], month: Option[Int]): ConnectionIO[List[Standup]] = standupModel.find(ecode, month)
 }
