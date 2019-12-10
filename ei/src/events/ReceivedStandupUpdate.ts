@@ -22,7 +22,7 @@ class ReceivedStandupUpdate implements EventI {
       ecode: yup.string().required(),
       project: yup.string().required(),
       standup: yup.string().required(),
-      type: yup.string().oneOf(['committed', 'delivered']).required(),
+      type: yup.string().oneOf(['committed', 'delivered', 'impediment']).required(),
       date: yup.date().required(),
     }),
   };

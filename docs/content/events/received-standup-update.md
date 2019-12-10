@@ -20,10 +20,10 @@ replace old standup update with a more recent one for a given date.
 
 Following fields can be present in the event payload:
 
-| Field   | Is Required? | Description                                      | Type     |
-| :--     | :--          | :--                                              | :--      |
-| ecode   | Yes          | ECode of employee                                | String   |
-| project | Yes          | Project name                                     | String   |
-| standup | Yes          | Content of the update itself                     | String   |
-| date    | Yes          | Date for which this standup update is applicable | DateTime |
-| isEod   | Yes          | Is this update for end of day                    | Boolean  |
+| Field   | Is Required? | Description                                      | Type                               |
+| :--     | :--          | :--                                              | :--                                |
+| ecode   | Yes          | ECode of employee                                | String                             |
+| project | Yes          | Project name                                     | String                             |
+| standup | Yes          | Content of the update itself                     | String                             |
+| date    | Yes          | Date for which this standup update is applicable | DateTime                           |
+| type    | Yes          | The type of the standup                          | [committed, delivered, impediment] |
