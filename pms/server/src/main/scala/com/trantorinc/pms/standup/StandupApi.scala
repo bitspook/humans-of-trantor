@@ -7,6 +7,7 @@ import com.trantorinc.pms.infrastructure.Json._
 import com.trantorinc.pms.util.ServerEndpoints
 import doobie.util.transactor.Transactor
 import monix.eval.Task
+import sttp.tapir.{EndpointInput, query}
 
 class StandupApi(http: Http, standupService: StandupService, xa: Transactor[Task]) {
   import StandupApi._
@@ -16,11 +17,12 @@ class StandupApi(http: Http, standupService: StandupService, xa: Transactor[Task
 
   private val getStandupEndpoint = baseEndpoint.get
     .in(StandupPath)
+    .in(ecode)
     .out(jsonBody[GetStandup_OUT])
-    .serverLogic { _ =>
+    .serverLogic { (ecode) =>
       (for {
-        standup <- standupService.findByType("1").transact(xa)
-      } yield GetStandup_OUT(standup = standup.standup)).toOut
+        standup <- standupService.find(ecode).transact(xa)
+      } yield GetStandup_OUT(data = standup)).toOut
     }
 
   val endpoints: ServerEndpoints =
@@ -32,5 +34,8 @@ class StandupApi(http: Http, standupService: StandupService, xa: Transactor[Task
 }
 
 object StandupApi {
-  case class GetStandup_OUT(standup: String)
+  val ecode: EndpointInput[Option[String]] = query[Option[String]]("ecode")
+
+  case class GetStandup_IN(ecode: Option[String])
+  case class GetStandup_OUT(data: List[Standup])
 }

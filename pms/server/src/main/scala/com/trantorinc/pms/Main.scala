@@ -28,7 +28,7 @@ object Main extends StrictLogging {
 
         /*
         Sequencing two tasks using the >> operator:
-        - the first starts the background processes (such as an standupType sender)
+        - the first starts the background processes (such as an ecode sender)
         - the second alocates the http api resource, and never releases it (so that the http server is available
           as long as our application runs)
          */

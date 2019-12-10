@@ -9,4 +9,4 @@ rest of the team about:
 
 1. What they accomplished the last working day
 2. What they are working on today
-3. If there are facing any impediments
+3. If they are facing any impediments
