@@ -18,7 +18,7 @@ class StandupApi(http: Http, standupService: StandupService, xa: Transactor[Task
   private val getStandupEndpoint = baseEndpoint.get
     .in(StandupPath.and(ecode).and(month))
     .out(jsonBody[GetStandup_OUT])
-    .serverLogic { q =>
+    .serverLogic {q =>
       (for {
         standup <- standupService.find(q._1, q._2).transact(xa)
       } yield GetStandup_OUT(data = standup)).toOut
