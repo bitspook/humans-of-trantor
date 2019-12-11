@@ -81,7 +81,7 @@ module.exports = {
       sheets.spreadsheets.values.update.bind(sheets),
     );
 
-    for (const employee of (employeesToUpdate as StandupEmployee[])) {
+    for (const employee of employeesToUpdate as StandupEmployee[]) {
       const spinnerPermaText = `[${employee.sheetName}]`;
 
       let spinner = print.spin(
