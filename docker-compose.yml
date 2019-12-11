@@ -35,6 +35,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: hot
     logging:
       driver: none
+    volumes:
+      - ./docker-volumes/pgadmin:/var/lib/pgadmin
     ports:
       - 7001:80
 
