@@ -19,12 +19,12 @@ details on every event.
 
 Following fields can be present in the event payload for version `v1`:
 
-| Field       | Is Required? | Description                   |
-| :--         | :--          | :--                           |
-| email       | Yes          |                               |
-| ecode       | No           |                               |
-| name        | No           |                               |
-| skypeId     | No           |                               |
-| phoneNumber | No           |                               |
-| dateOfBirth | No           |                               |
-| designation | No           |                               |
+| Field       | Is Required? | Description |
+| :--         | :--          | :--         |
+| email       | Yes          |             |
+| ecode       | Yes          |             |
+| name        | Yes          |             |
+| skypeId     | No           |             |
+| phoneNumber | No           |             |
+| dateOfBirth | No           |             |
+| designation | No           |             |

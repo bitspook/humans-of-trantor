@@ -5,8 +5,8 @@ import * as yup from 'yup';
 
 interface DiscoveredEmployeePayloadI {
   email: string;
-  ecode?: string;
-  name?: string;
+  ecode: string;
+  name: string;
   skypeId?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
@@ -25,8 +25,8 @@ class DiscoveredEmployee implements EventI {
         .string()
         .email()
         .required(),
-      ecode: yup.string(),
-      name: yup.string(),
+      ecode: yup.string().required(),
+      name: yup.string().required(),
       skypeId: yup.string(),
       phoneNumber: yup.string(),
       dateOfBirth: yup.date(),
@@ -38,7 +38,7 @@ class DiscoveredEmployee implements EventI {
   type = 'DISCOVERED_EMPLOYEE';
   public id?: string;
 
-  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) {}
+  constructor(public version: string, public payload: DiscoveredEmployeePayloadI) { }
 
   async validate() {
     if (!DiscoveredEmployee.versions.find((v) => v === this.version)) {

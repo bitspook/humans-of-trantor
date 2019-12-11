@@ -12,13 +12,7 @@ const emitDiscoveredEmployee = (employee: any, eiUrl: string) => {
     },
     body: JSON.stringify({
       version: 'v1',
-      payload: {
-        email: employee.emailAddress,
-        name: `${employee.firstName} ${employee.lastName}`,
-        designation: employee.designation,
-        skypeId: employee.skypeId,
-        project: employee.projectName,
-      },
+      payload: employee,
     }),
   });
 };
@@ -84,7 +78,7 @@ module.exports = {
         spinner.text = print.colors.cyan(`${remaining} remaining`);
         remaining -= 1;
       } catch (err) {
-        print.error(`Failed to emit event for employee: ${emp.emailAddress}`);
+        print.error(`Failed to emit event for employee: ${emp.name} (${emp.ecode})`);
       }
     }
     spinner.succeed('Done!');
