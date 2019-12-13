@@ -5,13 +5,20 @@ import { map, mergeMap } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
 import duck, { SaveStandupPayload } from './duck';
 import standupDuck from 'src/ducks/standup';
+import { Dayjs } from 'dayjs';
 
-const saveStandup = (ecode: string, standup: StandupFormValues) => {
+const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
 
+  const standups = [
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'committed', standup: values.committed },
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'impediment', standup: values.impediment },
+  ];
+
   return Promise.all(
-    Object.keys(standup).map((type) => {
-      return fetch(url, {
+    standups.map(async (standup) => {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -19,20 +26,18 @@ const saveStandup = (ecode: string, standup: StandupFormValues) => {
         body: JSON.stringify({
           version: 'v1',
           payload: {
-            ecode,
-            date: type === 'delivered' ? standup.delivered.date : standup.committed.date,
-            type,
-            standup: type === 'delivered' ? standup.delivered.standup : standup.committed.standup,
+            ...standup,
             project: 'Veriown',
           },
         }),
       })
-        .then((res) => res.json())
-        .then((res) => {
-          if (!res.id) {
-            throw res;
-          }
-        });
+        .then((res) => res.json());
+
+      if (!res.id) {
+        throw res;
+      }
+
+      return res;
     }),
   );
 };
@@ -43,12 +48,12 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
     ofType(actions.startSaveStandup),
     mergeMap(async ({ payload }) => {
-      const { ecode, standup, helpers } = payload as SaveStandupPayload;
+      const { ecode, standup, helpers, day } = payload as SaveStandupPayload;
 
       helpers.setSubmitting(true);
 
       try {
-        await saveStandup(ecode, standup);
+        await saveStandup(ecode, day, standup);
 
         helpers.setSubmitting(false);
         helpers.resetForm();

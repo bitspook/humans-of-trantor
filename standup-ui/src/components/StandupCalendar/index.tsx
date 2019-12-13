@@ -1,6 +1,7 @@
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 import { List } from 'semantic-ui-react';
+import { Standup } from 'src/ducks/standup';
 import c from './index.module.scss';
 
 interface CalendarListItemProps {
@@ -27,7 +28,7 @@ const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps
 };
 
 interface DataProps {
-  days: Dayjs[];
+  standup: Standup[];
   selectedDay: Dayjs;
 }
 
@@ -35,21 +36,33 @@ interface CbProps {
   onSelect: (e: Dayjs) => void;
 }
 
-const StandupCalendarList: React.FC<DataProps & CbProps> = (p) => {
-  const days = p.days.map((d) => (
+const calendarDays = () => {
+  const today = dayjs(new Date());
+
+  const calDays = [];
+
+  for (let i = 0; i < 31; i += 1) {
+    calDays.push(today.subtract(i, 'day'));
+  }
+
+  return calDays;
+};
+
+const StandupCalendar: React.FC<DataProps & CbProps> = (p) => {
+  const days = calendarDays().map((d) => (
     <CalendarListItem
       day={d}
       key={d.unix()}
       onClick={p.onSelect}
-      isHighlighted={d.isSame(p.selectedDay)}
+      isHighlighted={d.isSame(p.selectedDay, 'day')}
     />
   ));
 
   return (
-    <List selection={true} relaxed={true} divided={true} verticalAlign='middle' size='big'>
+    <List selection={true} relaxed={true} divided={true} verticalAlign='middle' size='medium'>
       {days}
     </List>
   );
 };
 
-export default StandupCalendarList;
+export default StandupCalendar;

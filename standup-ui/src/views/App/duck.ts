@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { StandupFormValues } from 'src/components/StandupForm';
 
 export interface SaveStandupPayload {
+  day: Dayjs;
   ecode: string;
   standup: StandupFormValues;
   helpers: FormikHelpers<StandupFormValues>;

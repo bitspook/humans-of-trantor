@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Message } from 'semantic-ui-react';
@@ -6,22 +6,27 @@ import { Message } from 'semantic-ui-react';
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
-import StandupCalendarList from 'src/components/StandupCalendarList';
+import StandupCalendar from 'src/components/StandupCalendar';
 import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
+import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
 import c from './index.module.scss';
 
 interface AppDataProps {
   employees: Employee[];
+  selectedDay: Dayjs;
   selectedEmployee: string;
   saveStandupError: string;
+  standup: Standup[];
+  initialStandupFormValue: StandupFormValues;
 }
 
 interface AppCbProps {
   fetchEmployeesStart: (project: string) => void;
+  selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
   startSaveStandup: (payload: SaveStandupPayload) => void;
 }
@@ -31,7 +36,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     standup: StandupFormValues,
     helpers: FormikHelpers<StandupFormValues>,
   ) => {
-    p.startSaveStandup({ ecode, standup, helpers });
+    p.startSaveStandup({ ecode, standup, helpers, day: p.selectedDay });
   };
 
   useEffect(() => {
@@ -41,18 +46,6 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   const maybeError = p.saveStandupError && (
     <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />
   );
-
-  const calendarDays = () => {
-    const today = dayjs(new Date());
-
-    const calDays = [];
-
-    for (let i = 0; i < 31; i += 1) {
-      calDays.push(today.subtract(i, 'day'));
-    }
-
-    return calDays;
-  };
 
   return (
     <div className={c.root}>
@@ -66,15 +59,18 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
         </div>
 
         <div className={c.calendar}>
-          <StandupCalendarList
-            days={calendarDays()}
-            onSelect={(day) => console.warn('SELECTED', day)}
-            selectedDay={dayjs(new Date())}
+          <StandupCalendar
+            standup={p.standup}
+            onSelect={p.selectDay}
+            selectedDay={p.selectedDay}
           />
         </div>
 
         <div className={c.standupForm}>
-          <StandupForm onSave={handleSaveStandup(p.selectedEmployee)} />
+          <StandupForm
+            initialValues={p.initialStandupFormValue}
+            onSave={handleSaveStandup(p.selectedEmployee)}
+          />
 
           {maybeError}
         </div>
@@ -83,10 +79,22 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   );
 };
 
-const mapState = (state: State): AppDataProps => ({
-  ...state.app,
-  employees: state.employees.data,
-});
+const mapState = (state: State): AppDataProps => {
+  const activeStandup = state.standup.data
+    .filter((s) => s.ecode === state.app.selectedEmployee && s.date.isSame(state.app.selectedDay, 'day'));
+  const initialStandupFormValue = {
+    committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' }).standup,
+    delivered: (activeStandup.find((s) => s.standupType === 'delivered') || { standup: '' }).standup,
+    impediment: (activeStandup.find((s) => s.standupType === 'impediment') || { standup: '' }).standup,
+  };
+
+  return {
+    ...state.app,
+    employees: state.employees.data,
+    initialStandupFormValue,
+    standup: state.standup.data.filter((s) => s.ecode === state.app.selectedEmployee),
+  };
+};
 
 const mapDispatch = (dispatch: Dispatch): AppCbProps => ({
   ...bindActionCreators(duck.actions, dispatch),
