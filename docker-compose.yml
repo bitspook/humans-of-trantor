@@ -64,3 +64,24 @@ services:
     command: yarn start
     ports:
      - 7003:80
+
+  pms:
+    image: 'pms:latest'
+    build: ./pms
+    environment:
+      DB_USERNAME: 'hot'
+      DB_PASSWORD: 'hot'
+      DB_NAME: 'hot'
+      DB_HOST: 'store'
+      DB_PORT: '5432'
+      HOST: '0.0.0.0'
+      PORT: '80'
+    ports:
+      - '7004:80'
+    volumes:
+      - ./pms:/app
+      - ~/.ivy2:/root/.ivy2
+      - ~/.sbt:/root/.sbt
+      - ~/.coursier:/root/.coursier
+    depends_on:
+      - store
