@@ -1,4 +1,4 @@
-import fecha from 'fecha';
+import day from 'dayjs';
 import { Field, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
 import React from 'react';
 import { Button, Form, Input, TextArea } from 'semantic-ui-react';
@@ -17,17 +17,17 @@ export interface StandupFormValues {
 }
 
 const StandupSchema = yup.object().shape({
-  delivered: yup
-    .object()
-    .shape({
-      date: yup.date().required('Delivered date is required'),
-      standup: yup.string().required('Standup is required'),
-    })
-    .required(),
   committed: yup
     .object()
     .shape({
       date: yup.date().required('Committed date is required'),
+      standup: yup.string().required('Standup is required'),
+    })
+    .required(),
+  delivered: yup
+    .object()
+    .shape({
+      date: yup.date().required('Delivered date is required'),
       standup: yup.string().required('Standup is required'),
     })
     .required(),
@@ -36,12 +36,12 @@ const StandupSchema = yup.object().shape({
 const today = new Date();
 const yesterday = new Date().setDate(today.getDate() - 1);
 const emptyContact: StandupFormValues = {
-  delivered: {
-    date: fecha.format(yesterday, 'YYYY-MM-DD'),
+  committed: {
+    date: day(today).format('YYYY-MM-DD'),
     standup: '',
   },
-  committed: {
-    date: fecha.format(today, 'YYYY-MM-DD'),
+  delivered: {
+    date: day(yesterday).format('YYYY-MM-DD'),
     standup: '',
   },
 };
