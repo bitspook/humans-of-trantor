@@ -21,10 +21,15 @@ $color-sep-border: rgba(0,0,0,.2);
 }
 
 .standupForm {
-  flex-grow: 0.5;
+  flex-grow: 1;
   padding: 1em;
 }
 
+.calendar {
+  flex-grow: 0.5;
+  border-right: 1px solid $color-sep-border;
+}
+
 .employeeTimeline {
-  flex-grow: 3;
+  flex-grow: 1;
 }

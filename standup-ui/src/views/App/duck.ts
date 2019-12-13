@@ -1,4 +1,5 @@
-import { createAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import dayjs from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { StandupFormValues } from 'src/components/StandupForm';
 
@@ -8,38 +9,40 @@ export interface SaveStandupPayload {
   helpers: FormikHelpers<StandupFormValues>;
 }
 
-const selectEmployee = createAction('selectEmployee');
-const startSaveStandup = createAction('startSaveStandup');
-const fullfillSaveStandup = createAction('fullfillSaveStandup');
-const failSaveStandup = createAction('failSaveStandup');
-
 export interface AppState {
   selectedEmployee: string;
   isSavingStandup: boolean;
   saveStandupError: string;
+  selectedDay: dayjs.Dayjs;
 }
 
+const initialState: AppState = {
+  isSavingStandup: false,
+  saveStandupError: '',
+  selectedDay: dayjs(new Date()),
+  selectedEmployee: 'E00916',
+};
+
 export default createSlice({
-  initialState: {
-    selectedEmployee: 'E00916',
-    isSavingStandup: false,
-    saveStandupError: '',
-  },
+  initialState,
+  name: 'app',
   reducers: {
-    [selectEmployee.type]: (state: any, action) => {
-      state.selectedEmployee = action.payload.ecode;
-    },
-    [startSaveStandup.type]: (state: AppState) => {
-      state.isSavingStandup = true;
-      state.saveStandupError = '';
-    },
-    [fullfillSaveStandup.type]: (state: AppState) => {
-      state.isSavingStandup = false;
-    },
-    [failSaveStandup.type]: (state: AppState, { payload }) => {
+    failSaveStandup: (state: AppState, { payload }) => {
       state.isSavingStandup = false;
       state.saveStandupError = payload;
     },
+    fullfillSaveStandup: (state: AppState) => {
+      state.isSavingStandup = false;
+    },
+    selectDay: (state: AppState, { payload }) => {
+      state.selectedDay = payload;
+    },
+    selectEmployee: (state: AppState, { payload }) => {
+      state.selectedEmployee = payload.ecode;
+    },
+    startSaveStandup: (state: AppState) => {
+      state.isSavingStandup = true;
+      state.saveStandupError = '';
+    },
   },
-  name: 'app',
 });

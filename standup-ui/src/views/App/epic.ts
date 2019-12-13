@@ -1,9 +1,10 @@
 import { AnyAction } from 'redux';
-import { ofType } from 'redux-observable';
+import { Epic, ofType, combineEpics } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { delay, mergeMap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
 import duck, { SaveStandupPayload } from './duck';
+import standupDuck from 'src/ducks/standup';
 
 const saveStandup = (ecode: string, standup: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
@@ -36,10 +37,11 @@ const saveStandup = (ecode: string, standup: StandupFormValues) => {
   );
 };
 
+const { actions } = duck;
+
 const saveStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
-    ofType(duck.actions.startSaveStandup),
-    delay(3000),
+    ofType(actions.startSaveStandup),
     mergeMap(async ({ payload }) => {
       const { ecode, standup, helpers } = payload as SaveStandupPayload;
 
@@ -51,14 +53,18 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
         helpers.setSubmitting(false);
         helpers.resetForm();
 
-        return duck.actions.fullfillSaveStandup();
+        return actions.fullfillSaveStandup();
       } catch (err) {
-        console.error('Error while saving standup', err);
         helpers.setSubmitting(false);
 
-        return duck.actions.failSaveStandup(`${err.message}`);
+        return actions.failSaveStandup([err]);
       }
     }),
   );
 
-export default saveStandupEpic;
+const fetchEmployeeStandupEpic: Epic = (action$) => action$.pipe(
+  ofType(actions.selectEmployee),
+  map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
+);
+
+export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic);
