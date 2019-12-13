@@ -11,17 +11,17 @@ export interface SaveStandupPayload {
 }
 
 export interface AppState {
-  selectedEmployee: string;
+  selectedEmployee?: string;
   isSavingStandup: boolean;
-  saveStandupError: string;
+  saveStandupError?: Error;
   selectedDay: dayjs.Dayjs;
 }
 
 const initialState: AppState = {
   isSavingStandup: false,
-  saveStandupError: '',
+  saveStandupError: undefined,
   selectedDay: dayjs(new Date()),
-  selectedEmployee: 'E00916',
+  selectedEmployee: undefined,
 };
 
 export default createSlice({
@@ -43,7 +43,7 @@ export default createSlice({
     },
     startSaveStandup: (state: AppState) => {
       state.isSavingStandup = true;
-      state.saveStandupError = '';
+      state.saveStandupError = undefined;
     },
   },
 });

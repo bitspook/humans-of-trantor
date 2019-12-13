@@ -1,7 +1,8 @@
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Message } from 'semantic-ui-react';
+import { Header, Icon, Message } from 'semantic-ui-react';
+import classNames from 'classnames';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -18,8 +19,8 @@ import c from './index.module.scss';
 interface AppDataProps {
   employees: Employee[];
   selectedDay: Dayjs;
-  selectedEmployee: string;
-  saveStandupError: string;
+  selectedEmployee?: string;
+  saveStandupError?: Error;
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
 }
@@ -30,6 +31,16 @@ interface AppCbProps {
   selectEmployee: (e: Employee) => void;
   startSaveStandup: (payload: SaveStandupPayload) => void;
 }
+
+const SelectEmployeeInstruction = () => (
+  <Header as='h2' className={c.instruction} disabled={true}>
+    <Icon name='users' circular={true} />
+    <Header.Content>
+      Please select an employee
+      <Header.Subheader>From the left-most column</Header.Subheader>
+    </Header.Content>
+  </Header>
+);
 
 const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   const handleSaveStandup = (ecode: string) => (
@@ -47,6 +58,21 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />
   );
 
+  const calendarCol = p.selectedEmployee ? (
+    <StandupCalendar
+      standup={p.standup}
+      onSelect={p.selectDay}
+      selectedDay={p.selectedDay}
+    />
+  ) : (<SelectEmployeeInstruction />);
+
+  const standupFormCol = p.selectedEmployee ? (
+    <StandupForm
+      initialValues={p.initialStandupFormValue}
+      onSave={handleSaveStandup(p.selectedEmployee)}
+    />
+  ) : (<SelectEmployeeInstruction />);
+
   return (
     <div className={c.root}>
       <div className={c.container}>
@@ -58,20 +84,12 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
           />
         </div>
 
-        <div className={c.calendar}>
-          <StandupCalendar
-            standup={p.standup}
-            onSelect={p.selectDay}
-            selectedDay={p.selectedDay}
-          />
+        <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
+          {calendarCol}
         </div>
 
-        <div className={c.standupForm}>
-          <StandupForm
-            initialValues={p.initialStandupFormValue}
-            onSave={handleSaveStandup(p.selectedEmployee)}
-          />
-
+        <div className={classNames(c.standupForm, { [c.empty]: !p.selectedEmployee })}>
+          {standupFormCol}
           {maybeError}
         </div>
       </div>

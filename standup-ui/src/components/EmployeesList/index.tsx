@@ -24,7 +24,7 @@ const EmployeeListItem = ({ employee, onClick, isHighlighted }: EmployeeListItem
 
 interface DataProps {
   employees: Employee[];
-  selectedEmployee: string;
+  selectedEmployee?: string;
 }
 
 interface CbProps {
