@@ -1,6 +1,6 @@
-import { createAction, createSlice } from 'redux-starter-kit';
-import { StandupFormValues } from 'src/components/StandupForm';
+import { createAction, createSlice } from '@reduxjs/toolkit';
 import { FormikHelpers } from 'formik';
+import { StandupFormValues } from 'src/components/StandupForm';
 
 export interface SaveStandupPayload {
   ecode: string;
@@ -23,7 +23,7 @@ export default createSlice({
   initialState: {
     selectedEmployee: 'E00916',
     isSavingStandup: false,
-    saveStandupError: ''
+    saveStandupError: '',
   },
   reducers: {
     [selectEmployee.type]: (state: any, action) => {
@@ -39,7 +39,7 @@ export default createSlice({
     [failSaveStandup.type]: (state: AppState, { payload }) => {
       state.isSavingStandup = false;
       state.saveStandupError = payload;
-    }
+    },
   },
-  name: 'app'
+  name: 'app',
 });
