@@ -1,12 +1,5 @@
 import fecha from 'fecha';
-import {
-  Field,
-  FieldProps,
-  Formik,
-  FormikHelpers,
-  FormikProps,
-  getIn
-} from 'formik';
+import { Field, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
 import React from 'react';
 import { Button, Form, Input, TextArea } from 'semantic-ui-react';
 import * as yup from 'yup';
@@ -28,16 +21,16 @@ const StandupSchema = yup.object().shape({
     .object()
     .shape({
       date: yup.date().required('Delivered date is required'),
-      standup: yup.string().required('Standup is required')
+      standup: yup.string().required('Standup is required'),
     })
     .required(),
   committed: yup
     .object()
     .shape({
       date: yup.date().required('Committed date is required'),
-      standup: yup.string().required('Standup is required')
+      standup: yup.string().required('Standup is required'),
     })
-    .required()
+    .required(),
 });
 
 const today = new Date();
@@ -45,12 +38,12 @@ const yesterday = new Date().setDate(today.getDate() - 1);
 const emptyContact: StandupFormValues = {
   delivered: {
     date: fecha.format(yesterday, 'YYYY-MM-DD'),
-    standup: ''
+    standup: '',
   },
   committed: {
     date: fecha.format(today, 'YYYY-MM-DD'),
-    standup: ''
-  }
+    standup: '',
+  },
 };
 
 interface SemanticFieldProps {
@@ -61,8 +54,7 @@ interface SemanticFieldProps {
 
 const SemanticInputField = (props: FieldProps & SemanticFieldProps) => {
   const error =
-    getIn(props.form.touched, props.field.name) &&
-    getIn(props.form.errors, props.field.name);
+    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
 
   return (
     <Form.Field error={Boolean(error)}>
@@ -80,61 +72,35 @@ const SemanticInputField = (props: FieldProps & SemanticFieldProps) => {
 
 const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
   const error =
-    getIn(props.form.touched, props.field.name) &&
-    getIn(props.form.errors, props.field.name);
+    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
 
   return (
     <Form.Field error={Boolean(error)}>
       <label>{props.label}</label>
-      <TextArea
-        {...props.field}
-        fluid={props.fluid}
-        disabled={props.form.isSubmitting}
-      />
+      <TextArea {...props.field} fluid={props.fluid} disabled={props.form.isSubmitting} />
       {error && <span className={c.error}>{error}</span>}
     </Form.Field>
   );
 };
 
-const InnerForm: React.FC<FormikProps<StandupFormValues>> = props => (
+const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
   <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
     <h2>Delivered</h2>
-    <Field
-      component={SemanticInputField}
-      name="delivered.date"
-      label="Date"
-      type="date"
-    />
-    <Field
-      component={SemanticTextAreaField}
-      name="delivered.standup"
-      label="Standup"
-    />
+    <Field component={SemanticInputField} name='delivered.date' label='Date' type='date' />
+    <Field component={SemanticTextAreaField} name='delivered.standup' label='Standup' />
 
     <h2>Commit</h2>
-    <Field
-      component={SemanticInputField}
-      name="committed.date"
-      label="Date"
-      type="date"
-    />
-    <Field
-      component={SemanticTextAreaField}
-      name="committed.standup"
-      label="Standup"
-    />
+    <Field component={SemanticInputField} name='committed.date' label='Date' type='date' />
+    <Field component={SemanticTextAreaField} name='committed.standup' label='Standup' />
 
-    <Button primary={true} type="submit" disabled={props.isSubmitting}>
+    <Button primary={true} type='submit' disabled={props.isSubmitting}>
       Save
     </Button>
   </Form>
 );
 
 interface StandupFormCbProps {
-  onSave: (
-    values: StandupFormValues,
-    helpers: FormikHelpers<StandupFormValues>
-  ) => void;
+  onSave: (values: StandupFormValues, helpers: FormikHelpers<StandupFormValues>) => void;
 }
 
 const NewContact: React.FC<StandupFormCbProps> = ({ onSave }) => {
