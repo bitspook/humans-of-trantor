@@ -17,8 +17,7 @@ const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps
     <List.Item
       onClick={() => onClick(day)}
       active={isHighlighted}
-      className={isWeekend ? c.disabled : ''}
-    >
+      className={isWeekend ? c.disabled : ''}>
       <List.Content>
         <List.Header>{day.format('dddd')}</List.Header>
         <List.Description>{day.format('MMM DD, YYYY')}</List.Description>

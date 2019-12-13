@@ -1,11 +1,11 @@
+import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
-import { Epic, ofType, combineEpics } from 'redux-observable';
+import { combineEpics, Epic, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
-import duck, { SaveStandupPayload } from './duck';
 import standupDuck from 'src/ducks/standup';
-import { Dayjs } from 'dayjs';
+import duck, { SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
@@ -30,8 +30,7 @@ const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
             project: 'Veriown',
           },
         }),
-      })
-        .then((res) => res.json());
+      }).then((res) => res.json());
 
       if (!res.id) {
         throw res;
@@ -67,9 +66,10 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
     }),
   );
 
-const fetchEmployeeStandupEpic: Epic = (action$) => action$.pipe(
-  ofType(actions.selectEmployee),
-  map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
-);
+const fetchEmployeeStandupEpic: Epic = (action$) =>
+  action$.pipe(
+    ofType(actions.selectEmployee),
+    map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
+  );
 
 export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic);

@@ -1,8 +1,8 @@
+import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Header, Icon, Message } from 'semantic-ui-react';
-import classNames from 'classnames';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -59,19 +59,19 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   );
 
   const calendarCol = p.selectedEmployee ? (
-    <StandupCalendar
-      standup={p.standup}
-      onSelect={p.selectDay}
-      selectedDay={p.selectedDay}
-    />
-  ) : (<SelectEmployeeInstruction />);
+    <StandupCalendar standup={p.standup} onSelect={p.selectDay} selectedDay={p.selectedDay} />
+  ) : (
+    <SelectEmployeeInstruction />
+  );
 
   const standupFormCol = p.selectedEmployee ? (
     <StandupForm
       initialValues={p.initialStandupFormValue}
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
-  ) : (<SelectEmployeeInstruction />);
+  ) : (
+    <SelectEmployeeInstruction />
+  );
 
   return (
     <div className={c.root}>
@@ -98,12 +98,16 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 };
 
 const mapState = (state: State): AppDataProps => {
-  const activeStandup = state.standup.data
-    .filter((s) => s.ecode === state.app.selectedEmployee && s.date.isSame(state.app.selectedDay, 'day'));
+  const activeStandup = state.standup.data.filter(
+    (s) => s.ecode === state.app.selectedEmployee && s.date.isSame(state.app.selectedDay, 'day'),
+  );
   const initialStandupFormValue = {
-    committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' }).standup,
-    delivered: (activeStandup.find((s) => s.standupType === 'delivered') || { standup: '' }).standup,
-    impediment: (activeStandup.find((s) => s.standupType === 'impediment') || { standup: '' }).standup,
+    committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' })
+      .standup,
+    delivered: (activeStandup.find((s) => s.standupType === 'delivered') || { standup: '' })
+      .standup,
+    impediment: (activeStandup.find((s) => s.standupType === 'impediment') || { standup: '' })
+      .standup,
   };
 
   return {
