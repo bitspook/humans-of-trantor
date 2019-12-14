@@ -20,6 +20,7 @@ interface AppDataProps {
   employees: Employee[];
   selectedDay: Dayjs;
   selectedEmployee?: string;
+  selectedProject: string;
   saveStandupError?: Error;
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
@@ -47,12 +48,12 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     standup: StandupFormValues,
     helpers: FormikHelpers<StandupFormValues>,
   ) => {
-    p.startSaveStandup({ ecode, standup, helpers, day: p.selectedDay });
+    p.startSaveStandup({ ecode, standup, project: p.selectedProject, day: p.selectedDay, helpers });
   };
 
   useEffect(() => {
-    p.fetchEmployeesStart('Veriown');
-  }, [1]);
+    p.fetchEmployeesStart(p.selectedProject);
+  }, [p.selectedProject]);
 
   const maybeError = p.saveStandupError && (
     <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />

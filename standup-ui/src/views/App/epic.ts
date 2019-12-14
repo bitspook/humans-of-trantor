@@ -7,7 +7,7 @@ import { StandupFormValues } from 'src/components/StandupForm';
 import standupDuck from 'src/ducks/standup';
 import duck, { SaveStandupPayload } from './duck';
 
-const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
+const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
 
   const standups = [
@@ -22,7 +22,7 @@ const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
         body: JSON.stringify({
           payload: {
             ...standup,
-            project: 'Veriown',
+            project,
           },
           version: 'v1',
         }),
@@ -47,12 +47,12 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
     ofType(actions.startSaveStandup),
     mergeMap(async ({ payload }) => {
-      const { ecode, standup, helpers, day } = payload as SaveStandupPayload;
+      const { ecode, standup, project, helpers, day } = payload as SaveStandupPayload;
 
       helpers.setSubmitting(true);
 
       try {
-        await saveStandup(ecode, day, standup);
+        await saveStandup(ecode, day, project, standup);
 
         helpers.setSubmitting(false);
         helpers.resetForm();

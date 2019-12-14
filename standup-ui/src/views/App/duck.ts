@@ -6,6 +6,7 @@ import { StandupFormValues } from 'src/components/StandupForm';
 export interface SaveStandupPayload {
   day: Dayjs;
   ecode: string;
+  project: string;
   standup: StandupFormValues;
   helpers: FormikHelpers<StandupFormValues>;
 }
@@ -15,6 +16,7 @@ export interface AppState {
   isSavingStandup: boolean;
   saveStandupError?: Error;
   selectedDay: dayjs.Dayjs;
+  selectedProject: string;
 }
 
 const initialState: AppState = {
@@ -22,6 +24,7 @@ const initialState: AppState = {
   saveStandupError: undefined,
   selectedDay: dayjs(new Date()),
   selectedEmployee: undefined,
+  selectedProject: 'Veriown',
 };
 
 export default createSlice({
