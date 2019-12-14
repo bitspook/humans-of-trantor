@@ -48,6 +48,8 @@ const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
     <Button primary={true} type='submit' disabled={props.isSubmitting}>
       Save
     </Button>
+
+    <p>*Empty values will not be saved</p>
   </Form>
 );
 

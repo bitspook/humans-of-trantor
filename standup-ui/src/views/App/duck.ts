@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import dayjs, { Dayjs } from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { StandupFormValues } from 'src/components/StandupForm';
+import { ToastDataProps } from 'src/components/Toaster';
 
 export interface SaveStandupPayload {
   day: Dayjs;
@@ -17,6 +18,7 @@ export interface AppState {
   saveStandupError?: Error;
   selectedDay: dayjs.Dayjs;
   selectedProject: string;
+  toasts: ToastDataProps[];
 }
 
 const initialState: AppState = {
@@ -25,17 +27,25 @@ const initialState: AppState = {
   selectedDay: dayjs(new Date()),
   selectedEmployee: undefined,
   selectedProject: 'Veriown',
+  toasts: [],
 };
 
 export default createSlice({
   initialState,
   name: 'app',
   reducers: {
-    failSaveStandup: (state: AppState, { payload }) => {
+    hideToast: (state: AppState, { payload }) => {
+      state.toasts = state.toasts.filter((t) => t.key === payload.key);
+    },
+    saveStandupFailed: (state: AppState, { payload }) => {
       state.isSavingStandup = false;
       state.saveStandupError = payload;
     },
-    fullfillSaveStandup: (state: AppState) => {
+    saveStandupStart: (state: AppState) => {
+      state.isSavingStandup = true;
+      state.saveStandupError = undefined;
+    },
+    saveStandupSuccess: (state: AppState) => {
       state.isSavingStandup = false;
     },
     selectDay: (state: AppState, { payload }) => {
@@ -44,9 +54,8 @@ export default createSlice({
     selectEmployee: (state: AppState, { payload }) => {
       state.selectedEmployee = payload.ecode;
     },
-    startSaveStandup: (state: AppState) => {
-      state.isSavingStandup = true;
-      state.saveStandupError = undefined;
+    showToast: (state: AppState, { payload }) => {
+      state.toasts = state.toasts.concat([payload]);
     },
   },
 });

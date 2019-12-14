@@ -1,8 +1,8 @@
 import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
 import { combineEpics, Epic, ofType } from 'redux-observable';
-import { Observable } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { delay, map, mergeMap } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
 import standupDuck from 'src/ducks/standup';
 import duck, { SaveStandupPayload } from './duck';
@@ -14,7 +14,7 @@ const saveStandup = (ecode: string, day: Dayjs, project: string, values: Standup
     { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },
     { ecode, date: day.format('YYYY-MM-DD'), type: 'committed', standup: values.committed },
     { ecode, date: day.format('YYYY-MM-DD'), type: 'impediment', standup: values.impediment },
-  ];
+  ].filter((s) => Boolean(s.standup));
 
   return Promise.all(
     standups.map(async (standup) => {
@@ -45,25 +45,40 @@ const { actions } = duck;
 
 const saveStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
-    ofType(actions.startSaveStandup),
+    ofType(actions.saveStandupStart),
     mergeMap(async ({ payload }) => {
       const { ecode, standup, project, helpers, day } = payload as SaveStandupPayload;
 
       helpers.setSubmitting(true);
 
       try {
-        await saveStandup(ecode, day, project, standup);
+        const responses = await saveStandup(ecode, day, project, standup);
+        const toasts: AnyAction[] = responses.map((r) =>
+          actions.showToast({
+            body: `${r.payload.type} for ${r.payload.ecode}`,
+            header: 'Standup saved successfully!',
+            key: `${r.payload.type}-${r.payload.ecode}`,
+          }),
+        );
 
-        helpers.setSubmitting(false);
-        helpers.resetForm();
-
-        return actions.fullfillSaveStandup();
+        return toasts.concat([actions.saveStandupSuccess()]);
       } catch (err) {
-        helpers.setSubmitting(false);
+        const errors = Array.isArray(err) ? err : [err];
 
-        return actions.failSaveStandup([err]);
+        const toasts: AnyAction[] = errors.map((e) =>
+          actions.showToast({
+            body: `${e.name}`,
+            header: 'Failed to save standup',
+            key: new Date().getTime(),
+          }),
+        );
+
+        return toasts.concat([actions.saveStandupFailed(errors)]);
+      } finally {
+        helpers.setSubmitting(false);
       }
     }),
+    mergeMap((arr) => from(arr)),
   );
 
 const fetchEmployeeStandupEpic: Epic = (action$) =>
@@ -72,4 +87,11 @@ const fetchEmployeeStandupEpic: Epic = (action$) =>
     map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
   );
 
-export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic);
+const autoHideToastEpic: Epic = (action$) =>
+  action$.pipe(
+    ofType(actions.showToast),
+    delay(4000),
+    map(({ payload }) => actions.hideToast(payload)),
+  );
+
+export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic, autoHideToastEpic);

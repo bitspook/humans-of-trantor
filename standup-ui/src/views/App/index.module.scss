@@ -43,3 +43,9 @@ $color-sep-border: rgba(0,0,0,.2);
     @extend .empty-col;
   }
 }
+
+.toaster {
+  position: absolute;
+  right: 2em;
+  bottom: 2em;
+}

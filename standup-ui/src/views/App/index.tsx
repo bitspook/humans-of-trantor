@@ -9,6 +9,7 @@ import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
 import StandupCalendar from 'src/components/StandupCalendar';
 import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
+import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
@@ -24,13 +25,14 @@ interface AppDataProps {
   saveStandupError?: Error;
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
+  toasts: ToastDataProps[];
 }
 
 interface AppCbProps {
   fetchEmployeesStart: (project: string) => void;
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
-  startSaveStandup: (payload: SaveStandupPayload) => void;
+  saveStandupStart: (payload: SaveStandupPayload) => void;
 }
 
 const SelectEmployeeInstruction = () => (
@@ -48,7 +50,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     standup: StandupFormValues,
     helpers: FormikHelpers<StandupFormValues>,
   ) => {
-    p.startSaveStandup({ ecode, standup, project: p.selectedProject, day: p.selectedDay, helpers });
+    p.saveStandupStart({ ecode, standup, project: p.selectedProject, day: p.selectedDay, helpers });
   };
 
   useEffect(() => {
@@ -91,6 +93,10 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
           {standupFormCol}
           {maybeError}
         </div>
+      </div>
+
+      <div className={c.toaster}>
+        <Toaster toasts={p.toasts} />
       </div>
     </div>
   );
