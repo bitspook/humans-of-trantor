@@ -4,12 +4,14 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.1.0",
+    "@types/classnames": "^2.2.9",
     "@types/jest": "24.0.23",
     "@types/node": "12.12.17",
     "@types/react": "16.9.16",
     "@types/react-dom": "16.9.4",
+    "classnames": "^2.2.6",
     "connected-react-router": "^6.6.1",
-    "fecha": "^3.0.3",
+    "dayjs": "^1.8.17",
     "formik": "^2.0.8",
     "history": "^4.10.1",
     "node-sass": "^4.13.0",
@@ -31,6 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "lint": "tslint 'src/**/*.{ts,tsx}'",
     "fmt": "prettier-tslint fix 'src/**/*.{ts,tsx}'"
   },
   "eslintConfig": {

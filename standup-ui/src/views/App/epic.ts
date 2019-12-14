@@ -1,64 +1,75 @@
+import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
-import { ofType } from 'redux-observable';
+import { combineEpics, Epic, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { delay, mergeMap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
+import standupDuck from 'src/ducks/standup';
 import duck, { SaveStandupPayload } from './duck';
 
-const saveStandup = (ecode: string, standup: StandupFormValues) => {
+const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
 
+  const standups = [
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'committed', standup: values.committed },
+    { ecode, date: day.format('YYYY-MM-DD'), type: 'impediment', standup: values.impediment },
+  ];
+
   return Promise.all(
-    Object.keys(standup).map((type) => {
-      return fetch(url, {
-        method: 'POST',
+    standups.map(async (standup) => {
+      const response = await fetch(url, {
+        body: JSON.stringify({
+          payload: {
+            ...standup,
+            project,
+          },
+          version: 'v1',
+        }),
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({
-          version: 'v1',
-          payload: {
-            ecode,
-            date: type === 'delivered' ? standup.delivered.date : standup.committed.date,
-            type,
-            standup: type === 'delivered' ? standup.delivered.standup : standup.committed.standup,
-            project: 'Veriown',
-          },
-        }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (!res.id) {
-            throw res;
-          }
-        });
+        method: 'POST',
+      }).then((res) => res.json());
+
+      if (!response.id) {
+        throw response;
+      }
+
+      return response;
     }),
   );
 };
 
+const { actions } = duck;
+
 const saveStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
-    ofType(duck.actions.startSaveStandup),
-    delay(3000),
+    ofType(actions.startSaveStandup),
     mergeMap(async ({ payload }) => {
-      const { ecode, standup, helpers } = payload as SaveStandupPayload;
+      const { ecode, standup, project, helpers, day } = payload as SaveStandupPayload;
 
       helpers.setSubmitting(true);
 
       try {
-        await saveStandup(ecode, standup);
+        await saveStandup(ecode, day, project, standup);
 
         helpers.setSubmitting(false);
         helpers.resetForm();
 
-        return duck.actions.fullfillSaveStandup();
+        return actions.fullfillSaveStandup();
       } catch (err) {
-        console.error('Error while saving standup', err);
         helpers.setSubmitting(false);
 
-        return duck.actions.failSaveStandup(`${err.message}`);
+        return actions.failSaveStandup([err]);
       }
     }),
   );
 
-export default saveStandupEpic;
+const fetchEmployeeStandupEpic: Epic = (action$) =>
+  action$.pipe(
+    ofType(actions.selectEmployee),
+    map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
+  );
+
+export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic);

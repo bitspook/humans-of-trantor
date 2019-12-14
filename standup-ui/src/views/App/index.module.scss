@@ -15,16 +15,31 @@ $color-sep-border: rgba(0,0,0,.2);
   border-radius: 0.8em;
 }
 
+.empty-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .employeesListSidebar {
   flex-grow: 0.2;
   border-right: 1px solid $color-sep-border;
 }
 
-.standupForm {
+.calendar {
   flex-grow: 0.5;
-  padding: 1em;
+  border-right: 1px solid $color-sep-border;
+
+  &.empty {
+    @extend .empty-col;
+  }
 }
 
-.employeeTimeline {
-  flex-grow: 3;
+.standupForm {
+  flex-grow: 1;
+  padding: 1em;
+
+  &.empty {
+    @extend .empty-col;
+  }
 }

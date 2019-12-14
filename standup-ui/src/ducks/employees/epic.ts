@@ -25,8 +25,6 @@ const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
 
         return actions.fetchEmployeesSuccess(data);
       } catch (err) {
-        console.error('Error while fetching employees', err);
-
         return actions.fetchEmployeesFailed(`${err.message}`);
       }
     }),
