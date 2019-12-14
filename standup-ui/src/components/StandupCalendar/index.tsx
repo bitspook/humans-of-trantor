@@ -12,12 +12,10 @@ interface CalendarListItemProps {
 
 const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps) => {
   const isWeekend = day.day() === 0 || day.day() === 6;
+  const handleClick = () => onClick(day);
 
   return (
-    <List.Item
-      onClick={() => onClick(day)}
-      active={isHighlighted}
-      className={isWeekend ? c.disabled : ''}>
+    <List.Item onClick={handleClick} active={isHighlighted} className={isWeekend ? c.disabled : ''}>
       <List.Content>
         <List.Header>{day.format('dddd')}</List.Header>
         <List.Description>{day.format('MMM DD, YYYY')}</List.Description>

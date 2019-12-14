@@ -10,9 +10,10 @@ interface EmployeeListItemProps {
 }
 const EmployeeListItem = ({ employee, onClick, isHighlighted }: EmployeeListItemProps) => {
   const avatarImage = employee.avatar || '/images/default-employee.png';
+  const handleClick = () => onClick(employee);
 
   return (
-    <List.Item onClick={() => onClick(employee)} active={isHighlighted}>
+    <List.Item onClick={handleClick} active={isHighlighted}>
       <Image avatar={true} src={avatarImage} />
       <List.Content>
         <List.Header>{employee.name}</List.Header>
@@ -36,16 +37,18 @@ const EmployeesList: React.FC<DataProps & CbProps> = ({
   onSelect,
   selectedEmployee,
 }) => {
+  const employeesList = employees.map((e) => (
+    <EmployeeListItem
+      employee={e}
+      key={e.ecode}
+      onClick={onSelect}
+      isHighlighted={e.ecode === selectedEmployee}
+    />
+  ));
+
   return (
     <List selection={true} relaxed={true} divided={true} verticalAlign='middle' size='big'>
-      {employees.map((e) => (
-        <EmployeeListItem
-          employee={e}
-          key={e.ecode}
-          onClick={onSelect}
-          isHighlighted={e.ecode === selectedEmployee}
-        />
-      ))}
+      {employeesList}
     </List>
   );
 };

@@ -37,13 +37,13 @@ const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
 const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
   <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
     <h2>Committed</h2>
-    <Field component={SemanticTextAreaField} name='committed' label='Standup' />
+    <Field component={SemanticTextAreaField} name='committed' />
 
     <h2>Delivered</h2>
-    <Field component={SemanticTextAreaField} name='delivered' label='Standup' />
+    <Field component={SemanticTextAreaField} name='delivered' />
 
     <h2>Impediment</h2>
-    <Field component={SemanticTextAreaField} name='impediment' label='Standup' />
+    <Field component={SemanticTextAreaField} name='impediment' />
 
     <Button primary={true} type='submit' disabled={props.isSubmitting}>
       Save

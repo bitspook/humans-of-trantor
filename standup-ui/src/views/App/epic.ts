@@ -18,25 +18,25 @@ const saveStandup = (ecode: string, day: Dayjs, values: StandupFormValues) => {
 
   return Promise.all(
     standups.map(async (standup) => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
+      const response = await fetch(url, {
         body: JSON.stringify({
-          version: 'v1',
           payload: {
             ...standup,
             project: 'Veriown',
           },
+          version: 'v1',
         }),
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
       }).then((res) => res.json());
 
-      if (!res.id) {
-        throw res;
+      if (!response.id) {
+        throw response;
       }
 
-      return res;
+      return response;
     }),
   );
 };
