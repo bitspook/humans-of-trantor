@@ -58,19 +58,19 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />
   );
 
-  const calendarCol = p.selectedEmployee ? (
-    <StandupCalendar standup={p.standup} onSelect={p.selectDay} selectedDay={p.selectedDay} />
-  ) : (
-    <SelectEmployeeInstruction />
-  );
-
   const standupFormCol = p.selectedEmployee ? (
     <StandupForm
       initialValues={p.initialStandupFormValue}
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
   ) : (
-    <SelectEmployeeInstruction />
+      <SelectEmployeeInstruction />
+    );
+
+  const maybeCalendarCol = p.selectedEmployee && (
+    <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
+      <StandupCalendar standup={p.standup} onSelect={p.selectDay} selectedDay={p.selectedDay} />
+    </div>
   );
 
   return (
@@ -84,9 +84,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
           />
         </div>
 
-        <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
-          {calendarCol}
-        </div>
+        {maybeCalendarCol}
 
         <div className={classNames(c.standupForm, { [c.empty]: !p.selectedEmployee })}>
           {standupFormCol}
