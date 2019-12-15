@@ -14,7 +14,7 @@ const fetchEmployees = async (project: string): Promise<Employee[]> => {
 
 const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
-    ofType(actions.fetchEmployeesStart),
+    ofType(actions.fetchStart),
     mergeMap(async ({ payload: project }) => {
       try {
         const data = await fetchEmployees(project);
@@ -23,9 +23,9 @@ const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
           throw new Error(data);
         }
 
-        return actions.fetchEmployeesSuccess(data);
+        return actions.fetchSuccess(data);
       } catch (err) {
-        return actions.fetchEmployeesFailed(`${err.message}`);
+        return actions.fetchFail(`${err.message}`);
       }
     }),
   );

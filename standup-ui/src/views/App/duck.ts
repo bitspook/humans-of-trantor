@@ -37,7 +37,7 @@ export default createSlice({
     hideToast: (state: AppState, { payload }) => {
       state.toasts = state.toasts.filter((t) => t.key === payload.key);
     },
-    saveStandupFailed: (state: AppState, { payload }) => {
+    saveStandupFail: (state: AppState, { payload }) => {
       state.isSavingStandup = false;
       state.saveStandupError = payload;
     },

@@ -24,15 +24,15 @@ export default createSlice({
   initialState,
   name: 'standup',
   reducers: {
-    fetchStandupFailed: (state, { payload }) => {
+    fetchFail: (state, { payload }) => {
       state.isLoading = false;
       state.errors = payload;
     },
-    fetchStandupStart: (state, payload) => {
+    fetchStart: (state, payload) => {
       state.isLoading = true;
       state.errors = [];
     },
-    fetchStandupSuccess: (state, { payload }) => {
+    fetchSuccess: (state, { payload }) => {
       state.isLoading = false;
       state.errors = [];
       state.data = payload;

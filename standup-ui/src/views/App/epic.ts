@@ -73,7 +73,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
           }),
         );
 
-        return toasts.concat([actions.saveStandupFailed(errors)]);
+        return toasts.concat([actions.saveStandupFail(errors)]);
       } finally {
         helpers.setSubmitting(false);
       }
@@ -84,7 +84,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
 const fetchEmployeeStandupEpic: Epic = (action$) =>
   action$.pipe(
     ofType(actions.selectEmployee),
-    map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
+    map(({ payload }) => standupDuck.actions.fetchStart(payload.ecode)),
   );
 
 const autoHideToastEpic: Epic = (action$) =>

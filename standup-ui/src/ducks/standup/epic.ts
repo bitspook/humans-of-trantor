@@ -15,7 +15,7 @@ const fetchStandup = async (ecode: string): Promise<Standup[]> => {
 
 const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
-    ofType(actions.fetchStandupStart),
+    ofType(actions.fetchStart),
     mergeMap(async ({ payload: ecode }) => {
       try {
         const data = await fetchStandup(ecode);
@@ -24,9 +24,9 @@ const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
           throw new Error(data);
         }
 
-        return actions.fetchStandupSuccess(data);
+        return actions.fetchSuccess(data);
       } catch (err) {
-        return actions.fetchStandupFailed([err]);
+        return actions.fetchFail([err]);
       }
     }),
   );

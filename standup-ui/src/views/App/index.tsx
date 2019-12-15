@@ -67,8 +67,8 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
   ) : (
-    <SelectEmployeeInstruction />
-  );
+      <SelectEmployeeInstruction />
+    );
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
@@ -125,7 +125,7 @@ const mapState = (state: State): AppDataProps => {
 
 const mapDispatch = (dispatch: Dispatch): AppCbProps => ({
   ...bindActionCreators(duck.actions, dispatch),
-  fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchEmployeesStart, dispatch),
+  fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchStart, dispatch),
 });
 
 export default connect(mapState, mapDispatch)(App);
