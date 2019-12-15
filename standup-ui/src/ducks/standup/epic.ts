@@ -13,7 +13,7 @@ const fetchStandup = async (ecode: string): Promise<Standup[]> => {
     .then((res) => (res.data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) })));
 };
 
-const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
+const fetchStandupEpic = (action$: Observable<AnyAction>) =>
   action$.pipe(
     ofType(actions.fetchStart),
     mergeMap(async ({ payload: ecode }) => {
@@ -31,4 +31,4 @@ const fetchEmployeesEpic = (action$: Observable<AnyAction>) =>
     }),
   );
 
-export default fetchEmployeesEpic;
+export default fetchStandupEpic;

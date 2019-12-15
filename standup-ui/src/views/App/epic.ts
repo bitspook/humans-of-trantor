@@ -61,7 +61,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
           }),
         );
 
-        return toasts.concat([actions.saveStandupSuccess(), standupDuck.actions.fetchStart()]);
+        return toasts.concat([actions.saveStandupSuccess(), standupDuck.actions.fetchStart(ecode)]);
       } catch (err) {
         const errors = Array.isArray(err) ? err : [err];
 
