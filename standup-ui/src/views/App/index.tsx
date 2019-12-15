@@ -7,6 +7,7 @@ import { Header, Icon, Message } from 'semantic-ui-react';
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
+import Report from 'src/components/Report';
 import StandupCalendar from 'src/components/StandupCalendar';
 import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
@@ -14,7 +15,7 @@ import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload } from './duck';
+import duck, { ReportState, SaveStandupPayload } from './duck';
 import c from './index.module.scss';
 
 interface AppDataProps {
@@ -26,6 +27,7 @@ interface AppDataProps {
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
+  report: ReportState;
 }
 
 interface AppCbProps {
@@ -33,11 +35,13 @@ interface AppCbProps {
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
+  showReport: () => void;
+  hideReport: () => void;
 }
 
 const SelectEmployeeInstruction = () => (
   <Header as='h2' className={c.instruction} disabled={true}>
-    <Icon name='users' circular={true} />
+    <Icon name='user' circular={true} />
     <Header.Content>
       Please select an employee
       <Header.Subheader>From the left-most column</Header.Subheader>
@@ -67,8 +71,8 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
   ) : (
-    <SelectEmployeeInstruction />
-  );
+      <SelectEmployeeInstruction />
+    );
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
@@ -78,6 +82,16 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 
   return (
     <div className={c.root}>
+      <div className={c.reportBar}>
+        <Report
+          day={p.selectedDay}
+          onOpen={p.showReport}
+          onClose={p.hideReport}
+          isOpen={p.report.isVisible}
+          reports={p.report.data}
+        />
+      </div>
+
       <div className={c.container}>
         <div className={c.employeesListSidebar}>
           <EmployeesList
@@ -120,12 +134,13 @@ const mapState = (state: State): AppDataProps => {
     employees: state.employees.data,
     initialStandupFormValue,
     standup: state.standup.data.filter((s) => s.ecode === state.app.selectedEmployee),
+    toasts: Object.values(state.app.toasts),
   };
 };
 
 const mapDispatch = (dispatch: Dispatch): AppCbProps => ({
   ...bindActionCreators(duck.actions, dispatch),
-  fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchEmployeesStart, dispatch),
+  fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchStart, dispatch),
 });
 
 export default connect(mapState, mapDispatch)(App);

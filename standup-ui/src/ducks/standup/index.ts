@@ -6,6 +6,7 @@ export interface Standup {
   standup: string;
   date: Dayjs;
   ecode: string;
+  project: string;
 }
 
 export interface StandupState {
@@ -24,18 +25,23 @@ export default createSlice({
   initialState,
   name: 'standup',
   reducers: {
-    fetchStandupFailed: (state, { payload }) => {
+    fetchFail: (state, { payload }) => {
       state.isLoading = false;
       state.errors = payload;
     },
-    fetchStandupStart: (state, payload) => {
+    fetchStart: (state, payload) => {
       state.isLoading = true;
       state.errors = [];
     },
-    fetchStandupSuccess: (state, { payload }) => {
+    fetchSuccess: (state, { payload }) => {
       state.isLoading = false;
       state.errors = [];
-      state.data = payload;
+      state.data = state.data.concat(payload).filter((standup, index, arr) => {
+        const getKey = (s: Standup) => `${s.ecode}-${s.project}-${s.date}-${s.standupType}`;
+        const isDuplicate = arr.findIndex((s) => getKey(s) === getKey(standup)) !== index;
+
+        return !isDuplicate;
+      });
     },
   },
 });

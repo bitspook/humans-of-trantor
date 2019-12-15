@@ -23,14 +23,14 @@ export default createSlice({
   initialState,
   name: 'employees',
   reducers: {
-    fetchEmployeesFailed: (state, { payload }) => {
+    fetchFail: (state, { payload }) => {
       state.isLoading = false;
       state.errors = Array.isArray(payload) ? payload : [{ message: payload.message }];
     },
-    fetchEmployeesStart: (state) => {
+    fetchStart: (state) => {
       state.isLoading = true;
     },
-    fetchEmployeesSuccess: (state, { payload }) => {
+    fetchSuccess: (state, { payload }) => {
       state.isLoading = false;
       state.errors = [];
       state.data = payload;

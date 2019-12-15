@@ -1,11 +1,13 @@
+import { stripIndent } from 'common-tags';
 import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
-import { combineEpics, Epic, ofType } from 'redux-observable';
+import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
-import { delay, map, mergeMap } from 'rxjs/operators';
+import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
-import standupDuck from 'src/ducks/standup';
-import duck, { SaveStandupPayload } from './duck';
+import standupDuck, { Standup } from 'src/ducks/standup';
+import { State } from 'src/reducer';
+import duck, { Report, SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
@@ -61,7 +63,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
           }),
         );
 
-        return toasts.concat([actions.saveStandupSuccess()]);
+        return toasts.concat([actions.saveStandupSuccess(), standupDuck.actions.fetchStart(ecode)]);
       } catch (err) {
         const errors = Array.isArray(err) ? err : [err];
 
@@ -73,7 +75,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
           }),
         );
 
-        return toasts.concat([actions.saveStandupFailed(errors)]);
+        return toasts.concat([actions.saveStandupFail(errors)]);
       } finally {
         helpers.setSubmitting(false);
       }
@@ -84,7 +86,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>) =>
 const fetchEmployeeStandupEpic: Epic = (action$) =>
   action$.pipe(
     ofType(actions.selectEmployee),
-    map(({ payload }) => standupDuck.actions.fetchStandupStart(payload.ecode)),
+    map(({ payload }) => standupDuck.actions.fetchStart(payload.ecode)),
   );
 
 const autoHideToastEpic: Epic = (action$) =>
@@ -94,4 +96,49 @@ const autoHideToastEpic: Epic = (action$) =>
     map(({ payload }) => actions.hideToast(payload)),
   );
 
-export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic, autoHideToastEpic);
+const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
+  action$.pipe(
+    ofType(actions.showReport),
+    withLatestFrom(state$),
+    map(([_, state]) => {
+      const selectedDay = state.app.selectedDay;
+
+      const reports = state.employees.data
+        .map((employee) => {
+          const standup = state.standup.data
+            .filter((s) => s.ecode === employee.ecode)
+            .sort((s1, s2) => (s1.date.isBefore(s2.date) ? 1 : -1));
+
+          const yesterday = standup.find(
+            (s) => s.standupType === 'delivered' && s.date.isBefore(selectedDay, 'day'),
+          );
+          const today = standup.find(
+            (s) => s.standupType === 'committed' && s.date.isSame(selectedDay, 'day'),
+          );
+          const impediment = standup.find(
+            (s) => s.standupType === 'impediment' && s.date.isSame(selectedDay, 'day'),
+          );
+
+          if (!yesterday && !today && !impediment) {
+            return;
+          }
+
+          return {
+            employee,
+            impediment,
+            today,
+            yesterday,
+          };
+        })
+        .filter((r) => Boolean(r));
+
+      return actions.createReport(reports);
+    }),
+  );
+
+export default combineEpics(
+  saveStandupEpic,
+  fetchEmployeeStandupEpic,
+  autoHideToastEpic,
+  createReportEpic,
+);
