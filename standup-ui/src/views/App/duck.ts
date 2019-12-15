@@ -18,7 +18,7 @@ export interface AppState {
   saveStandupError?: Error;
   selectedDay: dayjs.Dayjs;
   selectedProject: string;
-  toasts: ToastDataProps[];
+  toasts: { [key: string]: ToastDataProps };
 }
 
 const initialState: AppState = {
@@ -27,7 +27,7 @@ const initialState: AppState = {
   selectedDay: dayjs(new Date()),
   selectedEmployee: undefined,
   selectedProject: 'Veriown',
-  toasts: [],
+  toasts: {},
 };
 
 export default createSlice({
@@ -35,7 +35,13 @@ export default createSlice({
   name: 'app',
   reducers: {
     hideToast: (state: AppState, { payload }) => {
-      state.toasts = state.toasts.filter((t) => t.key === payload.key);
+      state.toasts = Object.entries(state.toasts)
+        .filter(([key]) => key !== payload.key)
+        .reduce((accum, [key, toast]) => {
+          accum[key] = toast;
+
+          return accum;
+        }, {} as { [key: string]: ToastDataProps });
     },
     saveStandupFail: (state: AppState, { payload }) => {
       state.isSavingStandup = false;
@@ -55,7 +61,7 @@ export default createSlice({
       state.selectedEmployee = payload.ecode;
     },
     showToast: (state: AppState, { payload }) => {
-      state.toasts = state.toasts.concat([payload]);
+      state.toasts[payload.key] = payload;
     },
   },
 });

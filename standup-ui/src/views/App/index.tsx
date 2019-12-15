@@ -67,8 +67,8 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
   ) : (
-      <SelectEmployeeInstruction />
-    );
+    <SelectEmployeeInstruction />
+  );
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
@@ -120,6 +120,7 @@ const mapState = (state: State): AppDataProps => {
     employees: state.employees.data,
     initialStandupFormValue,
     standup: state.standup.data.filter((s) => s.ecode === state.app.selectedEmployee),
+    toasts: Object.values(state.app.toasts),
   };
 };
 
