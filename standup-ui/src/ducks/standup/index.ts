@@ -36,14 +36,12 @@ export default createSlice({
     fetchSuccess: (state, { payload }) => {
       state.isLoading = false;
       state.errors = [];
-      state.data = state.data
-        .concat(payload)
-        .filter((standup, index, arr) => {
-          const getKey = (s: Standup) => `${s.ecode}-${s.project}-${s.date}-${s.standupType}`;
-          const isDuplicate = arr.findIndex((s) => getKey(s) === getKey(standup)) !== index;
+      state.data = state.data.concat(payload).filter((standup, index, arr) => {
+        const getKey = (s: Standup) => `${s.ecode}-${s.project}-${s.date}-${s.standupType}`;
+        const isDuplicate = arr.findIndex((s) => getKey(s) === getKey(standup)) !== index;
 
-          return !isDuplicate;
-        });
+        return !isDuplicate;
+      });
     },
   },
 });

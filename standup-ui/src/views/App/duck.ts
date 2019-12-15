@@ -3,6 +3,8 @@ import dayjs, { Dayjs } from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { StandupFormValues } from 'src/components/StandupForm';
 import { ToastDataProps } from 'src/components/Toaster';
+import { Employee } from 'src/ducks/employees';
+import { Standup } from 'src/ducks/standup';
 
 export interface SaveStandupPayload {
   day: Dayjs;
@@ -12,6 +14,18 @@ export interface SaveStandupPayload {
   helpers: FormikHelpers<StandupFormValues>;
 }
 
+export interface Report {
+  employee: Employee;
+  yesterday?: Standup;
+  today?: Standup;
+  impediment?: Standup;
+}
+
+export interface ReportState {
+  data: Report[];
+  isVisible: boolean;
+}
+
 export interface AppState {
   selectedEmployee?: string;
   isSavingStandup: boolean;
@@ -19,15 +33,13 @@ export interface AppState {
   selectedDay: dayjs.Dayjs;
   selectedProject: string;
   toasts: { [key: string]: ToastDataProps };
-  report: {
-    isVisible: boolean;
-    content?: string;
-  };
+  report: ReportState;
 }
 
 const initialState: AppState = {
   isSavingStandup: false,
   report: {
+    data: [],
     isVisible: false,
   },
   saveStandupError: undefined,
@@ -41,8 +53,8 @@ export default createSlice({
   initialState,
   name: 'app',
   reducers: {
-    createReport: (state: AppState) => {
-      return state;
+    createReport: (state: AppState, { payload }) => {
+      state.report.data = payload;
     },
     hideReport: (state: AppState) => {
       state.report.isVisible = false;
@@ -73,8 +85,7 @@ export default createSlice({
     selectEmployee: (state: AppState, { payload }) => {
       state.selectedEmployee = payload.ecode;
     },
-    showReport: (state: AppState, { payload }) => {
-      state.report.content = payload;
+    showReport: (state: AppState) => {
       state.report.isVisible = true;
     },
     showToast: (state: AppState, { payload }) => {

@@ -1,14 +1,13 @@
 import { stripIndent } from 'common-tags';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
 import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
-import { Employee } from 'src/ducks/employees';
 import standupDuck, { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload } from './duck';
+import duck, { Report, SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
@@ -97,45 +96,43 @@ const autoHideToastEpic: Epic = (action$) =>
     map(({ payload }) => actions.hideToast(payload)),
   );
 
-const showReportEpic: Epic = (action$, state$: StateObservable<State>) =>
+const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
   action$.pipe(
-    ofType(actions.createReport),
+    ofType(actions.showReport),
     withLatestFrom(state$),
     map(([_, state]) => {
-      const today = dayjs();
-      const standup = state.standup.data
-        .filter((s) => s.date.isSame(today, 'day'))
-        .reduce((accum, s) => {
-          accum[s.ecode] = accum[s.ecode] || {};
-          accum[s.ecode].delivered = accum[s.ecode].delivered || '';
-          accum[s.ecode].committed = accum[s.ecode].committed || '';
-          accum[s.ecode].impediment = accum[s.ecode].impediment || '';
-
-          accum[s.ecode][s.standupType] = s.standup;
-
-          return accum;
-        }, {} as { [ecode: string]: { [status: string]: string } });
+      const selectedDay = state.app.selectedDay;
 
       const reports = state.employees.data
-        .map((emp) => {
-          const empStandup = standup[emp.ecode];
+        .map((employee) => {
+          const standup = state.standup.data
+            .filter((s) => s.ecode === employee.ecode)
+            .sort((s1, s2) => (s1.date.isBefore(s2.date) ? 1 : -1));
 
-          if (!empStandup) {
-            return '';
+          const yesterday = standup.find(
+            (s) => s.standupType === 'delivered' && s.date.isBefore(selectedDay, 'day'),
+          );
+          const today = standup.find(
+            (s) => s.standupType === 'committed' && s.date.isSame(selectedDay, 'day'),
+          );
+          const impediment = standup.find(
+            (s) => s.standupType === 'impediment' && s.date.isSame(selectedDay, 'day'),
+          );
+
+          if (!yesterday && !today && !impediment) {
+            return;
           }
 
-          return stripIndent`
-        ${emp.name}:
-          Today:
-            ${standup[emp.ecode].delivered.split('\n') || '-'}
-
-          Impediments:
-            ${standup[emp.ecode].impediment.split('\n') || '-'}
-      `;
+          return {
+            employee,
+            impediment,
+            today,
+            yesterday,
+          };
         })
         .filter((r) => Boolean(r));
 
-      return actions.showReport(reports.join('---\n\n'));
+      return actions.createReport(reports);
     }),
   );
 
@@ -143,5 +140,5 @@ export default combineEpics(
   saveStandupEpic,
   fetchEmployeeStandupEpic,
   autoHideToastEpic,
-  showReportEpic,
+  createReportEpic,
 );

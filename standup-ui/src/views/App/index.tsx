@@ -2,11 +2,12 @@ import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Button, Header, Icon, Message, Modal } from 'semantic-ui-react';
+import { Header, Icon, Message } from 'semantic-ui-react';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
+import Report from 'src/components/Report';
 import StandupCalendar from 'src/components/StandupCalendar';
 import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
@@ -14,7 +15,7 @@ import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload } from './duck';
+import duck, { ReportState, SaveStandupPayload } from './duck';
 import c from './index.module.scss';
 
 interface AppDataProps {
@@ -26,10 +27,7 @@ interface AppDataProps {
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
-  report: {
-    isVisible: boolean;
-    content?: string;
-  };
+  report: ReportState;
 }
 
 interface AppCbProps {
@@ -37,13 +35,13 @@ interface AppCbProps {
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
-  createReport: () => void;
+  showReport: () => void;
   hideReport: () => void;
 }
 
 const SelectEmployeeInstruction = () => (
   <Header as='h2' className={c.instruction} disabled={true}>
-    <Icon name='users' circular={true} />
+    <Icon name='user' circular={true} />
     <Header.Content>
       Please select an employee
       <Header.Subheader>From the left-most column</Header.Subheader>
@@ -73,8 +71,8 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
   ) : (
-    <SelectEmployeeInstruction />
-  );
+      <SelectEmployeeInstruction />
+    );
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
@@ -85,18 +83,13 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   return (
     <div className={c.root}>
       <div className={c.reportBar}>
-        <Button
-          content='Create Report'
-          icon='download'
-          labelPosition='left'
-          onClick={p.createReport}
+        <Report
+          day={p.selectedDay}
+          onOpen={p.showReport}
+          onClose={p.hideReport}
+          isOpen={p.report.isVisible}
+          reports={p.report.data}
         />
-
-        <Modal dimmer={true} open={p.report.isVisible} onClose={p.hideReport}>
-          <Modal.Content>
-            <pre>{p.report.content}</pre>
-          </Modal.Content>
-        </Modal>
       </div>
 
       <div className={c.container}>
