@@ -1,10 +1,13 @@
-import { Dayjs } from 'dayjs';
+import { stripIndent } from 'common-tags';
+import dayjs, { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
-import { combineEpics, Epic, ofType } from 'redux-observable';
+import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
-import { delay, map, mergeMap } from 'rxjs/operators';
+import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
-import standupDuck from 'src/ducks/standup';
+import { Employee } from 'src/ducks/employees';
+import standupDuck, { Standup } from 'src/ducks/standup';
+import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
@@ -94,4 +97,51 @@ const autoHideToastEpic: Epic = (action$) =>
     map(({ payload }) => actions.hideToast(payload)),
   );
 
-export default combineEpics(saveStandupEpic, fetchEmployeeStandupEpic, autoHideToastEpic);
+const showReportEpic: Epic = (action$, state$: StateObservable<State>) =>
+  action$.pipe(
+    ofType(actions.createReport),
+    withLatestFrom(state$),
+    map(([_, state]) => {
+      const today = dayjs();
+      const standup = state.standup.data
+        .filter((s) => s.date.isSame(today, 'day'))
+        .reduce((accum, s) => {
+          accum[s.ecode] = accum[s.ecode] || {};
+          accum[s.ecode].delivered = accum[s.ecode].delivered || '';
+          accum[s.ecode].committed = accum[s.ecode].committed || '';
+          accum[s.ecode].impediment = accum[s.ecode].impediment || '';
+
+          accum[s.ecode][s.standupType] = s.standup;
+
+          return accum;
+        }, {} as { [ecode: string]: { [status: string]: string } });
+
+      const reports = state.employees.data
+        .map((emp) => {
+          const empStandup = standup[emp.ecode];
+
+          if (!empStandup) {
+            return '';
+          }
+
+          return stripIndent`
+        ${emp.name}:
+          Today:
+            ${standup[emp.ecode].delivered.split('\n') || '-'}
+
+          Impediments:
+            ${standup[emp.ecode].impediment.split('\n') || '-'}
+      `;
+        })
+        .filter((r) => Boolean(r));
+
+      return actions.showReport(reports.join('---\n\n'));
+    }),
+  );
+
+export default combineEpics(
+  saveStandupEpic,
+  fetchEmployeeStandupEpic,
+  autoHideToastEpic,
+  showReportEpic,
+);

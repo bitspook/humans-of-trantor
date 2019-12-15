@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Header, Icon, Message } from 'semantic-ui-react';
+import { Button, Header, Icon, Message, Modal } from 'semantic-ui-react';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -26,6 +26,10 @@ interface AppDataProps {
   standup: Standup[];
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
+  report: {
+    isVisible: boolean;
+    content?: string;
+  };
 }
 
 interface AppCbProps {
@@ -33,6 +37,8 @@ interface AppCbProps {
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
+  createReport: () => void;
+  hideReport: () => void;
 }
 
 const SelectEmployeeInstruction = () => (
@@ -78,6 +84,21 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 
   return (
     <div className={c.root}>
+      <div className={c.reportBar}>
+        <Button
+          content='Create Report'
+          icon='download'
+          labelPosition='left'
+          onClick={p.createReport}
+        />
+
+        <Modal dimmer={true} open={p.report.isVisible} onClose={p.hideReport}>
+          <Modal.Content>
+            <pre>{p.report.content}</pre>
+          </Modal.Content>
+        </Modal>
+      </div>
+
       <div className={c.container}>
         <div className={c.employeesListSidebar}>
           <EmployeesList

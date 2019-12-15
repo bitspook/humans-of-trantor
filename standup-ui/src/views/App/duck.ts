@@ -19,10 +19,17 @@ export interface AppState {
   selectedDay: dayjs.Dayjs;
   selectedProject: string;
   toasts: { [key: string]: ToastDataProps };
+  report: {
+    isVisible: boolean;
+    content?: string;
+  };
 }
 
 const initialState: AppState = {
   isSavingStandup: false,
+  report: {
+    isVisible: false,
+  },
   saveStandupError: undefined,
   selectedDay: dayjs(new Date()),
   selectedEmployee: undefined,
@@ -34,6 +41,12 @@ export default createSlice({
   initialState,
   name: 'app',
   reducers: {
+    createReport: (state: AppState) => {
+      return state;
+    },
+    hideReport: (state: AppState) => {
+      state.report.isVisible = false;
+    },
     hideToast: (state: AppState, { payload }) => {
       state.toasts = Object.entries(state.toasts)
         .filter(([key]) => key !== payload.key)
@@ -59,6 +72,10 @@ export default createSlice({
     },
     selectEmployee: (state: AppState, { payload }) => {
       state.selectedEmployee = payload.ecode;
+    },
+    showReport: (state: AppState, { payload }) => {
+      state.report.content = payload;
+      state.report.isVisible = true;
     },
     showToast: (state: AppState, { payload }) => {
       state.toasts[payload.key] = payload;
