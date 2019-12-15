@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 import React, { FC, Fragment } from 'react';
-import { Button, Divider, Header, Modal, Popup, Segment } from 'semantic-ui-react';
+import { Button, Header, Icon, Modal, Popup, Segment } from 'semantic-ui-react';
 import { Report } from 'src/views/App/duck';
 
 interface ReportDataProps {
@@ -65,9 +65,10 @@ const ReportButton: FC<ReportDataProps & ReportCbProps> = (p) => {
   if (!modalContent.length) {
     modalContent = [
       <Header as='h2' key={1} disabled={true}>
+        <Icon name='user' circular={true} />
         <Header.Content>
           No Standup to report
-          <Header.Subheader>Please select a different date</Header.Subheader>
+          <Header.Subheader>Please select employees to create report for</Header.Subheader>
         </Header.Content>
       </Header>,
     ];
@@ -77,7 +78,7 @@ const ReportButton: FC<ReportDataProps & ReportCbProps> = (p) => {
     <section>
       {/* prettier-ignore */}
       <Popup
-        content={<p>Report for <b>{p.day.format('dddd, MMMM, DD')}</b></p>}
+        content={<p>Report for <b>{p.day.format('dddd, MMM DD')}</b></p>}
         position='bottom right'
         trigger={<Button content='Report' icon='download' labelPosition='left' onClick={p.onOpen} />}
       />

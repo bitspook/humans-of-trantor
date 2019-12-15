@@ -59,20 +59,19 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 
   useEffect(() => {
     p.fetchEmployeesStart(p.selectedProject);
-  }, [p.selectedProject]);
+  }, [p.selectedProject]); // eslint-disable-line
 
   const maybeError = p.saveStandupError && (
     <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />
   );
 
+  /* prettier-ignore */
   const standupFormCol = p.selectedEmployee ? (
     <StandupForm
       initialValues={p.initialStandupFormValue}
       onSave={handleSaveStandup(p.selectedEmployee)}
     />
-  ) : (
-      <SelectEmployeeInstruction />
-    );
+  ) : (<SelectEmployeeInstruction />);
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>

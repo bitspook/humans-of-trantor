@@ -1,13 +1,12 @@
-import { stripIndent } from 'common-tags';
 import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
 import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
-import standupDuck, { Standup } from 'src/ducks/standup';
+import standupDuck from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { Report, SaveStandupPayload } from './duck';
+import duck, { SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
   const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
@@ -120,7 +119,7 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
           );
 
           if (!yesterday && !today && !impediment) {
-            return;
+            return null;
           }
 
           return {
