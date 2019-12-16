@@ -4,6 +4,7 @@ WORKDIR /app
 
 EXPOSE 3000
 ENV HOST=0.0.0.0
+ENV PORT=80
 
 RUN apk update && apk add hugo git
 
@@ -21,4 +22,4 @@ RUN echo "alias hugo='hugo --themesDir /themes --theme current'" > ~/.profile
 
 COPY . /app
 
-CMD hugo serve --port 3000 --bind='0.0.0.0' --themesDir /themes --theme current
+CMD hugo serve --port "$PORT" --bind='0.0.0.0' --themesDir /themes --theme current
