@@ -1,0 +1,4 @@
+- name: Build the HoT Containers
+  hosts: builder
+  roles:
+    - standup-ui

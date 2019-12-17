@@ -1,0 +1,5 @@
+hot_version:                  "{{ lookup('env', 'HOT_VERSION') }}"
+
+hot_docker_registry:          "{{ lookup('env', 'DOCKER_REGISTRY') }}"
+hot_docker_registry_username: "{{ lookup('env', 'DOCKER_REGISTRY_USERNAME') }}"
+hot_docker_registry_password: "{{ lookup('env', 'DOCKER_REGISTRY_PASSWORD') }}"
