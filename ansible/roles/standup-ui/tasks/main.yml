@@ -1,3 +1,10 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ standup_ui_docker_registry }}"
+    username: "{{ standup_ui_docker_registry_username }}"
+    password: "{{ standup_ui_docker_registry_password }}"
+  when: standup_ui_docker_registry|default('') != ''
+
 - name: Create docker image
   docker_image:
     name: "{{ standup_ui_docker_name }}"

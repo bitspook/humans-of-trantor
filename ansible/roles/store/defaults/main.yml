@@ -1,0 +1,11 @@
+store_version: ""
+store_src_dir: "{{ playbook_dir }}/../store"
+
+store_dockerfile: "Dockerfile"
+store_docker_name: ""
+store_docker_tag: ""
+
+store_docker_repository: ""
+store_docker_registry: ""
+store_docker_registry_username: ""
+store_docker_registry_password: ""

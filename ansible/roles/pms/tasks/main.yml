@@ -1,0 +1,28 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ pms_docker_registry }}"
+    username: "{{ pms_docker_registry_username }}"
+    password: "{{ pms_docker_registry_password }}"
+  when: pms_docker_registry|default('') != ''
+
+- name: Create docker image
+  docker_image:
+    name: "{{ pms_docker_name }}"
+    tag: "{{ pms_docker_tag }}"
+    source: build
+    debug: yes
+    build:
+      path: "{{ pms_src_dir }}"
+      dockerfile: "{{ pms_dockerfile }}"
+      pull: no
+      rm: no
+    state: present
+    repository: "{{ pms_docker_repository }}"
+    push: "{{ pms_docker_repository != '' }}"
+
+- name: Destroy docker image
+  docker_image:
+    state: absent
+    name: "{{ pms_docker_name }}"
+    tag: "{{ pms_version }}"
+  tags: [ never, destroy ]
