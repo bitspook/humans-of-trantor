@@ -14,8 +14,10 @@
     build:
       path: "{{ standup_ui_src_dir }}"
       dockerfile: "{{ standup_ui_dockerfile }}"
+      args:
+        REACT_APP_EI_URL: "{{ standup_ui_ei_url }}"
+        REACT_APP_PMS_URL: "{{ standup_ui_pms_url }}"
       pull: no
-      rm: no
     state: present
     repository: "{{ standup_ui_docker_repository }}"
     push: "{{ standup_ui_docker_repository != '' }}"

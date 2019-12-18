@@ -9,3 +9,6 @@ standup_ui_docker_repository: ""
 standup_ui_docker_registry: ""
 standup_ui_docker_registry_username: ""
 standup_ui_docker_registry_password: ""
+
+standup_ui_ei_url: ""
+standup_ui_pms_url: ""

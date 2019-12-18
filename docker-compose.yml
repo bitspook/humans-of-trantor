@@ -18,7 +18,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ./data/hot/redis:/data
+      - ./docker-volumes/redis:/data
 
   docs:
     image: hot-docs
@@ -58,6 +58,8 @@ services:
     build: ./standup-ui
     environment:
       PORT: 80
+      REACT_APP_EI_URL: "http://localhost:7002"
+      REACT_APP_PMS_URL: "http://localhost:7004"
     volumes:
       - ./standup-ui:/app
       - ./standup-ui/node_modules:/app/node_modules

@@ -2,12 +2,13 @@ import { AnyAction } from 'redux';
 import { ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
+import config from 'src/config';
 import duck, { Employee } from './index';
 
 const actions = duck.actions;
 
 const fetchEmployees = async (project: string): Promise<Employee[]> => {
-  return fetch(`http://localhost:7004/api/v1/employees?project=${project}`)
+  return fetch(`${config.urls.pms}/api/v1/employees?project=${project}`)
     .then((res) => res.json())
     .then((res) => (res.data as Employee[]).sort((a, b) => (a.name > b.name ? 1 : -1)));
 };

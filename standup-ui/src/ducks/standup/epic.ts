@@ -3,12 +3,13 @@ import { AnyAction } from 'redux';
 import { ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
+import config from 'src/config';
 import duck, { Standup } from './index';
 
 const actions = duck.actions;
 
 const fetchStandup = async (ecode: string): Promise<Standup[]> => {
-  return fetch(`http://localhost:7004/api/v1/standup?ecode=${ecode}`)
+  return fetch(`${config.urls.pms}/api/v1/standup?ecode=${ecode}`)
     .then((res) => res.json())
     .then((res) => (res.data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) })));
 };
