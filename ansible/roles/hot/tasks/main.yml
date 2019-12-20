@@ -1,0 +1,21 @@
+- name: Create hot dir
+  file:
+    path: "{{ hot_dir }}"
+    state: directory
+  tags:
+    - deploy
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ hot_dir }}/docker-compose.yml"
+  tags:
+    - deploy
+
+- name: Start HoT Cloud
+  shell: "docker-compose up -d"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags:
+    - deploy
+    - launch

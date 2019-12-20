@@ -1,0 +1,56 @@
+version: '3'
+services:
+  store:
+    image: "{{ store_docker_name }}:{{ store_docker_tag }}"
+    volumes:
+      - "{{ hot_data_dir }}/store:/var/lib/postgresql/data"
+      - "{{ hot_data_dir }}/migrations:/migrations"
+    environment:
+      POSTGRES_USER: {{ hot_store_db_user }}
+      POSTGRES_PASSWORD: {{ hot_store_db_password }}
+      POSTGRES_DB: {{ hot_store_db_name }}
+
+  docs:
+    image: "{{ docs_docker_name }}:{{ docs_docker_tag }}"
+    volumes:
+      - "{{ hot_data_dir }}/docs:/app"
+
+  ei:
+    image: "{{ ei_docker_name }}:{{ ei_docker_tag }}"
+    environment:
+      ROARR_LOG: "true"
+      HOST: "0.0.0.0"
+      PORT: "80"
+    volumes:
+      - "{{ hot_data_dir }}/ei:/app"
+    depends_on:
+      - store
+
+  standup-ui:
+    image: "{{ standup_ui_docker_name }}:{{ standup_ui_docker_tag }}"
+    environment:
+      REACT_APP_EI_URL: "{{ hot_ei_url }}"
+      REACT_APP_PMS_URL: "{{ hot_pms_url }}"
+      HOST: "0.0.0.0"
+      PORT: "80"
+    volumes:
+      - "{{ hot_data_dir }}/standup-ui:/app"
+    depends_on:
+      - store
+      - ei
+      - pms
+
+  pms:
+    image: "{{ pms_docker_name }}:{{ pms_docker_tag }}"
+    environment:
+      DB_USERNAME: "{{ hot_pms_db_user }}"
+      DB_PASSWORD: "{{ hot_pms_db_password }}"
+      DB_NAME: "{{ hot_pms_db_name }}"
+      DB_HOST: "{{ hot_pms_db_host }}"
+      DB_PORT: "{{ hot_pms_db_port }}"
+      HOST: "0.0.0.0"
+      PORT: "80"
+    volumes:
+      - "{{ hot_data_dir }}/pms:/app"
+    depends_on:
+      - store
