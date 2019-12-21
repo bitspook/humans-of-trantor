@@ -1,0 +1,27 @@
+- name: Create hot dir
+  file:
+    path: "{{ hot_dir }}"
+    state: directory
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ hot_dir }}/docker-compose.yml"
+
+- name: Start HoT Cloud
+  shell: "docker-compose up -d"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags:
+    - launch
+
+- name: Run intial store migrations
+  shell: "docker-compose exec -T store \
+            migrate \
+            -path /migrations \
+            -database postgres://{{ hot_store_db_user }}:{{ hot_store_db_password }}@localhost/{{ hot_store_db_name }}?sslmode=disable \
+            up"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags:
+    - post-launch
