@@ -10,12 +10,12 @@
     name: "{{ docs_docker_name }}"
     tag: "{{ docs_docker_tag }}"
     source: build
-    debug: yes
     build:
       path: "{{ docs_src_dir }}"
       dockerfile: "{{ docs_dockerfile }}"
       pull: no
-      rm: no
+      args:
+        BASE_URL: "{{ docs_base_url }}"
     state: present
     repository: "{{ docs_docker_repository }}"
     push: "{{ docs_docker_repository != '' }}"

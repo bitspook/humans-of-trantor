@@ -1,11 +1,11 @@
 docs_version:                  "{{ hot_version }}"
 
-docs_dockerfile:        "Dockerfile"
-docs_docker_name:       "hot-docs"
-docs_docker_tag:        "{{ docs_version }}"
+docs_dockerfile:               "Dockerfile-prod"
+docs_docker_name:              "hot-docs"
+docs_docker_tag:               "{{ docs_version }}"
 
-docs_docker_registry:   "{{ hot_docker_registry }}"
-docs_docker_repository: "{{ docs_docker_registry + '/' + docs_docker_name if docs_docker_registry else '' }}"
+docs_docker_registry:          "{{ hot_docker_registry }}"
+docs_docker_repository:        "{{ docs_docker_registry + '/' + docs_docker_name if docs_docker_registry else '' }}"
 
 docs_docker_registry_username: "{{ hot_docker_registry_username }}"
 docs_docker_registry_password: "{{ hot_docker_registry_password }}"

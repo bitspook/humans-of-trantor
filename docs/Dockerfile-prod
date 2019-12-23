@@ -1,10 +1,14 @@
-FROM channikhabra/hot-docs-builder
+FROM channikhabra/hot-docs-builder as builder
 
 WORKDIR /app
 
-CMD hugo --baseURL "$BASE_URL" --themesDir /themes --theme learn
+ARG BASE_URL
+
+COPY . /app
+RUN hugo --baseURL "$BASE_URL" --themesDir /themes --theme learn
 
 FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/public /app
+CMD sh

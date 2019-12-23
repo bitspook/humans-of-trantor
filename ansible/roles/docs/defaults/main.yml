@@ -9,3 +9,5 @@ docs_docker_repository: ""
 docs_docker_registry: ""
 docs_docker_registry_username: ""
 docs_docker_registry_password: ""
+
+docs_base_url: "/docs"
