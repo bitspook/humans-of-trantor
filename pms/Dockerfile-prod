@@ -10,7 +10,6 @@ ARG sbt_home
 RUN apk add --no-cache --update bash
 
 # Download and extract from archive
-RUN apk add --no-cache --update wget
 RUN mkdir -pv "$sbt_home"
 RUN wget -qO - "https://github.com/sbt/sbt/releases/download/v$sbt_version/sbt-$sbt_version.tgz" >/tmp/sbt.tgz
 RUN tar xzf /tmp/sbt.tgz -C "$sbt_home" --strip-components=1
@@ -18,6 +17,7 @@ RUN tar xzf /tmp/sbt.tgz -C "$sbt_home" --strip-components=1
 # Make a clean image (i.e., without extra packages)
 FROM woahbase/alpine-openjdk11:x86_64 as assembly
 ARG sbt_home
+ARG API_PREFIX=""
 
 # sbt requires bash at run-time.
 RUN apk add --no-cache --update bash
@@ -26,11 +26,12 @@ COPY --from=unzip $sbt_home $sbt_home
 RUN ln -sv "$sbt_home"/bin/sbt /usr/bin/
 
 # This triggers a bunch of useful downloads.
-RUN sbt sbtVersion
+RUN sbt compile
 
 WORKDIR /app
 
 ENV HOST=0.0.0.0
+ENV PORT=80
 EXPOSE 80
 
 COPY . /app

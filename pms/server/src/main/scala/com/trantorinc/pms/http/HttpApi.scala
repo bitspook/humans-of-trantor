@@ -38,7 +38,7 @@ class HttpApi(
     collectorRegistry: CollectorRegistry,
     config: HttpConfig
 ) {
-  private val apiContextPath = "/api/v1"
+  private val apiContextPath = s"${config.prefix}/api/v1"
   private val endpointsToRoutes = new EndpointsToRoutes(http, apiContextPath)
 
   lazy val mainRoutes: HttpRoutes[Task] = CorrelationId.setCorrelationIdMiddleware(endpointsToRoutes(endpoints))

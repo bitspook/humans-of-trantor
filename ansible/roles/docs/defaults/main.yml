@@ -10,4 +10,4 @@ docs_docker_registry: ""
 docs_docker_registry_username: ""
 docs_docker_registry_password: ""
 
-docs_base_url: "/docs"
+docs_base_url: ""

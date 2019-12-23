@@ -9,3 +9,5 @@ pms_docker_repository: ""
 pms_docker_registry: ""
 pms_docker_registry_username: ""
 pms_docker_registry_password: ""
+
+pms_api_prefix: ""

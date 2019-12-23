@@ -1,3 +1,3 @@
 package com.trantorinc.pms.http
 
-case class HttpConfig(host: String, port: Int)
+case class HttpConfig(host: String, port: Int, prefix: String = "")

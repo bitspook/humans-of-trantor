@@ -15,7 +15,9 @@
       path: "{{ pms_src_dir }}"
       dockerfile: "{{ pms_dockerfile }}"
       pull: no
-      rm: no
+      rm: yes
+      args:
+        API_PREFIX: "{{ pms_api_prefix }}"
     state: present
     repository: "{{ pms_docker_repository }}"
     push: "{{ pms_docker_repository != '' }}"
