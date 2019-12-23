@@ -1,4 +1,6 @@
 version: '3'
+volumes:
+  docs-vol:
 services:
   store:
     image: "{{ store_docker_repository }}:{{ store_docker_tag }}"
@@ -9,11 +11,22 @@ services:
       POSTGRES_PASSWORD: {{ hot_store_db_password }}
       POSTGRES_DB: {{ hot_store_db_name }}
 
+  gateway:
+    image: "{{ gateway_docker_repository }}:{{ store_docker_tag }}"
+    ports:
+      - "{{ hot_gateway_port }}:80"
+    volumes:
+      - docs-vol:/docs
+    depends_on:
+      - docs
+      - ei
+      - pms
+      - standup-ui
+
   docs:
     image: "{{ docs_docker_repository }}:{{ docs_docker_tag }}"
-    environment:
-      HOST: "0.0.0.0"
-      PORT: "80"
+    volumes:
+      - docs-vol:/app
 
   ei:
     image: "{{ ei_docker_repository }}:{{ ei_docker_tag }}"

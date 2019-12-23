@@ -2,6 +2,7 @@
   hosts: builder
   roles:
     - infra
+    - gateway
     - standup-ui
     - ei
     - docs

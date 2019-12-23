@@ -13,3 +13,5 @@ hot_pms_db_port: "5432"
 hot_pms_db_name: "{{ hot_store_db_name }}"
 hot_pms_db_user: "{{ hot_store_db_user }}"
 hot_pms_db_password: "{{ hot_store_db_password }}"
+
+hot_gateway_port: "{{ gateway_port }}"

@@ -1,0 +1,11 @@
+gateway_version:                  "{{ hot_version }}"
+
+gateway_dockerfile:        "Dockerfile-prod"
+gateway_docker_name:       "hot-gateway"
+gateway_docker_tag:        "{{ gateway_version }}"
+
+gateway_docker_registry:   "{{ hot_docker_registry }}"
+gateway_docker_repository: "{{ gateway_docker_registry + '/' + gateway_docker_name if gateway_docker_registry else '' }}"
+
+gateway_docker_registry_username: "{{ hot_docker_registry_username }}"
+gateway_docker_registry_password: "{{ hot_docker_registry_password }}"

@@ -9,3 +9,5 @@ hot_store_db_port:            "{{ lookup('env', 'HOT_DB_PORT') }}"
 hot_store_db_name:            "{{ lookup('env', 'HOT_DB_NAME') }}"
 hot_store_db_user:            "{{ lookup('env', 'HOT_DB_USER') }}"
 hot_store_db_password:        "{{ lookup('env', 'HOT_DB_PASSWORD') }}"
+
+hot_gateway_port: "5000"
