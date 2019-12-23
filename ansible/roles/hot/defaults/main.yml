@@ -5,9 +5,6 @@ hot_store_db_name: ""
 hot_store_db_user: ""
 hot_store_db_password: ""
 
-hot_ei_url: "http://localhost:7002"
-hot_pms_url: "http://localhost:7004"
-
 hot_pms_db_host: "{{ hot_store_db_host }}"
 hot_pms_db_port: "5432"
 hot_pms_db_name: "{{ hot_store_db_name }}"
@@ -15,3 +12,6 @@ hot_pms_db_user: "{{ hot_store_db_user }}"
 hot_pms_db_password: "{{ hot_store_db_password }}"
 
 hot_gateway_port: "{{ gateway_port }}"
+
+hot_ei_url: ""
+hot_pms_url: ""

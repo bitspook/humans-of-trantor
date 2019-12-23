@@ -10,4 +10,4 @@ pms_docker_registry: ""
 pms_docker_registry_username: ""
 pms_docker_registry_password: ""
 
-pms_api_prefix: ""
+pms_api_prefix: "{{ hot_pms_api_prefix }}"

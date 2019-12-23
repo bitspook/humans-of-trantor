@@ -17,6 +17,5 @@ COPY . /app
 
 CMD yarn build
 
-FROM nginx:alpine
-COPY nginx-site.conf /etc/nginx/conf.d/default.conf
+FROM alpine
 COPY --from=builder /app/build/ /app
