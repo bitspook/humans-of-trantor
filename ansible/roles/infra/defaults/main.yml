@@ -1,0 +1,11 @@
+docs_builder_version: ""
+docs_builder_src_dir: "{{ playbook_dir }}/../infra/docs-builder"
+
+docs_builder_dockerfile: "Dockerfile"
+docs_builder_docker_name: ""
+docs_builder_docker_tag: ""
+
+docs_builder_docker_repository: ""
+docs_builder_docker_registry: ""
+docs_builder_docker_registry_username: ""
+docs_builder_docker_registry_password: ""

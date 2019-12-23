@@ -1,6 +1,7 @@
 - name: Build the HoT Containers
   hosts: builder
   roles:
+    - infra
     - standup-ui
     - ei
     - docs

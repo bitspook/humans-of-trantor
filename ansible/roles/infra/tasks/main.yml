@@ -1,0 +1,12 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ docs_builder_docker_registry }}"
+    username: "{{ docs_builder_docker_registry_username }}"
+    password: "{{ docs_builder_docker_registry_password }}"
+  when: docs_builder_docker_registry|default('') != ''
+  tags: infra
+
+- import_tasks: docs-builder.yml
+  tags:
+    - infra
+    - docs-builder
