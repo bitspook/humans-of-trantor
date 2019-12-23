@@ -1,7 +1,7 @@
-baseUrl = "./"
 languageCode = "en-us"
 title = "Humans of Trantor"
 theme = "learn"
+canonifyURLs = false
 
 # For search functionality
 [outputs]

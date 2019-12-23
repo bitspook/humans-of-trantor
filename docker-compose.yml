@@ -35,8 +35,7 @@ services:
     environment:
       HOST: '0.0.0.0'
       PORT: 80
-    ports:
-     - 7000:80
+      BASE_URL: "http://localhost:5000/docs/"
 
   pgadmin:
     image: dpage/pgadmin4
