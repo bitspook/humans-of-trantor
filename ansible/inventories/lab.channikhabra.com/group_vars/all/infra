@@ -1,0 +1,11 @@
+docs_builder_version:           "0.0.1"
+
+docs_builder_dockerfile:        "Dockerfile"
+docs_builder_docker_name:       "hot-docs-builder"
+docs_builder_docker_tag:        "{{ docs_builder_version }}"
+
+docs_builder_docker_registry:   "{{ hot_docker_registry }}"
+docs_builder_docker_repository: "{{ docs_builder_docker_registry + '/' + docs_builder_docker_name if docs_builder_docker_registry else '' }}"
+
+docs_builder_docker_registry_username: "{{ hot_docker_registry_username }}"
+docs_builder_docker_registry_password: "{{ hot_docker_registry_password }}"

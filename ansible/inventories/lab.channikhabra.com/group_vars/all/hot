@@ -1,0 +1,22 @@
+hot_version:                  "{{ lookup('env', 'HOT_VERSION') }}"
+
+hot_docker_registry:          "{{ lookup('env', 'DOCKER_REGISTRY') }}"
+hot_docker_registry_username: "{{ lookup('env', 'DOCKER_REGISTRY_USERNAME') }}"
+hot_docker_registry_password: "{{ lookup('env', 'DOCKER_REGISTRY_PASSWORD') }}"
+
+hot_store_db_host:            "{{ lookup('env', 'HOT_DB_HOST') }}"
+hot_store_db_port:            "{{ lookup('env', 'HOT_DB_PORT') }}"
+hot_store_db_name:            "{{ lookup('env', 'HOT_DB_NAME') }}"
+hot_store_db_user:            "{{ lookup('env', 'HOT_DB_USER') }}"
+hot_store_db_password:        "{{ lookup('env', 'HOT_DB_PASSWORD') }}"
+
+hot_gateway_port: "5000"
+
+hot_fqdn: "https://lab.channikhabra.com"
+hot_base_url: "/humans-of-trantor"
+hot_docs_base_url: "{{ hot_base_url }}/docs"
+hot_pms_api_prefix: "{{ hot_base_url }}/pms"
+
+hot_standup_ui_url: "{{ hot_fqdn }}{{hot_base_url }}"
+hot_ei_url: "{{ hot_fqdn }}/ei"
+hot_pms_url: "{{ hot_fqdn }}{{ hot_pms_api_prefix }}"

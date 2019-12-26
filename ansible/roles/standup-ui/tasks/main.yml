@@ -15,6 +15,7 @@
       path: "{{ standup_ui_src_dir }}"
       dockerfile: "{{ standup_ui_dockerfile }}"
       args:
+        PUBLIC_URL: "{{ standup_ui_public_url }}"
         REACT_APP_EI_URL: "{{ standup_ui_ei_url }}"
         REACT_APP_PMS_URL: "{{ standup_ui_pms_url }}"
       pull: no

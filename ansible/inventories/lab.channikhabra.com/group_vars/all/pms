@@ -1,0 +1,11 @@
+pms_version:                  "{{ hot_version }}"
+
+pms_dockerfile:               "Dockerfile-prod"
+pms_docker_name:              "hot-pms"
+pms_docker_tag:               "{{ pms_version }}"
+
+pms_docker_registry:          "{{ hot_docker_registry }}"
+pms_docker_repository:        "{{ pms_docker_registry + '/' + pms_docker_name if pms_docker_registry else '' }}"
+
+pms_docker_registry_username: "{{ hot_docker_registry_username }}"
+pms_docker_registry_password: "{{ hot_docker_registry_password }}"
