@@ -13,14 +13,20 @@
     src: docker-compose.yml.j2
     dest: "{{ hot_dir }}/docker-compose.yml"
 
-- name: Start HoT Cloud
-  shell: "docker-compose up -d"
+- name: Pull new containers
+  shell: docker-compose pull
   args:
     chdir: "{{ hot_dir }}"
-  tags:
-    - launch
+  tags: launch
 
-- name: Run intial store migrations
+  # Must remove named volumes otherwise standup-ui/docs won't load new content
+- name: (Re)Start HoT Cloud
+  shell: "docker-compose down -v && docker-compose up -d"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags: launch
+
+- name: Run store migrations
   shell: "docker-compose exec -T store \
             migrate \
             -path /migrations \

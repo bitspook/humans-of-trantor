@@ -5,7 +5,7 @@ server {
   root "/";
 
   location /docs {
-    rewrite ^/docs/?(.*) /docs/$1 break;
+    rewrite ^/docs/?(.*) {{ hot_gateway_docs_mount }}/$1 break;
 
     sendfile            on;
     sendfile_max_chunk  1m;
@@ -13,7 +13,7 @@ server {
   }
 
   location /pms {
-    rewrite ^/pms/?(.*) /pms/$1 break;
+    rewrite ^/pms/?(.*) {{ hot_pms_api_prefix }}/$1 break;
 
     proxy_pass http://pms;
   }
@@ -25,7 +25,7 @@ server {
   }
 
   location / {
-    root "/standup-ui";
+    root "{{ hot_gateway_standup_ui_mount }}";
 
     try_files $uri $uri/ /index.html;
   }

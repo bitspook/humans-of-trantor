@@ -18,8 +18,8 @@ services:
       - "{{ hot_gateway_port }}:80"
     volumes:
       - ./gateway.conf:/etc/nginx/conf.d/default.conf
-      - docs-vol:/docs
-      - standup-ui-vol:/standup-ui
+      - docs-vol:{{ hot_gateway_docs_mount }}
+      - standup-ui-vol:{{ hot_gateway_standup_ui_mount }}
     depends_on:
       - docs
       - ei
