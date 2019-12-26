@@ -1,5 +1,5 @@
 [builder]
 localhost ansible_connection=local
 
-[lab]
+[server]
 lab.channikhabra.com

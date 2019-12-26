@@ -3,6 +3,11 @@
     path: "{{ hot_dir }}"
     state: directory
 
+- name: Copy gateway conf
+  template:
+    src: gateway.conf.j2
+    dest: "{{ hot_dir }}/gateway.conf"
+
 - name: Copy docker-compose.yml
   template:
     src: docker-compose.yml.j2

@@ -1,4 +1,4 @@
 - name: Deploy HoT Containers from registry
-  hosts: lab
+  hosts: server
   roles:
     - hot
