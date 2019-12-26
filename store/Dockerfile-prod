@@ -1,0 +1,13 @@
+FROM postgres:alpine
+
+RUN apk update
+RUN apk add postgresql-contrib
+
+ENV MIGRATE_VERSION="v4.6.2"
+ENV MIGRATE_RELEASE_URL="https://github.com/golang-migrate/migrate/releases/download/${MIGRATE_VERSION}/migrate.linux-amd64.tar.gz"
+
+ADD $MIGRATE_RELEASE_URL /tmp
+RUN tar -xvzf /tmp/migrate.linux-amd64.tar.gz && mv migrate.linux-amd64 /usr/bin/migrate
+RUN echo "alias mcreate=\"migrate create -ext sql -dir /migrations\"" >> ~/.profile
+
+COPY migrations /migrations

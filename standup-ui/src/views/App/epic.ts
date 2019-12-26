@@ -4,12 +4,13 @@ import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
+import config from 'src/config';
 import standupDuck from 'src/ducks/standup';
 import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
 
 const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
-  const url = 'http://localhost:7002/events/RECEIVED_STANDUP_UPDATE';
+  const url = `${config.urls.ei}/events/RECEIVED_STANDUP_UPDATE`;
 
   const standups = [
     { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },

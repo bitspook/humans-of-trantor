@@ -1,0 +1,11 @@
+gateway_version: ""
+gateway_src_dir: "{{ playbook_dir }}/../gateway"
+
+gateway_dockerfile: "Dockerfile"
+gateway_docker_name: ""
+gateway_docker_tag: ""
+
+gateway_docker_repository: ""
+gateway_docker_registry: ""
+gateway_docker_registry_username: ""
+gateway_docker_registry_password: ""

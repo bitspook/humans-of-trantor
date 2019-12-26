@@ -1,0 +1,11 @@
+store_version:                  "{{ hot_version }}"
+
+store_dockerfile:        "Dockerfile-prod"
+store_docker_name:       "hot-store"
+store_docker_tag:        "{{ store_version }}"
+
+store_docker_registry:   "{{ hot_docker_registry }}"
+store_docker_repository: "{{ store_docker_registry + '/' + store_docker_name if store_docker_registry else '' }}"
+
+store_docker_registry_username: "{{ hot_docker_registry_username }}"
+store_docker_registry_password: "{{ hot_docker_registry_password }}"

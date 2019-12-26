@@ -1,0 +1,19 @@
+- name: Create docs-builder docker image
+  docker_image:
+    name: "{{ docs_builder_docker_name }}"
+    tag: "{{ docs_builder_docker_tag }}"
+    source: build
+    build:
+      path: "{{ docs_builder_src_dir }}"
+      dockerfile: "{{ docs_builder_dockerfile }}"
+      pull: yes
+    state: present
+    repository: "{{ docs_builder_docker_repository }}"
+    push: "{{ docs_builder_docker_repository != '' }}"
+
+- name: Destroy docs-builder docker image
+  docker_image:
+    state: absent
+    name: "{{ docs_builder_docker_name }}"
+    tag: "{{ docs_builder_version }}"
+  tags: [ never, destroy ]

@@ -1,0 +1,15 @@
+standup_ui_version: ""
+standup_ui_src_dir: "{{ playbook_dir }}/../standup-ui"
+
+standup_ui_dockerfile: "Dockerfile"
+standup_ui_docker_name: ""
+standup_ui_docker_tag: ""
+
+standup_ui_docker_repository: ""
+standup_ui_docker_registry: ""
+standup_ui_docker_registry_username: ""
+standup_ui_docker_registry_password: ""
+
+standup_ui_public_url: ""
+standup_ui_ei_url: ""
+standup_ui_pms_url: ""

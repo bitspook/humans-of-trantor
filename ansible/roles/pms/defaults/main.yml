@@ -1,0 +1,13 @@
+pms_version: ""
+pms_src_dir: "{{ playbook_dir }}/../pms"
+
+pms_dockerfile: "Dockerfile"
+pms_docker_name: ""
+pms_docker_tag: ""
+
+pms_docker_repository: ""
+pms_docker_registry: ""
+pms_docker_registry_username: ""
+pms_docker_registry_password: ""
+
+pms_api_prefix: "{{ hot_pms_api_prefix }}"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, List } from 'semantic-ui-react';
 import { Employee } from '../../ducks/employees';
+import defaultEmployeeAvatar from './images/default-employee.png';
 import './index.module.scss';
 
 interface EmployeeListItemProps {
@@ -9,7 +10,7 @@ interface EmployeeListItemProps {
   isHighlighted: boolean;
 }
 const EmployeeListItem = ({ employee, onClick, isHighlighted }: EmployeeListItemProps) => {
-  const avatarImage = employee.avatar || '/images/default-employee.png';
+  const avatarImage = employee.avatar || defaultEmployeeAvatar;
   const handleClick = () => onClick(employee);
 
   return (

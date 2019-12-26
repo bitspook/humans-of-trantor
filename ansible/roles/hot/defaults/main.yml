@@ -1,0 +1,20 @@
+hot_dir: "~/hot"
+hot_data_dir: "{{ hot_dir }}/data"
+
+hot_store_db_name: ""
+hot_store_db_user: ""
+hot_store_db_password: ""
+
+hot_pms_db_host: "{{ hot_store_db_host }}"
+hot_pms_db_port: "5432"
+hot_pms_db_name: "{{ hot_store_db_name }}"
+hot_pms_db_user: "{{ hot_store_db_user }}"
+hot_pms_db_password: "{{ hot_store_db_password }}"
+
+hot_gateway_port: "{{ gateway_port }}"
+
+hot_ei_url: ""
+hot_pms_url: ""
+
+hot_gateway_docs_mount: "/docs"
+hot_gateway_standup_ui_mount: "/standup-ui"

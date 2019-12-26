@@ -1,0 +1,5 @@
+[builder]
+localhost ansible_connection=local
+
+[server]
+localhost ansible_connection=local

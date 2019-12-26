@@ -1,0 +1,4 @@
+- name: Deploy HoT Containers from registry
+  hosts: server
+  roles:
+    - hot

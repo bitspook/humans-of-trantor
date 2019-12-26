@@ -1,0 +1,32 @@
+server {
+  error_log /dev/stdout debug;
+  access_log /dev/stdout;
+
+  root "/";
+
+  location /docs {
+    rewrite ^/docs/?(.*) {{ hot_gateway_docs_mount }}/$1 break;
+
+    sendfile            on;
+    sendfile_max_chunk  1m;
+    tcp_nopush on;
+  }
+
+  location /pms {
+    rewrite ^/pms/?(.*) {{ hot_pms_api_prefix }}/$1 break;
+
+    proxy_pass http://pms;
+  }
+
+  location /ei {
+    rewrite ^/ei/?(.*) /$1 break;
+
+    proxy_pass http://ei;
+  }
+
+  location / {
+    root "{{ hot_gateway_standup_ui_mount }}";
+
+    try_files $uri $uri/ /index.html;
+  }
+}

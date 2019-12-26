@@ -1,0 +1,64 @@
+version: '3'
+volumes:
+  docs-vol:
+  standup-ui-vol:
+services:
+  store:
+    image: "{{ store_docker_repository }}:{{ store_docker_tag }}"
+    volumes:
+      - "{{ hot_data_dir }}/store:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: {{ hot_store_db_user }}
+      POSTGRES_PASSWORD: {{ hot_store_db_password }}
+      POSTGRES_DB: {{ hot_store_db_name }}
+
+  gateway:
+    image: "{{ gateway_docker_repository }}:{{ store_docker_tag }}"
+    ports:
+      - "{{ hot_gateway_port }}:80"
+    volumes:
+      - ./gateway.conf:/etc/nginx/conf.d/default.conf
+      - docs-vol:{{ hot_gateway_docs_mount }}
+      - standup-ui-vol:{{ hot_gateway_standup_ui_mount }}
+    depends_on:
+      - docs
+      - ei
+      - pms
+      - standup-ui
+
+  docs:
+    image: "{{ docs_docker_repository }}:{{ docs_docker_tag }}"
+    volumes:
+      - docs-vol:/app
+
+  ei:
+    image: "{{ ei_docker_repository }}:{{ ei_docker_tag }}"
+    environment:
+      ROARR_LOG: "true"
+      HOST: "0.0.0.0"
+      PORT: "80"
+    depends_on:
+      - store
+
+  standup-ui:
+    image: "{{ standup_ui_docker_repository }}:{{ standup_ui_docker_tag }}"
+    volumes:
+      - standup-ui-vol:/app
+    depends_on:
+      - store
+      - ei
+      - pms
+
+  pms:
+    image: "{{ pms_docker_repository }}:{{ pms_docker_tag }}"
+    environment:
+      DB_USERNAME: "{{ hot_pms_db_user }}"
+      DB_PASSWORD: "{{ hot_pms_db_password }}"
+      DB_NAME: "{{ hot_pms_db_name }}"
+      DB_HOST: "{{ hot_pms_db_host }}"
+      DB_PORT: "{{ hot_pms_db_port }}"
+      HOST: "0.0.0.0"
+      PORT: "80"
+      API_PREFIX: "{{ hot_pms_api_prefix }}"
+    depends_on:
+      - store

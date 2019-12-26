@@ -1,0 +1,38 @@
+- name: Create hot dir
+  file:
+    path: "{{ hot_dir }}"
+    state: directory
+
+- name: Copy gateway conf
+  template:
+    src: gateway.conf.j2
+    dest: "{{ hot_dir }}/gateway.conf"
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ hot_dir }}/docker-compose.yml"
+
+- name: Pull new containers
+  shell: docker-compose pull
+  args:
+    chdir: "{{ hot_dir }}"
+  tags: launch
+
+  # Must remove named volumes otherwise standup-ui/docs won't load new content
+- name: (Re)Start HoT Cloud
+  shell: "docker-compose down -v && docker-compose up -d"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags: launch
+
+- name: Run store migrations
+  shell: "docker-compose exec -T store \
+            migrate \
+            -path /migrations \
+            -database postgres://{{ hot_store_db_user }}:{{ hot_store_db_password }}@localhost/{{ hot_store_db_name }}?sslmode=disable \
+            up"
+  args:
+    chdir: "{{ hot_dir }}"
+  tags:
+    - post-launch

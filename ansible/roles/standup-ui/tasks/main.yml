@@ -1,0 +1,31 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ standup_ui_docker_registry }}"
+    username: "{{ standup_ui_docker_registry_username }}"
+    password: "{{ standup_ui_docker_registry_password }}"
+  when: standup_ui_docker_registry|default('') != ''
+
+- name: Create docker image
+  docker_image:
+    name: "{{ standup_ui_docker_name }}"
+    tag: "{{ standup_ui_docker_tag }}"
+    source: build
+    debug: yes
+    build:
+      path: "{{ standup_ui_src_dir }}"
+      dockerfile: "{{ standup_ui_dockerfile }}"
+      args:
+        PUBLIC_URL: "{{ standup_ui_public_url }}"
+        REACT_APP_EI_URL: "{{ standup_ui_ei_url }}"
+        REACT_APP_PMS_URL: "{{ standup_ui_pms_url }}"
+      pull: no
+    state: present
+    repository: "{{ standup_ui_docker_repository }}"
+    push: "{{ standup_ui_docker_repository != '' }}"
+
+- name: Destroy docker image
+  docker_image:
+    state: absent
+    name: "{{ standup_ui_docker_name }}"
+    tag: "{{ standup_ui_version }}"
+  tags: [ never, destroy ]

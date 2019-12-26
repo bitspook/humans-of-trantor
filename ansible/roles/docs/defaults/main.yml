@@ -1,0 +1,13 @@
+docs_version: ""
+docs_src_dir: "{{ playbook_dir }}/../docs"
+
+docs_dockerfile: "Dockerfile"
+docs_docker_name: ""
+docs_docker_tag: ""
+
+docs_docker_repository: ""
+docs_docker_registry: ""
+docs_docker_registry_username: ""
+docs_docker_registry_password: ""
+
+docs_base_url: "{{ hot_docs_base_url }}"
