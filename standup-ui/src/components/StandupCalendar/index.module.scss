@@ -1,7 +1,22 @@
 .disabled {
   opacity: 0.3;
+  display: flex;
 
   &:hover, &:active {
     opacity: 0.7;
   }
+}
+
+.calendarItem {
+  display: flex !important;
+}
+
+.icon{
+  width: 2em;
+  height: 2em;
+  padding-top:0.14em
+}
+
+.calendarDetails{
+  padding-left: .5em;
 }
