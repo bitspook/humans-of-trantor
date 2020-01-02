@@ -25,7 +25,7 @@ const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps
         [c.disabled]: isWeekend
       })}
     >
-      <CalendarIcon day={day} className={c.icon}/>
+      <CalendarIcon day={day} className={c.calendarIcon}/>
       <List.Content className={c.calendarDetails}>
         <List.Header>{day.format('dddd')}</List.Header>
         <List.Description>{day.format('MMM DD, YYYY')}</List.Description>
