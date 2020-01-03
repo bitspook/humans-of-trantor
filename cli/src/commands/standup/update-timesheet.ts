@@ -87,7 +87,7 @@ module.exports = {
       let spinner = print.spin(
         `${spinnerPermaText}: Requesting recorded standup updates`,
       );
-      const standupRows = await db.many(sql`
+      const standupRows = await db.any(sql`
         SELECT DISTINCT ON (payload->>'date', payload->>'type')
           payload->>'date' as date,
           payload->>'standup' as standup
