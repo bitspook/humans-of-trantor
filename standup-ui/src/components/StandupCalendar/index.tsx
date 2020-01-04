@@ -1,8 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
+import classNames from 'classnames';
 import { List } from 'semantic-ui-react';
 import { Standup } from 'src/ducks/standup';
 import c from './index.module.scss';
+import CalendarIcon from 'src/components/CalendarIcon';
 
 interface CalendarListItemProps {
   day: Dayjs;
@@ -15,8 +17,16 @@ const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps
   const handleClick = () => onClick(day);
 
   return (
-    <List.Item onClick={handleClick} active={isHighlighted} className={isWeekend ? c.disabled : ''}>
-      <List.Content>
+    <List.Item 
+      onClick={handleClick} 
+      active={isHighlighted} 
+      className={classNames({
+        [c.calendarItem]: true,
+        [c.disabled]: isWeekend
+      })}
+    >
+      <CalendarIcon day={day} className={c.calendarIcon}/>
+      <List.Content className={c.calendarDetails}>
         <List.Header>{day.format('dddd')}</List.Header>
         <List.Description>{day.format('MMM DD, YYYY')}</List.Description>
       </List.Content>

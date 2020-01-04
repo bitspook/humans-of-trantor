@@ -5,7 +5,7 @@ WORKDIR /app
 ENV HOST=0.0.0.0
 ENV NODE_ENV=development
 
-RUN npm i -g yarn
+RUN npm i -g yarn -f
 
 COPY ./package.json /app/
 COPY ./yarn.lock /app/
