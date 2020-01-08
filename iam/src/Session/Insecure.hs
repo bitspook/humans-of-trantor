@@ -1,17 +1,13 @@
-{-# LANGUAGE DataKinds             #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
-{-# LANGUAGE TypeApplications      #-}
-{-# LANGUAGE TypeOperators         #-}
-
-module Session.Insecure where
+module Session.Insecure
+  ( API
+  , server
+  )
+where
 
 import           Data.Aeson
 import           RIO
-import qualified RIO.ByteString      as BS
 import           Servant
-import           Servant.Auth        as SA
-import           Servant.Auth.Server as SAS
+import           Servant.Auth.Server
 import           Session.Types
 
 data NewSessionInput = NewSessionInput
@@ -19,7 +15,10 @@ data NewSessionInput = NewSessionInput
   , password :: String
   } deriving (Show, Generic, FromJSON)
 
-createSession :: CookieSettings -> JWTSettings -> Server InsecureEndpoints
-createSession _ _ = \_ -> return $ Session (AccessToken "lol") (RefreshToken "rofl")
+type API = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
 
-type InsecureEndpoints = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
+server :: CookieSettings -> JWTSettings -> Server API
+server _ _ = return . createSession_
+ where
+  createSession_ :: NewSessionInput -> Session
+  createSession_ i = Session (AccessToken "lol") (RefreshToken "rofl")

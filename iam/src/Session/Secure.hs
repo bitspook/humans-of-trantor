@@ -1,16 +1,23 @@
-module Session.Secure where
+module Session.Secure
+  ( API
+  , server
+  )
+where
 
-import Data.Aeson
-import RIO
-import Session.Types
-import Servant
-import Servant.Auth.Server
+import           Data.Aeson
+import           RIO
+import           Session.Types
+import           Servant
+import           Servant.Auth.Server
 
 data SessionOpInput = SessionOpInput
   { refreshToken :: String } deriving (Show, Generic, FromJSON)
 
-type SecureEndpoints = "session" :> ReqBody '[JSON] SessionOpInput :> Put '[JSON] Session
+refreshSession :: Session -> SessionOpInput -> Session
+refreshSession s _ = s
 
-refreshSession :: AuthResult Session -> Server SecureEndpoints
-refreshSession (Authenticated s) = \_ -> return s
-refreshSession _                 = throwAll err401
+server :: AuthResult Session -> Server API
+server (Authenticated s) = return . refreshSession s
+server _                 = throwAll err401
+
+type API = "session" :> ReqBody '[JSON] SessionOpInput :> Put '[JSON] Session
