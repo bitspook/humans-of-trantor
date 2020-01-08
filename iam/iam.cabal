@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0c0e03657764e58015e6a3b3fa0f82e30a72eca971327afe080b031d18899d6b
+-- hash: cf6de18f6d02df7375a6ac95f0aa2d003b56a78d96a2ff1147661bc1a32b081f
 
 name:           iam
 version:        0.1.0.0
@@ -29,20 +29,30 @@ library
   exposed-modules:
       Lib
       Session
+      Session.Insecure
+      Session.Secure
+      Session.Types
   other-modules:
       Paths_iam
   hs-source-dirs:
       src
+  default-extensions: NoImplicitPrelude OverloadedStrings DeriveGeneric DeriveAnyClass ScopedTypeVariables TypeApplications DataKinds TypeOperators DuplicateRecordFields
   build-depends:
-      asn1-encoding
+      aeson
+    , asn1-encoding
     , asn1-types
     , base >=4.7 && <5
     , cryptonite
     , jose
-    , magicbane
     , pem
     , rio
+    , servant
+    , servant-auth
+    , servant-auth-server
+    , servant-client
+    , servant-server
     , text
+    , warp
     , x509
     , x509-store
   default-language: Haskell2010
@@ -55,16 +65,22 @@ executable iam
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      asn1-encoding
+      aeson
+    , asn1-encoding
     , asn1-types
     , base >=4.7 && <5
     , cryptonite
     , iam
     , jose
-    , magicbane
     , pem
     , rio
+    , servant
+    , servant-auth
+    , servant-auth-server
+    , servant-client
+    , servant-server
     , text
+    , warp
     , x509
     , x509-store
   default-language: Haskell2010
@@ -78,16 +94,22 @@ test-suite iam-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      asn1-encoding
+      aeson
+    , asn1-encoding
     , asn1-types
     , base >=4.7 && <5
     , cryptonite
     , iam
     , jose
-    , magicbane
     , pem
     , rio
+    , servant
+    , servant-auth
+    , servant-auth-server
+    , servant-client
+    , servant-server
     , text
+    , warp
     , x509
     , x509-store
   default-language: Haskell2010

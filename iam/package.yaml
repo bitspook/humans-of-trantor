@@ -21,7 +21,13 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- magicbane
+- servant
+- servant-client
+- servant-server
+- servant-auth
+- servant-auth-server
+- aeson
+- warp
 - rio
 - jose
 - cryptonite
@@ -34,6 +40,16 @@ dependencies:
 
 library:
   source-dirs: src
+  default-extensions:
+    - NoImplicitPrelude
+    - OverloadedStrings
+    - DeriveGeneric
+    - DeriveAnyClass
+    - ScopedTypeVariables
+    - TypeApplications
+    - DataKinds
+    - TypeOperators
+    - DuplicateRecordFields
 
 executables:
   iam:

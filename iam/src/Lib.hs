@@ -7,16 +7,18 @@
 {-# LANGUAGE UnicodeSyntax     #-}
 
 module Lib
-  ( run
-  ) where
-import           Magicbane
+  ( runApp  )
+where
+import           Network.Wai.Handler.Warp (run)
 import           RIO
-import qualified Session   as S
+import           Servant
+import           Servant.Auth.Server      as SAS
+import qualified Session                  as S
+import           System.IO
 
-type Api = S.Spi
-
-api = Proxy :: Proxy Api
-
-run = do
-  ctx <- newBasicContext
-  defWaiMain $ magicbaneApp api EmptyContext ctx $ S.server
+runApp = do
+  myKey <- SAS.generateKey
+  let jwtCfg = defaultJWTSettings myKey
+      cfg    = defaultCookieSettings :. jwtCfg :. EmptyContext
+      api    = Proxy :: Proxy (S.Api '[JWT])
+  run 7000 $ serveWithContext api cfg (S.server defaultCookieSettings jwtCfg)
