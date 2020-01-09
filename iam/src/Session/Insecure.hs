@@ -6,19 +6,26 @@ where
 
 import           Data.Aeson
 import           RIO
-import           Servant
+import           Servant                       as S
 import           Servant.Auth.Server
+import           Types
 import           Session.Types
+import           Data.Text.Encoding             ( decodeUtf8 )
+import           RIO.ByteString.Lazy            ( toStrict )
 
 data NewSessionInput = NewSessionInput
-  { email    :: String
-  , password :: String
+  { email    :: Email
+  , password :: Text
   } deriving (Show, Generic, FromJSON)
 
 type API = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
 
-server :: CookieSettings -> JWTSettings -> Server API
-server _ _ = return . createSession_
- where
-  createSession_ :: NewSessionInput -> Session
-  createSession_ i = Session (AccessToken "lol") (RefreshToken "rofl")
+createSession :: JWTSettings -> NewSessionInput -> S.Handler Session
+createSession jwts i = do
+  token <- liftIO $ makeJWT (AccessToken (UUID "1") (email i)) jwts Nothing
+  case token of
+    Left  e -> throwError err500
+    Right t -> return $ Session (decodeUtf8 $ toStrict t) (RefreshToken "lol")
+
+server :: JWTSettings -> Server API
+server = createSession

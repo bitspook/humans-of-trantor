@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cf6de18f6d02df7375a6ac95f0aa2d003b56a78d96a2ff1147661bc1a32b081f
+-- hash: 25c0a382ce9651c7a5c21fe086fef66bd6ad9e5736c545114021c63116af1f9b
 
 name:           iam
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Session.Insecure
       Session.Secure
       Session.Types
+      Types
   other-modules:
       Paths_iam
   hs-source-dirs:

@@ -13,6 +13,6 @@ import qualified Session.Secure                as Secure
 import           Session.Types
 
 server :: CookieSettings -> JWTSettings -> Server (API auths)
-server cs jwts = Secure.server :<|> Insecure.server cs jwts
+server _ jwts = Secure.server jwts :<|> Insecure.server jwts
 
-type API auths = (Auth auths Session :> Secure.API) :<|> Insecure.API
+type API auths = (Auth auths AccessToken :> Secure.API) :<|> Insecure.API
