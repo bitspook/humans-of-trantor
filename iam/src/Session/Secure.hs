@@ -21,7 +21,7 @@ refreshSession
 refreshSession jwts (AccessToken aId aEmail) (SessionOpInput rt) = do
   token <- liftIO $ makeJWT (AccessToken aId aEmail) jwts Nothing
   case token of
-    Left e -> throwError err500
+    Left  e -> throwError err500 { errBody = fromString . show $ e }
     Right t ->
       return $ Session (decodeUtf8 . toStrict $ t) rt
 

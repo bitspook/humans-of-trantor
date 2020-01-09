@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 25c0a382ce9651c7a5c21fe086fef66bd6ad9e5736c545114021c63116af1f9b
+-- hash: 8a9c8c1fc04963c1f5272ea9727a7b7039a48164b689e154e8e932604a02fbb0
 
 name:           iam
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      CryptoUtil
       Lib
       Session
       Session.Insecure
@@ -40,22 +41,19 @@ library
   default-extensions: NoImplicitPrelude OverloadedStrings DeriveGeneric DeriveAnyClass ScopedTypeVariables TypeApplications DataKinds TypeOperators DuplicateRecordFields
   build-depends:
       aeson
-    , asn1-encoding
-    , asn1-types
     , base >=4.7 && <5
+    , crypto-pubkey-openssh
+    , crypto-pubkey-types
     , cryptonite
+    , either
     , jose
-    , pem
     , rio
     , servant
-    , servant-auth
     , servant-auth-server
     , servant-client
     , servant-server
     , text
     , warp
-    , x509
-    , x509-store
   default-language: Haskell2010
 
 executable iam
@@ -67,23 +65,20 @@ executable iam
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
-    , asn1-encoding
-    , asn1-types
     , base >=4.7 && <5
+    , crypto-pubkey-openssh
+    , crypto-pubkey-types
     , cryptonite
+    , either
     , iam
     , jose
-    , pem
     , rio
     , servant
-    , servant-auth
     , servant-auth-server
     , servant-client
     , servant-server
     , text
     , warp
-    , x509
-    , x509-store
   default-language: Haskell2010
 
 test-suite iam-test
@@ -96,21 +91,18 @@ test-suite iam-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
-    , asn1-encoding
-    , asn1-types
     , base >=4.7 && <5
+    , crypto-pubkey-openssh
+    , crypto-pubkey-types
     , cryptonite
+    , either
     , iam
     , jose
-    , pem
     , rio
     , servant
-    , servant-auth
     , servant-auth-server
     , servant-client
     , servant-server
     , text
     , warp
-    , x509
-    , x509-store
   default-language: Haskell2010

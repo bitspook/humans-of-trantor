@@ -20,11 +20,14 @@ data NewSessionInput = NewSessionInput
 
 type API = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
 
+wentWrong :: String -> ServerError
+wentWrong msg = ServerError 500 msg "" []
+
 createSession :: JWTSettings -> NewSessionInput -> S.Handler Session
 createSession jwts i = do
   token <- liftIO $ makeJWT (AccessToken (UUID "1") (email i)) jwts Nothing
   case token of
-    Left  e -> throwError err500
+    Left  e -> throwError err500 { errBody = fromString . show $ e }
     Right t -> return $ Session (decodeUtf8 $ toStrict t) (RefreshToken "lol")
 
 server :: JWTSettings -> Server API

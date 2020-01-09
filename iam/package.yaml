@@ -24,19 +24,16 @@ dependencies:
 - servant
 - servant-client
 - servant-server
-- servant-auth
 - servant-auth-server
 - aeson
 - warp
 - rio
 - jose
 - cryptonite
-- asn1-encoding
-- asn1-types
-- pem
 - text
-- x509
-- x509-store
+- crypto-pubkey-openssh
+- either
+- crypto-pubkey-types
 
 library:
   source-dirs: src
