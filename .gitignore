@@ -2,4 +2,6 @@ docker-volumes
 tsconfig.tsbuildinfo
 .stack-work
 .hotrc
+.scannerwork
 /env/*.sh
+/iam/dist-newstyle/

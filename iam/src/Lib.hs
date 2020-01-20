@@ -8,20 +8,26 @@ import           Network.Wai.Handler.Warp       ( run )
 import           RIO
 import           Servant
 import           Servant.Auth.Server           as SAS
+import           Data.Either.Combinators        ( fromRight' )
+import           Crypto.JOSE                   as Jose
+import           Data.Pool
+
+import           CryptoUtil                     ( readPemRsaKey )
+import           Db                             ( initConnectionPool, migrate )
+
 import           Session                        ( API
                                                 , server
                                                 )
-import Data.Either.Combinators (fromRight')
-import           Crypto.JOSE                   as Jose
-import Crypto.PubKey.RSA.Types
-import Crypto.PubKey.OpenSsh
-import CryptoUtil (readPemRsaKey)
 
+runApp :: IO ()
 runApp = do
-  myKey      <- SAS.generateKey
+  pool <- initConnectionPool "postgresql://hot:hot@localhost/iam"
+  _ <- liftIO . withResource pool $ migrate "migrations"
   privateKey <- fromRSA . fromRight' <$> readPemRsaKey "./jwt-keys.pem"
-  let
-    jwtCfg = JWTSettings privateKey (Just Jose.RS256) (Jose.JWKSet [privateKey]) (const Matches)
-    cfg    = defaultCookieSettings :. jwtCfg :. EmptyContext
-    api    = Proxy :: Proxy (API '[JWT])
-  run 7000 $ serveWithContext api cfg (server defaultCookieSettings jwtCfg)
+  let jwtCfg = JWTSettings privateKey
+                           (Just Jose.RS256)
+                           (Jose.JWKSet [privateKey])
+                           (const Matches)
+      cfg     = defaultCookieSettings :. jwtCfg :. EmptyContext
+      api     = Proxy :: Proxy (API '[JWT])
+  run 7000 $ serveWithContext api cfg (server defaultCookieSettings jwtCfg pool)

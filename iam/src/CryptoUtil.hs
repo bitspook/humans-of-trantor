@@ -6,7 +6,7 @@ import qualified Crypto.Types.PubKey.RSA as CRSA
 import           RIO
 import qualified RIO.ByteString          as B
 
-data PrivateKeyError = NotRSA | ParseErr String | NoKey FilePath
+data PrivateKeyError = NotRSA | ParseErr String
 
 -- | Read private RSA Key in PEM format
 readPemRsaKey
@@ -17,7 +17,7 @@ readPemRsaKey path = do
   eKey <- liftIO $ D.decodePrivate <$> B.readFile path
   return $ case eKey of
     Right (D.OpenSshPrivateKeyRsa k) -> Right . convertPri' $ k
-    Right other                      -> Left NotRSA
+    Right _                          -> Left NotRSA
     Left  err                        -> Left . ParseErr $ err
 
 convertPub' :: CRSA.PublicKey -> PublicKey

@@ -34,6 +34,18 @@ dependencies:
 - crypto-pubkey-openssh
 - either
 - crypto-pubkey-types
+- resource-pool
+- postgresql-simple
+- postgresql-simple-migration
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wpartial-fields
+- -Wredundant-constraints
 
 library:
   source-dirs: src

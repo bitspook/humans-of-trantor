@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8a9c8c1fc04963c1f5272ea9727a7b7039a48164b689e154e8e932604a02fbb0
+-- hash: 152466bb8ef2958f9d512dac0f5555b406222ef710ec662086a5293e7b22b7cb
 
 name:           iam
 version:        0.1.0.0
@@ -28,10 +28,9 @@ source-repository head
 library
   exposed-modules:
       CryptoUtil
+      Db
       Lib
       Session
-      Session.Insecure
-      Session.Secure
       Session.Types
       Types
   other-modules:
@@ -39,6 +38,7 @@ library
   hs-source-dirs:
       src
   default-extensions: NoImplicitPrelude OverloadedStrings DeriveGeneric DeriveAnyClass ScopedTypeVariables TypeApplications DataKinds TypeOperators DuplicateRecordFields
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -47,6 +47,9 @@ library
     , cryptonite
     , either
     , jose
+    , postgresql-simple
+    , postgresql-simple-migration
+    , resource-pool
     , rio
     , servant
     , servant-auth-server
@@ -62,7 +65,7 @@ executable iam
       Paths_iam
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -72,6 +75,9 @@ executable iam
     , either
     , iam
     , jose
+    , postgresql-simple
+    , postgresql-simple-migration
+    , resource-pool
     , rio
     , servant
     , servant-auth-server
@@ -88,7 +94,7 @@ test-suite iam-test
       Paths_iam
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -98,6 +104,9 @@ test-suite iam-test
     , either
     , iam
     , jose
+    , postgresql-simple
+    , postgresql-simple-migration
+    , resource-pool
     , rio
     , servant
     , servant-auth-server
