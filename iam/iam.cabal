@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 152466bb8ef2958f9d512dac0f5555b406222ef710ec662086a5293e7b22b7cb
+-- hash: 9d3df08928535156934b6451d9b496d25a30a71c553d57a0ba46d563378fd1f1
 
 name:           iam
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       CryptoUtil
       Db
+      Identity
       Lib
       Session
       Session.Types
