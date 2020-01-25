@@ -2,7 +2,6 @@ CREATE SCHEMA iam;
 -- enabled extensions
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- functions
@@ -21,7 +20,7 @@ SET search_path TO iam, PUBLIC;
 -- identity is a how a client who can create a session is identified
 CREATE TABLE identity (
   id UUID NOT NULL DEFAULT uuid_generate_v1mc(),
-  email CITEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
 
   created_at TIMESTAMP DEFAULT NOW(),

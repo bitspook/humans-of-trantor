@@ -6,14 +6,26 @@ where
 
 
 import           Data.Pool
+import           Data.Text
 import           Data.Text.Encoding         (decodeUtf8)
 import           Database.PostgreSQL.Simple
-import           RIO
+import           Identity.Types             (Identity (Identity))
+import           RIO                        hiding (Identity)
 import           RIO.ByteString.Lazy        (toStrict)
 import           Servant                    as S
 import           Servant.Auth.Server
 import           Session.Types
 import           Types
+
+getIdentity :: Pool Connection -> NewSessionInput -> IO (Maybe Identity)
+getIdentity pool (NewSessionInput (Email email') pass') = do
+  rows <- liftIO . withResource pool $ \conn -> query
+    conn
+    "SELECT id, email from iam.identity WHERE email = ? and password = crypt(?, password)"
+    (toLower email', pass')
+  case rows of
+    (x : _) -> return $ Just (Identity (fst x) (Email $ decodeUtf8 . snd $ x))
+    []      -> return Nothing
 
 refreshSession
   :: JWTSettings
@@ -21,8 +33,8 @@ refreshSession
   -> AccessToken
   -> SessionOpInput
   -> S.Handler Session
-refreshSession jwts conns (AccessToken aId) (SessionOpInput rt) = do
-  v <- liftIO . withResource conns $ \conn -> execute conn "SELECT 1" ()
+refreshSession jwts pool (AccessToken aId) (SessionOpInput rt) = do
+  v <- liftIO . withResource pool $ \conn -> execute conn "SELECT 1" ()
   traceShowIO v
   token <- liftIO $ makeJWT (AccessToken aId) jwts Nothing
   case token of
@@ -34,20 +46,25 @@ secureServer
   -> Pool Connection
   -> AuthResult AccessToken
   -> Server SecureAPI
-secureServer jwts conns (Authenticated a) = refreshSession jwts conns a
-secureServer _    _     _                 = throwAll err401
+secureServer jwts pool (Authenticated a) = refreshSession jwts pool a
+secureServer _    _    _                 = throwAll err401
 
 createSession
   :: JWTSettings -> Pool Connection -> NewSessionInput -> S.Handler Session
-createSession jwts conns input = do
-  _     <- liftIO . withResource conns $ \conn -> execute conn "SELECT 1" ()
-  token <- liftIO $ makeJWT (AccessToken (UUID "1")) jwts Nothing
-  case token of
-    Left  e -> throwError err500 { errBody = fromString . show $ e }
-    Right t -> return $ Session (decodeUtf8 $ toStrict t) (RefreshToken "lol")
+createSession jwts pool inp = do
+  maybeId <- liftIO $ getIdentity pool inp
+
+  case maybeId of
+    Nothing               -> throwError err401
+    Just (Identity id' _) -> do
+      token <- liftIO $ makeJWT (AccessToken id') jwts Nothing
+      case token of
+        Left e -> throwError err500 { errBody = fromString . show $ e }
+        Right t ->
+          return $ Session (decodeUtf8 $ toStrict t) (RefreshToken "lol")
 
 insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
 insecureServer = createSession
 
 server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server _ jwts conns = secureServer jwts conns :<|> insecureServer jwts conns
+server _ jwts pool = secureServer jwts pool :<|> insecureServer jwts pool

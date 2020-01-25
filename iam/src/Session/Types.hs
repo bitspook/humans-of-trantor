@@ -1,6 +1,7 @@
 module Session.Types where
 
 import           Data.Aeson
+import           Data.UUID
 import           RIO
 import           Servant.Auth.Server
 import           Types

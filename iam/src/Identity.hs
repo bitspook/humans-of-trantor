@@ -1,34 +1,28 @@
-module Identity where
+module Identity
+  ( API
+  , server
+  )
+where
 
-import           Data.Aeson
 import           Data.Pool
+import           Data.Text
+import           Data.Text.Encoding         (decodeUtf8)
 import           Database.PostgreSQL.Simple
-import           RIO                     hiding ( Identity )
-import           Types
-import           Servant as S
+import           Identity.Types
+import           RIO                        hiding (Identity)
+import           Servant                    as S
 import           Servant.Auth.Server
+import           Types
 
-data Identity = Identity
-  { id    :: UUID,
-    email :: Email
-  } deriving(Show, Generic, ToJSON, FromRow)
-
-data NewIdentityPayload = NewIdentityPayload
-  { email    :: Email
-  , password :: Text
-  } deriving(Show, Generic, FromJSON)
-
-type InsecureAPI
-  = "identity" :> ReqBody '[JSON] NewIdentityPayload :> Post '[JSON] Identity
-
-type API = InsecureAPI
-
-registerIdentity :: Pool Connection -> NewIdentityPayload ->  S.Handler Identity
-registerIdentity pool (NewIdentityPayload email' password') = do
-  res <- liftIO . withResource pool $ \conn -> query conn "INSERT INTO iam.identity (email, password) VALUES (?, crypt(?, gen_salt('bf', 10))) RETURNING id, email, password" (email', password')
-  case res of
-    (x:_) -> return x
-    [] -> throwError err400
+registerIdentity :: Pool Connection -> NewIdentityPayload -> S.Handler Identity
+registerIdentity pool (NewIdentityPayload (Email email') password') = do
+  rows <- liftIO . withResource pool $ \conn -> query
+    conn
+    "INSERT INTO iam.identity (email, password) VALUES (?, crypt(?, gen_salt('bf', 10))) RETURNING id, email"
+    (toLower email', password')
+  case rows of
+    (x : _) -> return (Identity (fst x) (Email $ decodeUtf8 . snd $ x))
+    []      -> throwError err400
 
 insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
 insecureServer _ = registerIdentity
