@@ -37,9 +37,10 @@ CREATE TRIGGER set_identity_timestamp
 CREATE TABLE session (
   id UUID NOT NULL DEFAULT uuid_generate_v1mc(),
   identity_id UUID NOT NULL REFERENCES identity(id),
+  revoked_at TIMESTAMP,
 
   created_at TIMESTAMP DEFAULT NOW(),
-  last_used_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY (id)
 );
 

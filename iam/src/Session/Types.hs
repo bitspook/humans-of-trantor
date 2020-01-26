@@ -26,8 +26,9 @@ data NewSessionInput = NewSessionInput
   , password :: Text
   } deriving (Show, Generic, FromJSON)
 
-type SecureAPI
-  = "session" :> "refresh" :> ReqBody '[JSON] SessionOpInput :> Post '[JSON] Session
+type SecureAPI = "placeholder" :> Post '[JSON] NoContent
 type InsecureAPI
   = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
+    :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Put '[JSON] Session
+    :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Delete '[JSON] NoContent
 type API auths = (Auth auths AccessToken :> SecureAPI) :<|> InsecureAPI
