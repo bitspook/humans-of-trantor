@@ -7,12 +7,13 @@ where
 
 import           Data.Pool
 import           Data.Text
-import           Data.Text.Encoding         (decodeUtf8)
+import           Data.Text.Encoding             ( decodeUtf8 )
+import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple
-import           Identity.Types             (Identity (Identity))
-import           RIO                        hiding (Identity)
-import           RIO.ByteString.Lazy        (toStrict)
-import           Servant                    as S
+import           Identity.Types                 ( Identity(Identity) )
+import           RIO                     hiding ( Identity )
+import           RIO.ByteString.Lazy            ( toStrict )
+import           Servant                       as S
 import           Servant.Auth.Server
 import           Session.Types
 import           Types
@@ -49,22 +50,38 @@ secureServer
 secureServer jwts pool (Authenticated a) = refreshSession jwts pool a
 secureServer _    _    _                 = throwAll err401
 
-createSession
+createSession :: Pool Connection -> UUID -> IO (Maybe RefreshToken)
+createSession pool aid = do
+  rows :: Either SqlError [(Only UUID)] <-
+    liftIO $ try $ withResource pool $ \conn -> query
+      conn
+      "INSERT INTO iam.session (identity_id) VALUES (?) RETURNING id"
+      (Only aid)
+  case rows of
+    Right (Only x : _) -> return $ Just (RefreshToken $ show x)
+    Right _       -> return Nothing
+    Left  _       -> return Nothing
+
+createSessionH
   :: JWTSettings -> Pool Connection -> NewSessionInput -> S.Handler Session
-createSession jwts pool inp = do
+createSessionH jwts pool inp = do
   maybeId <- liftIO $ getIdentity pool inp
 
   case maybeId of
     Nothing               -> throwError err401
     Just (Identity id' _) -> do
-      token <- liftIO $ makeJWT (AccessToken id') jwts Nothing
-      case token of
-        Left e -> throwError err500 { errBody = fromString . show $ e }
-        Right t ->
-          return $ Session (decodeUtf8 $ toStrict t) (RefreshToken "lol")
+      session' <- liftIO $ createSession pool id'
+      case session' of
+        Nothing -> throwError err500
+        Just session -> do
+          token <- liftIO $ makeJWT (AccessToken id') jwts Nothing
+          case token of
+            Left e -> throwError err500 { errBody = fromString . show $ e }
+            Right t ->
+              return $ Session (decodeUtf8 $ toStrict t) session
 
 insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
-insecureServer = createSession
+insecureServer = createSessionH
 
 server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
 server _ jwts pool = secureServer jwts pool :<|> insecureServer jwts pool
