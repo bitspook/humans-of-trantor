@@ -101,7 +101,7 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
     ofType(actions.showReport),
     withLatestFrom(state$),
     map(([_, state]) => {
-      const selectedDay = state.app.selectedDay;
+      const selectedDay = state.standupMeeting.selectedDay;
 
       const reports = state.employees.data
         .map((employee) => {

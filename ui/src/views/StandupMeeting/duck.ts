@@ -1,10 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import dayjs, { Dayjs } from 'dayjs';
 import { FormikHelpers } from 'formik';
+import { Report } from 'src/components/Report';
 import { StandupFormValues } from 'src/components/StandupForm';
 import { ToastDataProps } from 'src/components/Toaster';
-import { Employee } from 'src/ducks/employees';
-import { Standup } from 'src/ducks/standup';
 
 export interface SaveStandupPayload {
   day: Dayjs;
@@ -14,19 +13,12 @@ export interface SaveStandupPayload {
   helpers: FormikHelpers<StandupFormValues>;
 }
 
-export interface Report {
-  employee: Employee;
-  yesterday?: Standup;
-  today?: Standup;
-  impediment?: Standup;
-}
-
 export interface ReportState {
   data: Report[];
   isVisible: boolean;
 }
 
-export interface AppState {
+export interface StandupMeetingState {
   selectedEmployee?: string;
   isSavingStandup: boolean;
   saveStandupError?: Error;
@@ -36,7 +28,7 @@ export interface AppState {
   report: ReportState;
 }
 
-const initialState: AppState = {
+const initialState: StandupMeetingState = {
   isSavingStandup: false,
   report: {
     data: [],
@@ -51,15 +43,15 @@ const initialState: AppState = {
 
 export default createSlice({
   initialState,
-  name: 'app',
+  name: 'standupMeeting',
   reducers: {
-    createReport: (state: AppState, { payload }) => {
+    createReport: (state: StandupMeetingState, { payload }) => {
       state.report.data = payload;
     },
-    hideReport: (state: AppState) => {
+    hideReport: (state: StandupMeetingState) => {
       state.report.isVisible = false;
     },
-    hideToast: (state: AppState, { payload }) => {
+    hideToast: (state: StandupMeetingState, { payload }) => {
       state.toasts = Object.entries(state.toasts)
         .filter(([key]) => key !== payload.key)
         .reduce((accum, [key, toast]) => {
@@ -68,27 +60,27 @@ export default createSlice({
           return accum;
         }, {} as { [key: string]: ToastDataProps });
     },
-    saveStandupFail: (state: AppState, { payload }) => {
+    saveStandupFail: (state: StandupMeetingState, { payload }) => {
       state.isSavingStandup = false;
       state.saveStandupError = payload;
     },
-    saveStandupStart: (state: AppState) => {
+    saveStandupStart: (state: StandupMeetingState) => {
       state.isSavingStandup = true;
       state.saveStandupError = undefined;
     },
-    saveStandupSuccess: (state: AppState) => {
+    saveStandupSuccess: (state: StandupMeetingState) => {
       state.isSavingStandup = false;
     },
-    selectDay: (state: AppState, { payload }) => {
+    selectDay: (state: StandupMeetingState, { payload }) => {
       state.selectedDay = payload;
     },
-    selectEmployee: (state: AppState, { payload }) => {
+    selectEmployee: (state: StandupMeetingState, { payload }) => {
       state.selectedEmployee = payload.ecode;
     },
-    showReport: (state: AppState) => {
+    showReport: (state: StandupMeetingState) => {
       state.report.isVisible = true;
     },
-    showToast: (state: AppState, { payload }) => {
+    showToast: (state: StandupMeetingState, { payload }) => {
       state.toasts[payload.key] = payload;
     },
   },

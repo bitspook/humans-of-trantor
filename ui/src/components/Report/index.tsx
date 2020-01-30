@@ -1,7 +1,15 @@
 import { Dayjs } from 'dayjs';
 import React, { FC, Fragment } from 'react';
 import { Button, Header, Icon, Modal, Popup, Segment } from 'semantic-ui-react';
-import { Report } from 'src/views/App/duck';
+import { Employee } from 'src/ducks/employees';
+import { Standup } from 'src/ducks/standup';
+
+export interface Report {
+  employee: Employee;
+  yesterday?: Standup;
+  today?: Standup;
+  impediment?: Standup;
+}
 
 interface ReportDataProps {
   day: Dayjs;

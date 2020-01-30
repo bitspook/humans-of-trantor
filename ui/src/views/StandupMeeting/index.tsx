@@ -117,7 +117,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 
 const mapState = (state: State): AppDataProps => {
   const activeStandup = state.standup.data.filter(
-    (s) => s.ecode === state.app.selectedEmployee && s.date.isSame(state.app.selectedDay, 'day'),
+    (s) => s.ecode === state.standupMeeting.selectedEmployee && s.date.isSame(state.standupMeeting.selectedDay, 'day'),
   );
   const initialStandupFormValue = {
     committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' })
@@ -129,11 +129,11 @@ const mapState = (state: State): AppDataProps => {
   };
 
   return {
-    ...state.app,
+    ...state.standupMeeting,
     employees: state.employees.data,
     initialStandupFormValue,
-    standup: state.standup.data.filter((s) => s.ecode === state.app.selectedEmployee),
-    toasts: Object.values(state.app.toasts),
+    standup: state.standup.data.filter((s) => s.ecode === state.standupMeeting.selectedEmployee),
+    toasts: Object.values(state.standupMeeting.toasts),
   };
 };
 
