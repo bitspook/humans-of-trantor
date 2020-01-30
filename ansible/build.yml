@@ -5,8 +5,8 @@
       tags: infra
     - name: gateway
       tags: gateway
-    - name: standup-ui
-      tags: standup-ui
+    - name: ui
+      tags: ui
     - name: ei
       tags: ei
     - name: docs

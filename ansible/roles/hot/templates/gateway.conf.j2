@@ -25,7 +25,7 @@ server {
   }
 
   location / {
-    root "{{ hot_gateway_standup_ui_mount }}";
+    root "{{ hot_gateway_ui_mount }}";
 
     try_files $uri $uri/ /index.html;
   }

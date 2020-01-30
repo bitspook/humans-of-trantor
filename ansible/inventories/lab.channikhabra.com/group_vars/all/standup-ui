@@ -1,15 +1,15 @@
-standup_ui_version:           "{{ hot_version }}"
+ui_version:           "{{ hot_version }}"
 
-standup_ui_dockerfile:        "Dockerfile-prod"
-standup_ui_docker_name:       "hot-standup-ui"
-standup_ui_docker_tag:        "{{ standup_ui_version }}"
+ui_dockerfile:        "Dockerfile-prod"
+ui_docker_name:       "hot-ui"
+ui_docker_tag:        "{{ ui_version }}"
 
-standup_ui_docker_registry:          "{{ hot_docker_registry }}"
-standup_ui_docker_repository:        "{{ standup_ui_docker_registry + '/' + standup_ui_docker_name if standup_ui_docker_registry else '' }}"
+ui_docker_registry:          "{{ hot_docker_registry }}"
+ui_docker_repository:        "{{ ui_docker_registry + '/' + ui_docker_name if ui_docker_registry else '' }}"
 
-standup_ui_docker_registry_username: "{{ hot_docker_registry_username }}"
-standup_ui_docker_registry_password: "{{ hot_docker_registry_password }}"
+ui_docker_registry_username: "{{ hot_docker_registry_username }}"
+ui_docker_registry_password: "{{ hot_docker_registry_password }}"
 
-standup_ui_public_url: "{{ hot_standup_ui_url }}"
-standup_ui_ei_url: "{{ hot_ei_url }}"
-standup_ui_pms_url: "{{ hot_pms_url }}"
+ui_public_url: "{{ hot_ui_url }}"
+ui_ei_url: "{{ hot_ei_url }}"
+ui_pms_url: "{{ hot_pms_url }}"

@@ -17,4 +17,4 @@ hot_ei_url: ""
 hot_pms_url: ""
 
 hot_gateway_docs_mount: "/docs"
-hot_gateway_standup_ui_mount: "/standup-ui"
+hot_gateway_ui_mount: "/ui"
