@@ -13,6 +13,13 @@
     src: docker-compose.yml.j2
     dest: "{{ hot_dir }}/docker-compose.yml"
 
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ hot_docker_registry }}"
+    username: "{{ hot_docker_registry_username }}"
+    password: "{{ hot_docker_registry_password }}"
+  when: gateway_docker_registry|default('') != ''
+
 - name: Pull new containers
   shell: docker-compose pull
   args:

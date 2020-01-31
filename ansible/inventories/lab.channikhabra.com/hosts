@@ -2,4 +2,4 @@
 localhost ansible_connection=local
 
 [server]
-lab.channikhabra.com
+lab.channikhabra.com ansible_connection=ssh ansible_user=channi

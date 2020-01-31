@@ -18,3 +18,7 @@ hot_pms_url: ""
 
 hot_gateway_docs_mount: "/docs"
 hot_gateway_standup_ui_mount: "/standup-ui"
+
+hot_docker_registry: ""
+hot_docker_registry_username: ""
+hot_docker_registry_password: ""

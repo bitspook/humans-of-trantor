@@ -1,0 +1,84 @@
+image:
+  name: docker
+services:
+  - docker:dind
+
+workflow:
+  - if: $CI_COMMIT_REF_NAME == /^develop$/
+    when: always
+  - when: never
+
+before_script:
+  - apk add make gcc g++ python3 ansible
+  - pip3 install docker
+
+variables:
+  DOCKER_REGISTRY: "$CI_REGISTRY_IMAGE"
+  DOCKER_REGISTRY_USERNAME: "$CI_REGISTRY_USER"
+  DOCKER_REGISTRY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+
+  HOT_VERSION: "$CI_COMMIT_SHORT_SHA"
+
+  HOT_DB_HOST: "store"
+  HOT_DB_PORT: "5432"
+  HOT_DB_NAME: "hot"
+  HOT_DB_USER: "hot"
+  HOT_DB_PASSWORD: "hot"
+
+stages:
+  - build
+  - deploy
+
+Build infrastructure images:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags infra
+
+Build gateway image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags gateway
+
+Build standup-ui image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags standup-ui
+
+Build ei image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags ei
+
+Build docs image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags docs
+
+Build store image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags store
+
+Build pms image:
+  stage: build
+  script:
+    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags pms
+
+Deploy to lab:
+  stage: deploy
+  before_script:
+    - apk add make gcc g++ python3 ansible openssh-client
+    - pip3 install docker
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan lab.channikhabra.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+  script:
+    - ansible-playbook --inventory=./ansible/inventories/lab.channikhabra.com ./ansible/deploy.yml --skip-tags post-launch
+
+  environment:
+    name: lab
+    url: lab.channikhabra.com

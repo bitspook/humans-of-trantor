@@ -5,18 +5,13 @@ WORKDIR /app
 ENV HOST=0.0.0.0
 ENV NODE_ENV=production
 
-RUN npm i -g yarn
-
-COPY ./package.json /app/
-COPY ./yarn.lock /app/
-RUN yarn
-
 COPY . /app
 
 ARG PUBLIC_URL
 ARG REACT_APP_EI_URL
 ARG REACT_APP_PMS_URL
-RUN yarn build
+
+RUN yarn && yarn build
 
 FROM alpine
 COPY --from=builder /app/build/ /app
