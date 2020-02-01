@@ -1,0 +1,14 @@
+# This file expects the build to be prepared on the CI (or another machine) and
+# produced stack bins copied over to ./build directory. This is decided because
+# I couldn't figure out a better way to cache stack work (which is a major time
+# consumer) with just docker
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install libpq-dev -y
+
+WORKDIR /app
+
+COPY ./build /app
+COPY ./migrations /app/migrations
+
+CMD /app/iam

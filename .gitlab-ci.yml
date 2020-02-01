@@ -3,7 +3,7 @@ image:
 services:
   - docker:dind
 
-workflow:
+.workflow:
   - if: $CI_COMMIT_REF_NAME == /^develop$/
     when: always
   - when: never
@@ -27,44 +27,69 @@ variables:
 
 stages:
   - build
+  - docker-build
   - deploy
 
-Build infrastructure images:
-  stage: build
+.Build infrastructure images:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags infra
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags infra
 
-Build gateway image:
-  stage: build
+.Build gateway image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags gateway
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags gateway
 
-Build standup-ui image:
-  stage: build
+.Build standup-ui image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags standup-ui
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags standup-ui
 
-Build ei image:
-  stage: build
+.Build ei image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags ei
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags ei
 
-Build docs image:
-  stage: build
+.Build docs image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags docs
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags docs
 
-Build store image:
-  stage: build
+.Build store image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags store
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags store
 
-Build pms image:
-  stage: build
+.Build pms image:
+  stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/local ./ansible/build.yml --tags pms
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags pms
 
-Deploy to lab:
+build:iam-binary:
+  stage: build
+  image: haskell:8.6.5
+  before_script:
+    - mkdir -p $CI_PROJECT_DIR/.stack-root
+  variables:
+    STACK_ROOT: "${CI_PROJECT_DIR}/.stack-root"
+  cache:
+    key: default
+    paths:
+      - .stack-root
+      - ./iam/.stack-work
+  script:
+    - apt-get update && apt-get install libpq-dev -y
+    - cd iam
+    - echo $PWD && stack build --copy-bins --local-bin-path ./build
+
+Build iam image:
+  stage: docker-build
+  needs:
+    - "build:iam-binary"
+  script:
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags pms
+
+.Deploy to lab:
   stage: deploy
   before_script:
     - apk add make gcc g++ python3 ansible openssh-client

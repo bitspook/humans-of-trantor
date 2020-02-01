@@ -1,0 +1,11 @@
+iam_version: ""
+iam_src_dir: "{{ playbook_dir }}/../iam"
+
+iam_dockerfile: "Dockerfile"
+iam_docker_name: ""
+iam_docker_tag: ""
+
+iam_docker_repository: ""
+iam_docker_registry: ""
+iam_docker_registry_username: ""
+iam_docker_registry_password: ""

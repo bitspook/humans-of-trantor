@@ -62,3 +62,10 @@ services:
       API_PREFIX: "{{ hot_pms_api_prefix }}"
     depends_on:
       - store
+
+  iam:
+    image: "{{ iam_docker_repository }}:{{ iam_docker_tag }}"
+    volumes:
+      - "{{ hot_data_dir }}/jwt-keys.pem:/app/jwt-keys.pem"
+    depends_on:
+      - store

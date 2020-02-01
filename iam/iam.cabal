@@ -4,26 +4,20 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ac653fd13947685a9c36d423d5de20243956e73aa7770f098ab0515868120240
+-- hash: 9b6dca4e966df8c4bbdb9a62391af6b3c7413264a1cdd1ec68a1aac225b15974
 
 name:           iam
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/iam#readme>
-homepage:       https://github.com/githubuser/iam#readme
-bug-reports:    https://github.com/githubuser/iam/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2019 Author name here
+author:         Charanjit Singh
+maintainer:     charanjit.singh@trantorinc.com
+copyright:      2019 Charanjit Singh
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
-
-source-repository head
-  type: git
-  location: https://github.com/githubuser/iam
 
 library
   exposed-modules:

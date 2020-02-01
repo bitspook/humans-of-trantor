@@ -1,0 +1,45 @@
+#+TITLE: HoT Toolchain
+
+toolchain has the tools required by different HoT services gathered in a single
+place.
+
+* Basic Usage
+
+You can run =dc up toolchain= to run toolchain shell. It will:
+- load all aliases defined for =ash=
+- mount the =hot= source dir at =/cloud= and set it as =WORKDIR=
+
+To run a command directly in toolchain, you'll likely want to run =dc run --rm
+toolchain sh -lc "<command>"=. Please not the =<command>= is in quotes. =sh -lc=
+run the =ash= in login mode so the command aliases can be loaded.
+
+* DB Migration
+
+At this stage, HoT primarily uses PostgreSQL. Running migrations in a postgres
+db is a common task in most services. HoT use [[https://github.com/golang-migrate/migrate/][golang-migrate]] tool for running
+and maintaining these migrations. It has awful CLI, which toolchain tries to fix
+with a couple of aliases (list below). We'll hopefully shift to a better
+solution in future for running migrations in future, but right now we are going
+ahead with golang-migrate to create/maintain momentum.
+
+Following *environment variables* can be used to control which database/service
+the migrations are run against
+
+- DIR: the migrations directory. e.g 'iam/migrations', 'store/migrations'
+- DB: the db url e.g 'postgres://user:pass@host/db'
+
+---
+
+Following aliases can be used to ease off running migrations
+
+- *mcreate <name>*: /Create a new migration/
+
+    #+begin_example sh
+    dc run --rm -e DIR="iam/migrations" toolchain sh -lc "mcreate init"
+    #+end_example
+
+- *migrate <command>*: /Run the migrate with some options pre-defined/
+
+    #+begin_example sh
+    dc run --rm -e DIR="iam/migrations" toolchain sh -lc "migrate up"
+    #+end_example

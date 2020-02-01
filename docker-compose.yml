@@ -3,6 +3,8 @@ services:
   store:
     image: hot-store
     build: ./store
+    ports:
+      - 5432:5432
     volumes:
       - ./docker-volumes/store:/var/lib/postgresql/data
       - ./store/migrations:/migrations
@@ -82,5 +84,12 @@ services:
       - ~/.ivy2:/root/.ivy2
       - ~/.sbt:/root/.sbt
       - ~/.coursier:/root/.coursier
+    depends_on:
+      - store
+
+  iam:
+    build: ./
+    volumes:
+      - ./iam:/app
     depends_on:
       - store

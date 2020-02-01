@@ -1,0 +1,11 @@
+iam_version:                  "{{ hot_version }}"
+
+iam_dockerfile:               "Dockerfile-prod"
+iam_docker_name:              "hot-iam"
+iam_docker_tag:               "{{ iam_version }}"
+
+iam_docker_registry:          "{{ hot_docker_registry }}"
+iam_docker_repository:        "{{ iam_docker_registry + '/' + iam_docker_name if iam_docker_registry else '' }}"
+
+iam_docker_registry_username: "{{ hot_docker_registry_username }}"
+iam_docker_registry_password: "{{ hot_docker_registry_password }}"

@@ -1,0 +1,28 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ iam_docker_registry }}"
+    username: "{{ iam_docker_registry_username }}"
+    password: "{{ iam_docker_registry_password }}"
+  when: iam_docker_registry|default('') != ''
+
+- name: Create docker image
+  docker_image:
+    name: "{{ iam_docker_name }}"
+    tag: "{{ iam_docker_tag }}"
+    source: build
+    debug: yes
+    build:
+      path: "{{ iam_src_dir }}"
+      dockerfile: "{{ iam_dockerfile }}"
+      pull: yes
+      rm: yes
+    state: present
+    repository: "{{ iam_docker_repository }}"
+    push: "{{ iam_docker_repository != '' }}"
+
+- name: Destroy docker image
+  docker_image:
+    state: absent
+    name: "{{ iam_docker_name }}"
+    tag: "{{ iam_version }}"
+  tags: [ never, destroy ]
