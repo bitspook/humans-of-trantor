@@ -1,10 +1,8 @@
+# docker-compose for UI development
 version: '3'
 services:
   store:
-    image: hot-store
-    build: ./store
-    ports:
-      - 5432:5432
+    image: "registry.hub.docker.com/channikhabra/hot-store:0.0.1"
     volumes:
       - ./docker-volumes/store:/var/lib/postgresql/data
       - ./store/migrations:/migrations
@@ -14,12 +12,11 @@ services:
       POSTGRES_DB: hot
 
   gateway:
-    image: hot-gateway
-    build: ./gateway
+    image: "registry.hub.docker.com/channikhabra/hot-gateway:0.0.1"
+    ports:
+      - "5000:80"
     volumes:
       - ./gateway/gateway.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - 5000:80
     depends_on:
       - docs
       - pms
@@ -46,15 +43,13 @@ services:
       - store
 
   ei:
-    image: hot-ei
-    build: ./ei
+    image: "registry.hub.docker.com/channikhabra/hot-ei:0.0.1"
     environment:
-      PORT: 80
-      ROARR_LOG: 'true'
-    volumes:
-      - ./ei:/app
-      - ./ei/node_modules:/app/node_modules
-    command: yarn start:dev
+      ROARR_LOG: "true"
+      HOST: "0.0.0.0"
+      PORT: "80"
+    depends_on:
+      - store
 
   ui:
     image: ui
@@ -69,27 +64,15 @@ services:
     command: yarn start
 
   pms:
-    image: pms
-    build: ./pms
+    image: "registry.hub.docker.com/channikhabra/hot-pms:0.0.1"
     environment:
-      DB_USERNAME: 'hot'
-      DB_PASSWORD: 'hot'
-      DB_NAME: 'hot'
-      DB_HOST: 'store'
-      DB_PORT: '5432'
-      HOST: '0.0.0.0'
-      PORT: '80'
-    volumes:
-      - ./pms:/app
-      - ~/.ivy2:/root/.ivy2
-      - ~/.sbt:/root/.sbt
-      - ~/.coursier:/root/.coursier
-    depends_on:
-      - store
-
-  iam:
-    build: ./
-    volumes:
-      - ./iam:/app
+      DB_USERNAME: "hot"
+      DB_PASSWORD: "hot"
+      DB_NAME: "hot"
+      DB_HOST: "store"
+      DB_PORT: "5432"
+      HOST: "0.0.0.0"
+      PORT: "80"
+      API_PREFIX: "/pms"
     depends_on:
       - store

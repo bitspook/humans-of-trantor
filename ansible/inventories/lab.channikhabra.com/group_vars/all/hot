@@ -17,6 +17,6 @@ hot_base_url: "/humans-of-trantor"
 hot_docs_base_url: "{{ hot_base_url }}/docs"
 hot_pms_api_prefix: "{{ hot_base_url }}/pms"
 
-hot_standup_ui_url: "{{ hot_fqdn }}{{hot_base_url }}"
+hot_ui_url: "{{ hot_fqdn }}{{hot_base_url }}"
 hot_ei_url: "{{ hot_fqdn }}{{hot_base_url }}/ei"
 hot_pms_url: "{{ hot_fqdn }}{{ hot_pms_api_prefix }}"

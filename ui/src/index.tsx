@@ -9,7 +9,8 @@ import 'semantic-ui-css/semantic.min.css';
 import './index.scss';
 
 import configureStore from './configureStore';
-import App from './views/App';
+import StandupMeeting from './views/StandupMeeting';
+import Login from './views/Login';
 
 const history = createBrowserHistory();
 const store = configureStore(history);
@@ -17,7 +18,9 @@ const store = configureStore(history);
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <Route path='/' component={App} />
+      <Route path='/standup/meeting' component={StandupMeeting} />
+
+      <Route path='/' component={Login} />
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root'),

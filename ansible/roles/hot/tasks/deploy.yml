@@ -26,7 +26,7 @@
     chdir: "{{ hot_dir }}"
   tags: launch
 
-  # Must remove named volumes otherwise standup-ui/docs won't load new content
+  # Must remove named volumes otherwise ui/docs won't load new content
 - name: (Re)Start HoT Cloud
   shell: "docker-compose down -v && docker-compose up -d"
   args:

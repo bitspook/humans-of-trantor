@@ -1,17 +1,17 @@
 import { RouterRootState } from 'connected-react-router';
 import employees, { EmployeesState } from './ducks/employees';
 import standup, { StandupState } from './ducks/standup';
-import app, { AppState } from './views/App/duck';
+import standupMeeting, { StandupMeetingState } from './views/StandupMeeting/duck';
 
 export interface State {
   employees: EmployeesState;
-  app: AppState;
+  standupMeeting: StandupMeetingState;
   router: RouterRootState;
   standup: StandupState;
 }
 
 const reducers = {
-  app: app.reducer,
+  standupMeeting: standupMeeting.reducer,
   employees: employees.reducer,
   standup: standup.reducer,
 };

@@ -1,4 +1,4 @@
-# Standup UI
+# UI
 
 Simple UI for adding standup updates.
 
