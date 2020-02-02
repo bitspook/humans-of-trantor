@@ -17,5 +17,6 @@ ENV HOST=0.0.0.0
 ENV PORT=80
 ENV NODE_ENV=production
 COPY --from=builder /app/dist /app/dist
+COPY package.json /app/
 
 CMD yarn start
