@@ -46,7 +46,6 @@ services:
       - store
 
   ei:
-    image: hot-ei
     build: ./ei
     environment:
       PORT: 80
@@ -84,12 +83,5 @@ services:
       - ~/.ivy2:/root/.ivy2
       - ~/.sbt:/root/.sbt
       - ~/.coursier:/root/.coursier
-    depends_on:
-      - store
-
-  iam:
-    build: ./
-    volumes:
-      - ./iam:/app
     depends_on:
       - store
