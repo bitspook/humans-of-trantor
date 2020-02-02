@@ -3,10 +3,11 @@ image:
 services:
   - docker:dind
 
-.workflow:
-  - if: $CI_COMMIT_REF_NAME == /^develop$/
-    when: always
-  - when: never
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME == /^develop$/
+      when: always
+    - when: never
 
 before_script:
   - apk add make gcc g++ python3 ansible
@@ -30,37 +31,37 @@ stages:
   - docker-build
   - deploy
 
-.Build infrastructure images:
+build:infra:images:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags infra
 
-.Build gateway image:
+build:gateway:image:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags gateway
 
-.Build standup-ui image:
+build:ui:image:
   stage: docker-build
   script:
-    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags standup-ui
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags ui
 
-.Build ei image:
+build:ei:image:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags ei
 
-.Build docs image:
+build:docs:image:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags docs
 
-.Build store image:
+build:store:image:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags store
 
-.Build pms image:
+build:pms:image:
   stage: docker-build
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags pms
@@ -82,14 +83,14 @@ build:iam-binary:
     - cd iam
     - echo $PWD && stack build --copy-bins --local-bin-path ./build
 
-Build iam image:
+build:iam:image:
   stage: docker-build
   needs:
     - "build:iam-binary"
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags pms
 
-.Deploy to lab:
+deploy:lab:
   stage: deploy
   before_script:
     - apk add make gcc g++ python3 ansible openssh-client
