@@ -18,9 +18,9 @@ const store = configureStore(history);
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <Route exact path='/' component={StandupMeeting} />
+      <Route path='/' component={StandupMeeting} />
 
-      <Route exact path='/login' component={Login} />
+      <Route path='/login' component={Login} />
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root'),
