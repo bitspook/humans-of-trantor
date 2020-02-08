@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9b6dca4e966df8c4bbdb9a62391af6b3c7413264a1cdd1ec68a1aac225b15974
+-- hash: f0cca4a15380efcbde4d54b6a4d58f08f6724a5d194aa7756b44807f5c169275
 
 name:           iam
 version:        0.1.0.0
@@ -33,7 +33,6 @@ library
       Paths_iam
   hs-source-dirs:
       src
-  default-extensions: NoImplicitPrelude OverloadedStrings DeriveGeneric DeriveAnyClass ScopedTypeVariables TypeApplications DataKinds TypeOperators DuplicateRecordFields
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
@@ -41,6 +40,7 @@ library
     , crypto-pubkey-openssh
     , crypto-pubkey-types
     , cryptonite
+    , dhall
     , either
     , jose
     , postgresql-simple
@@ -69,6 +69,7 @@ executable iam
     , crypto-pubkey-openssh
     , crypto-pubkey-types
     , cryptonite
+    , dhall
     , either
     , iam
     , jose
@@ -99,6 +100,7 @@ test-suite iam-test
     , crypto-pubkey-openssh
     , crypto-pubkey-types
     , cryptonite
+    , dhall
     , either
     , iam
     , jose

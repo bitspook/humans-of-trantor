@@ -1,13 +1,19 @@
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeOperators         #-}
+
 module Identity.Types where
 
-import           Data.Aeson                     ( ToJSON
-                                                , FromJSON
-                                                )
-import           Data.UUID                      ( UUID )
-import           Types                          ( Email )
+import           Data.Aeson                 (FromJSON, ToJSON)
+import           Data.UUID                  (UUID)
+import           Database.PostgreSQL.Simple (FromRow)
+import           RIO                        hiding (Identity)
 import           Servant
-import           RIO                     hiding ( Identity )
-import           Database.PostgreSQL.Simple     ( FromRow )
+import           Types                      (Email)
 
 data Identity = Identity
   { id    :: UUID,

@@ -37,6 +37,7 @@ dependencies:
 - postgresql-simple
 - postgresql-simple-migration
 - uuid
+- dhall
 
 ghc-options:
 - -Wall
@@ -49,16 +50,7 @@ ghc-options:
 
 library:
   source-dirs: src
-  default-extensions:
-    - NoImplicitPrelude
-    - OverloadedStrings
-    - DeriveGeneric
-    - DeriveAnyClass
-    - ScopedTypeVariables
-    - TypeApplications
-    - DataKinds
-    - TypeOperators
-    - DuplicateRecordFields
+  default-extensions: []
 
 executables:
   iam:

@@ -1,3 +1,13 @@
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeOperators         #-}
+
 module Db
   ( DBConnectionString
   , initConnectionPool
@@ -18,7 +28,10 @@ initConnectionPool connStr =
 
 migrate :: FilePath -> Connection -> IO (MigrationResult String)
 migrate dir conn = do
-  _ <- withTransaction  conn $ runMigration $ MigrationContext MigrationInitialization True conn
+  _ <- withTransaction conn $ runMigration $ MigrationContext
+    MigrationInitialization
+    True
+    conn
   withTransaction conn $ runMigration $ MigrationContext
     (MigrationDirectory dir)
     True

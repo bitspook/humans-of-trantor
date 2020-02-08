@@ -1,11 +1,19 @@
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeOperators         #-}
+
 module Session.Types where
 
 import           Data.Aeson
 import           Data.UUID
 import           RIO
+import           Servant
 import           Servant.Auth.Server
 import           Types
-import           Servant
 
 newtype AccessToken = AccessToken
   { id    :: UUID

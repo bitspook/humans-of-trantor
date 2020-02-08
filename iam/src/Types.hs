@@ -1,3 +1,7 @@
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Types where
 
 import           Data.Aeson                           (FromJSON, ToJSON)
