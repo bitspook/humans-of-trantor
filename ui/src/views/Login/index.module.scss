@@ -31,6 +31,11 @@
     border-radius: 0.2em;
     padding: 0.8em;
     outline: none;
+
+    &:disabled {
+      background-color: #fff;
+      color: $color-text;
+    }
   }
 
   &.hasError input {
@@ -71,5 +76,47 @@
 
   &:active {
     background-color: $color-primary-3;
+  }
+
+  &:disabled {
+    pointer-events: none;
+
+    &:hover {
+      background-color: $color-primary;
+    }
+  }
+}
+
+.loader {
+  display: none;
+
+  &.isLoading {
+    display: inline-block;
+    width: 0;
+
+    &:after {
+      // ensure animation
+      overflow: hidden;
+      display: inline-block;
+
+      // align periods
+      vertical-align: bottom;
+
+      // set up initial condition for the animation
+      width: 0px;
+
+      // ascii code for ellipsis
+      content: "\2026";
+
+      // run the animation, edit by changing steps and width
+      animation: ellipsis steps(4,end) 900ms infinite;
+    }
+  }
+}
+
+// edit the animation by changing steps and width
+@keyframes ellipsis {
+  to {
+    width: 1.25em;
   }
 }

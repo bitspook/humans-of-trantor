@@ -40,8 +40,8 @@ interface AppCbProps {
 }
 
 const SelectEmployeeInstruction = () => (
-  <Header as='h2' className={c.instruction} disabled={true}>
-    <Icon name='user' circular={true} />
+  <Header as="h2" className={c.instruction} disabled={true}>
+    <Icon name="user" circular={true} />
     <Header.Content>
       Please select an employee
       <Header.Subheader>From the left-most column</Header.Subheader>
@@ -62,7 +62,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   }, [p.selectedProject]); // eslint-disable-line
 
   const maybeError = p.saveStandupError && (
-    <Message error={true} header='Failed to save standup 😞' content={p.saveStandupError} />
+    <Message error={true} header="Failed to save standup 😞" content={p.saveStandupError} />
   );
 
   /* prettier-ignore */
@@ -117,7 +117,9 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
 
 const mapState = (state: State): AppDataProps => {
   const activeStandup = state.standup.data.filter(
-    (s) => s.ecode === state.standupMeeting.selectedEmployee && s.date.isSame(state.standupMeeting.selectedDay, 'day'),
+    (s) =>
+      s.ecode === state.standupMeeting.selectedEmployee &&
+      s.date.isSame(state.standupMeeting.selectedDay, 'day'),
   );
   const initialStandupFormValue = {
     committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' })

@@ -25,7 +25,7 @@ const Toaster: React.FC<ToasterDataProps> = (p) => {
 
   return (
     <Segment style={{ display: isVisible ? 'block' : 'none' }}>
-      <Transition.Group as={List} divided={true} animation='fly up'>
+      <Transition.Group as={List} divided={true} animation="fly up">
         {p.toasts.map(Toast)}
       </Transition.Group>
     </Segment>
