@@ -1,22 +1,51 @@
 import { Epic, ofType } from 'redux-observable';
-import { delay, map, mergeMap } from 'rxjs/operators';
-import duck, { LoginPayload } from './duck';
+import { delay, mergeMap } from 'rxjs/operators';
+import config from 'src/config';
+import userDuck from 'src/ducks/user';
+
+import duck, { LoginPayload, LoginValues } from './duck';
 
 const { actions } = duck;
 
-const loginEpic: Epic = (action$) => action$.pipe(
-  ofType(actions.loginStart),
-  delay(400),
-  map(({ payload }) => {
-    const { values, helpers } = payload as LoginPayload;
+const login = async ({ email, password }: LoginValues) => {
+  const res = await fetch(`${config.urls.iam}/session`, {
+    body: JSON.stringify({ email, password }),
+    headers: {
+      'content-type': 'application/json',
+    },
+    method: 'POST',
+  });
 
-    const error = new Error('Get out of here! Lol');
+  if (res.status === 401) {
+    throw new Error('Invaid email or password');
+  }
 
-    helpers.setSubmitting(true);
+  if (res.status !== 200) {
+    throw new Error('Login failed!');
+  }
 
-    return actions.loginFail(error);
-  }),
-  delay(4000)
-);
+  return res.json();
+};
+
+const loginEpic: Epic = (action$) =>
+  action$.pipe(
+    ofType(actions.loginStart),
+    // need to add some delay. Formik .setSubmitting don't work otherwise
+    delay(10),
+    mergeMap(async ({ payload }) => {
+      const { values, helpers } = payload as LoginPayload;
+      helpers.setSubmitting(true);
+
+      try {
+        const response = await login(values);
+
+        return userDuck.actions.loginSuccess(response);
+      } catch (err) {
+        return actions.loginFail(err);
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    }),
+  );
 
 export default loginEpic;

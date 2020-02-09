@@ -35,6 +35,5 @@ export default createSlice({
     loginStart: (state: LoginState) => {
       state.isLoggingIn = true;
     },
-    loginSuccess: () => initialState,
   },
 });
