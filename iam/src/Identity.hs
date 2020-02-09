@@ -1,3 +1,8 @@
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Identity
   ( API
   , server
@@ -6,13 +11,13 @@ where
 
 import           Data.Pool
 import           Data.Text
-import           Data.UUID                      ( UUID )
-import           Data.Text.Encoding             ( decodeUtf8 )
+import           Data.Text.Encoding                (decodeUtf8)
+import           Data.UUID                         (UUID)
 import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.Errors
 import           Identity.Types
-import           RIO                     hiding ( Identity )
-import           Servant                       as S
+import           RIO                               hiding (Identity)
+import           Servant                           as S
 import           Servant.Auth.Server
 import           Types
 

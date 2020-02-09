@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Session
   ( API
   , server
@@ -7,13 +11,13 @@ where
 
 import           Data.Pool
 import           Data.Text
-import           Data.Text.Encoding             ( decodeUtf8 )
-import           Data.UUID                      ( UUID )
+import           Data.Text.Encoding         (decodeUtf8)
+import           Data.UUID                  (UUID)
 import           Database.PostgreSQL.Simple
-import           Identity.Types                 ( Identity(Identity) )
-import           RIO                     hiding ( Identity )
-import           RIO.ByteString.Lazy            ( toStrict )
-import           Servant                       as S
+import           Identity.Types             (Identity (Identity))
+import           RIO                        hiding (Identity)
+import           RIO.ByteString.Lazy        (toStrict)
+import           Servant                    as S
 import           Servant.Auth.Server
 import           Session.Types
 import           Types

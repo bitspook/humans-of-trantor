@@ -48,7 +48,7 @@ const EmployeesList: React.FC<DataProps & CbProps> = ({
   ));
 
   return (
-    <List selection={true} relaxed={true} divided={true} verticalAlign='middle' size='big'>
+    <List selection={true} relaxed={true} divided={true} verticalAlign="middle" size="big">
       {employeesList}
     </List>
   );

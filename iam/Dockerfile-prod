@@ -10,5 +10,6 @@ WORKDIR /app
 
 COPY ./build /app
 COPY ./migrations /app/migrations
+COPY ./config.dhall /app/config.dhall
 
 CMD /app/iam

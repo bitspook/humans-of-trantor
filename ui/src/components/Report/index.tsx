@@ -25,7 +25,7 @@ interface ReportCbProps {
 const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
   const yesterday = r.yesterday?.standup && (
     <Fragment>
-      <Header as='h3' attached='top'>
+      <Header as="h3" attached="top">
         Yesterday ({r.yesterday?.date.format('dddd, MMM DD')})
       </Header>
       <Segment attached={true}>{r.yesterday?.standup}</Segment>
@@ -33,7 +33,7 @@ const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
   );
   const today = r.today?.standup && (
     <Fragment>
-      <Header as='h3' attached='top'>
+      <Header as="h3" attached="top">
         Today ({r.today?.date.format('dddd, MMM DD')})
       </Header>
       <Segment attached={true}>{r.today?.standup}</Segment>
@@ -41,7 +41,7 @@ const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
   );
   const impediment = r.impediment?.standup && (
     <Fragment>
-      <Header as='h3' attached='top'>
+      <Header as="h3" attached="top">
         Impediments ({r.impediment?.date.format('dddd, MMM DD')})
       </Header>
       <Segment attached={true}>{r.impediment?.standup}</Segment>
@@ -50,7 +50,7 @@ const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
 
   return (
     <div key={r.employee.ecode}>
-      <Header as='h2' attached='top'>
+      <Header as="h2" attached="top">
         {r.employee.name}
       </Header>
       <Segment attached={true}>
@@ -72,8 +72,8 @@ const ReportButton: FC<ReportDataProps & ReportCbProps> = (p) => {
 
   if (!modalContent.length) {
     modalContent = [
-      <Header as='h2' key={1} disabled={true}>
-        <Icon name='user' circular={true} />
+      <Header as="h2" key={1} disabled={true}>
+        <Icon name="user" circular={true} />
         <Header.Content>
           No Standup to report
           <Header.Subheader>Please select employees to create report for</Header.Subheader>
@@ -87,8 +87,8 @@ const ReportButton: FC<ReportDataProps & ReportCbProps> = (p) => {
       {/* prettier-ignore */}
       <Popup
         content={<p>Report for <b>{p.day.format('dddd, MMM DD')}</b></p>}
-        position='bottom right'
-        trigger={<Button content='Report' icon='download' labelPosition='left' onClick={p.onOpen} />}
+        position="bottom right"
+        trigger={<Button content="Report" icon="download" labelPosition="left" onClick={p.onOpen} />}
       />
 
       <Modal dimmer={true} open={p.isOpen} onClose={p.onClose}>
