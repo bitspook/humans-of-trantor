@@ -18,5 +18,8 @@ export default createSlice({
     loginSuccess: (state: UserState, { payload }) => {
       state.session = payload;
     },
+    logout: (state: UserState) => {
+      state.session = undefined;
+    },
   },
 });

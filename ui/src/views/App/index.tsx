@@ -1,37 +1,65 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
+import { Icon } from 'semantic-ui-react';
 
-import { Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+import { Dispatch, bindActionCreators } from 'redux';
+
 import ProtectedRoute from 'src/components/ProtectedRoute';
 import { State } from 'src/reducer';
 import Login from 'src/views/Login';
 import StandupMeeting from 'src/views/StandupMeeting';
+import userDuck from 'src/ducks/user';
 
-interface AppProps {
+import c from './index.module.scss';
+
+interface AppDataProps {
   isAuthenticated: boolean;
 }
 
-const App: React.FC<AppProps> = (p) => {
+interface AppCbProps {
+  logout: () => void;
+}
+
+const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   return (
     <Switch>
-      <ProtectedRoute isAuthenticated={p.isAuthenticated} path="/standup-meeting">
-        <StandupMeeting />
-      </ProtectedRoute>
-
       <ProtectedRoute path="/login" redirectTo="/" isAuthenticated={!p.isAuthenticated}>
         <Login />
       </ProtectedRoute>
 
-      <Redirect to="/standup-meeting" />
+      <Route>
+        <div className={c.root}>
+          <div className={c.navbarTop}>
+            <h2 className={c.brand}>HoT</h2>
+
+            <button className={c.logOut} onClick={p.logout}>
+              <Icon name="sign out" />
+            </button>
+          </div>
+
+          <ProtectedRoute isAuthenticated={p.isAuthenticated} path="/standup-meeting">
+            <StandupMeeting />
+          </ProtectedRoute>
+        </div>
+
+        <Redirect to="/standup-meeting" />
+      </Route>
     </Switch>
   );
 };
 
-const mapState = (state: State): AppProps => {
+const mapState = (state: State): AppDataProps => {
   return {
     isAuthenticated: Boolean(state.user.session),
   };
 };
 
-export default connect(mapState)(App);
+const mapDispatch = (dispatch: Dispatch): AppCbProps => {
+  return {
+    logout: bindActionCreators(userDuck.actions.logout, dispatch),
+  };
+};
+
+export default connect(mapState, mapDispatch)(App);
