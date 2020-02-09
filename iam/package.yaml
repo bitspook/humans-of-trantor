@@ -38,6 +38,8 @@ dependencies:
 - postgresql-simple-migration
 - uuid
 - dhall
+- wai
+- wai-cors
 
 ghc-options:
 - -Wall

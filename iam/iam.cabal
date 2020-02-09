@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f0cca4a15380efcbde4d54b6a4d58f08f6724a5d194aa7756b44807f5c169275
+-- hash: eefad60423cf9131d0714d349f0b53cf0d84688ae66ba88f1c581a438c58ea24
 
 name:           iam
 version:        0.1.0.0
@@ -53,6 +53,8 @@ library
     , servant-server
     , text
     , uuid
+    , wai
+    , wai-cors
     , warp
   default-language: Haskell2010
 
@@ -83,6 +85,8 @@ executable iam
     , servant-server
     , text
     , uuid
+    , wai
+    , wai-cors
     , warp
   default-language: Haskell2010
 
@@ -114,5 +118,7 @@ test-suite iam-test
     , servant-server
     , text
     , uuid
+    , wai
+    , wai-cors
     , warp
   default-language: Haskell2010
