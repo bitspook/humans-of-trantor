@@ -12,13 +12,21 @@
 }
 
 .form {
-  padding: 1em;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 1em;
   border: 1px solid #ddd;
   border-radius: 0.4em;
+
+  form {
+    width: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &.hasError {
+    border-bottom-color: $color-fail;
+  }
 }
 
 .inputField {
@@ -39,7 +47,7 @@
   }
 
   &.hasError input {
-    border-color: $color-fail;
+    border-bottom-color: $color-fail;
 
     &::placeholder {
       color: $color-fail-2;
@@ -119,4 +127,14 @@
   to {
     width: 1.25em;
   }
+}
+
+.formErrors {
+  display: flex;
+  width: 100%;
+}
+
+.formError {
+  color: $color-fail;
+  padding: 0.6em;
 }

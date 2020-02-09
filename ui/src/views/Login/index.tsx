@@ -40,21 +40,15 @@ const InnerForm: React.FC<FormikProps<LoginValues>> = (p) => {
   });
 
   return (
-    <div className={c.container}>
-      <div className={c.formContainer}>
-        <h1 className={c.title}>Humans of Trantor</h1>
+    <form onSubmit={p.handleSubmit}>
+      <Field component={InputField} name="email" placeholder="E-mail address" />
+      <Field component={InputField} name="password" placeholder="Password" type="password" />
 
-        <form className={c.form} onSubmit={p.handleSubmit}>
-          <Field component={InputField} name="email" placeholder="E-mail address" />
-          <Field component={InputField} name="password" placeholder="Password" type="password" />
-
-          <button className={c.loginButton} type="submit" disabled={p.isSubmitting}>
-            {p.isSubmitting ? 'Logging In' : 'Login'}
-            <span className={loaderCls} />
-          </button>
-        </form>
-      </div>
-    </div>
+      <button className={c.loginButton} type="submit" disabled={p.isSubmitting}>
+        {p.isSubmitting ? 'Logging In' : 'Login'}
+        <span className={loaderCls} />
+      </button>
+    </form>
   );
 };
 
@@ -70,6 +64,7 @@ const LoginFormSchema = yup.object().shape({
 });
 
 interface LoginFormDataProps {
+  errors: Error[];
   isLoggingIn: boolean;
 }
 
@@ -81,13 +76,34 @@ const Login: React.FC<LoginFormDataProps & LoginFormCbProps> = (p) => {
   const handleSubmit = (values: LoginValues, helpers: FormikHelpers<LoginValues>) =>
     p.loginStart({ values, helpers });
 
+  const formErrors = p.errors.map((e, i) => (
+    <div key={i} className={c.formError}>
+      {e.message}
+    </div>
+  ));
+
+  const formCls = classnames(c.form, {
+    [c.hasError]: formErrors.length,
+  });
+
   return (
-    <Formik
-      initialValues={{ email: '', password: '' }}
-      validationSchema={LoginFormSchema}
-      onSubmit={handleSubmit}
-      component={InnerForm}
-    />
+    <div className={c.container}>
+      <div className={c.formContainer}>
+        <h1 className={c.title}>Humans of Trantor</h1>
+
+        <div className={formCls}>
+          <Formik
+            initialValues={{ email: '', password: '' }}
+            validationSchema={LoginFormSchema}
+            onSubmit={handleSubmit}
+            component={InnerForm}
+            className="hasError"
+          />
+
+          <div className={c.formErrors}>{formErrors}</div>
+        </div>
+      </div>
+    </div>
   );
 };
 

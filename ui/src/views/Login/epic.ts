@@ -10,9 +10,11 @@ const loginEpic: Epic = (action$) => action$.pipe(
   map(({ payload }) => {
     const { values, helpers } = payload as LoginPayload;
 
+    const error = new Error('Get out of here! Lol');
+
     helpers.setSubmitting(true);
 
-    return actions.loginFail(new Error('Get out of here! Lol'));
+    return actions.loginFail(error);
   }),
   delay(4000)
 );
