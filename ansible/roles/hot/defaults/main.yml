@@ -11,6 +11,8 @@ hot_pms_db_name: "{{ hot_store_db_name }}"
 hot_pms_db_user: "{{ hot_store_db_user }}"
 hot_pms_db_password: "{{ hot_store_db_password }}"
 
+hot_iam_db_url: ""
+
 hot_gateway_port: "{{ gateway_port }}"
 
 hot_ei_url: ""

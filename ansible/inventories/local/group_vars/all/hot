@@ -17,3 +17,6 @@ hot_pms_api_prefix: "/pms"
 
 hot_ei_url: "http://localhost:{{ hot_gateway_port }}/ei"
 hot_pms_url: "http://localhost:{{ hot_gateway_port }}{{ hot_pms_api_prefix }}"
+
+hot_iam_db_name: "iam"
+hot_iam_db_url: "postgresql://{{ hot_store_db_user }}:{{ host_store_db_password }}@{{ hot_store_db_host }}:{{ hot_store_db_port }}/{{ hot_iam_db_name }}"

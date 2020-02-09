@@ -65,6 +65,9 @@ services:
 
   iam:
     image: "{{ iam_docker_repository }}:{{ iam_docker_tag }}"
+    environment:
+      DB_URL: "{{ hot_iam_db_url }}"
+      PORT: "80"
     volumes:
       - "{{ hot_data_dir }}/jwt-keys.pem:/app/jwt-keys.pem"
     depends_on:
