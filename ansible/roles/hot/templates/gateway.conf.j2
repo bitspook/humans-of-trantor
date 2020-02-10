@@ -24,6 +24,12 @@ server {
     proxy_pass http://ei;
   }
 
+  location /iam {
+    rewrite ^/iam/?(.*) /$1 break;
+
+    proxy_pass http://iam;
+  }
+
   location / {
     root "{{ hot_gateway_ui_mount }}";
 
