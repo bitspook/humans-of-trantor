@@ -69,6 +69,6 @@ services:
       DB_URL: '"{{ hot_iam_db_url }}"'
       PORT: "80"
     volumes:
-      - "{{ hot_data_dir }}/jwt-keys.pem:/app/jwt-keys.pem"
+      - "{{ hot_dir }}/jwt-keys.pem:/app/jwt-keys.pem"
     depends_on:
       - store
