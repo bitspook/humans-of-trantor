@@ -6,7 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeOperators         #-}
 
-module Session.Types where
+module Iam.Session.Types where
 
 import           Data.Aeson
 import           Data.UUID

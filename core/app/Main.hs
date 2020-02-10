@@ -1,7 +1,7 @@
 module Main where
 
-import           Lib (runApp)
+import           Api (run)
 import           RIO (IO)
 
 main :: IO ()
-main = runApp
+main = run

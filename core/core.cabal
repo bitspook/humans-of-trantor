@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: eefad60423cf9131d0714d349f0b53cf0d84688ae66ba88f1c581a438c58ea24
+-- hash: 926c9b4ee3adfec08c9a2a2e24c82468cce9d657fefb3980fa4e463025c6c1da
 
-name:           iam
+name:           core
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/iam#readme>
+description:    Please see the README on GitHub at <https://github.com/channikhabra/humans-of-trantor/core#readme>
 author:         Charanjit Singh
 maintainer:     charanjit.singh@trantorinc.com
-copyright:      2019 Charanjit Singh
-license:        BSD3
+copyright:      2020 Charanjit Singh
+license:        AGPL-3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -21,16 +21,17 @@ extra-source-files:
 
 library
   exposed-modules:
+      Api
       CryptoUtil
       Db
-      Identity
-      Identity.Types
-      Lib
-      Session
-      Session.Types
+      Iam
+      Iam.Identity
+      Iam.Identity.Types
+      Iam.Session
+      Iam.Session.Types
       Types
   other-modules:
-      Paths_iam
+      Paths_core
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
@@ -58,22 +59,22 @@ library
     , warp
   default-language: Haskell2010
 
-executable iam
+executable hot
   main-is: Main.hs
   other-modules:
-      Paths_iam
+      Paths_core
   hs-source-dirs:
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
+    , core
     , crypto-pubkey-openssh
     , crypto-pubkey-types
     , cryptonite
     , dhall
     , either
-    , iam
     , jose
     , postgresql-simple
     , postgresql-simple-migration
@@ -90,11 +91,11 @@ executable iam
     , warp
   default-language: Haskell2010
 
-test-suite iam-test
+test-suite core-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_iam
+      Paths_core
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N

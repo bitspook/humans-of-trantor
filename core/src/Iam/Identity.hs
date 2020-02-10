@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Identity
+module Iam.Identity
   ( API
   , server
   )
@@ -15,7 +15,7 @@ import           Data.Text.Encoding                (decodeUtf8)
 import           Data.UUID                         (UUID)
 import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.Errors
-import           Identity.Types
+import           Iam.Identity.Types
 import           RIO                               hiding (Identity)
 import           Servant                           as S
 import           Servant.Auth.Server

@@ -1,0 +1,3 @@
+iamUrl := http://localhost:5000/iam
+
+GET iamUrl

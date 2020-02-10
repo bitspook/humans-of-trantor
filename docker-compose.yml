@@ -1,13 +1,11 @@
 version: '3'
 services:
   store:
-    image: hot-store
     build: ./store
     ports:
       - 5432:5432
     volumes:
       - ./docker-volumes/store:/var/lib/postgresql/data
-      - ./store/migrations:/migrations
     environment:
       POSTGRES_USER: hot
       POSTGRES_PASSWORD: hot

@@ -1,9 +1,9 @@
-name:                iam
+name:                core
 version:             0.1.0.0
-license:             BSD3
+license:             AGPL-3
 author:              "Charanjit Singh"
 maintainer:          "charanjit.singh@trantorinc.com"
-copyright:           "2019 Charanjit Singh"
+copyright:           "2020 Charanjit Singh"
 
 extra-source-files:
 - README.md
@@ -16,7 +16,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/iam#readme>
+description:         Please see the README on GitHub at <https://github.com/channikhabra/humans-of-trantor/core#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -55,7 +55,7 @@ library:
   default-extensions: []
 
 executables:
-  iam:
+  hot:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -63,10 +63,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam
+    - core
 
 tests:
-  iam-test:
+  core-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:

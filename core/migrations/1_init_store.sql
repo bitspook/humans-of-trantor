@@ -1,7 +1,7 @@
 CREATE SCHEMA store;
 SET search_path TO store, PUBLIC;
 
-CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE store (
   id UUID NOT NULL DEFAULT uuid_generate_v1mc(),

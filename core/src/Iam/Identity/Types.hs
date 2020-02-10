@@ -6,7 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeOperators         #-}
 
-module Identity.Types where
+module Iam.Identity.Types where
 
 import           Data.Aeson                 (FromJSON, ToJSON)
 import           Data.UUID                  (UUID)
