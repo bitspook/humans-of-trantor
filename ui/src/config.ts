@@ -1,4 +1,5 @@
 interface Config {
+  basePath: string;
   urls: {
     ei: string;
     pms: string;
@@ -19,6 +20,7 @@ if (!process.env.REACT_APP_IAM_URL) {
 }
 
 const config: Config = {
+  basePath: process.env.REACT_APP_BASE_PATH || '/',
   urls: {
     ei: process.env.REACT_APP_EI_URL,
     iam: process.env.REACT_APP_IAM_URL,

@@ -12,6 +12,7 @@ hot_store_db_password:        "{{ lookup('env', 'HOT_DB_PASSWORD') }}"
 
 hot_gateway_port: "5000"
 
+hot_base_url: "/"
 hot_docs_base_url: "/docs"
 hot_pms_api_prefix: "/pms"
 

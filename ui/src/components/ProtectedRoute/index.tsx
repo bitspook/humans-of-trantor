@@ -1,4 +1,4 @@
-import React, { ReactChildren, ReactElement } from 'react';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Redirect, Route, RouteProps } from 'react-router-dom';
 

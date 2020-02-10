@@ -18,6 +18,7 @@
         PUBLIC_URL: "{{ ui_public_url }}"
         REACT_APP_EI_URL: "{{ ui_ei_url }}"
         REACT_APP_PMS_URL: "{{ ui_pms_url }}"
+        REACT_APP_BASE_PATH: "{{ ui_base_path }}"
       pull: no
     state: present
     repository: "{{ ui_docker_repository }}"
