@@ -10,7 +10,7 @@ where
 import           Crypto.JOSE                 (fromRSA)
 import           CryptoUtil                  (readPemRsaKey)
 import           Data.Either.Combinators     (fromRight')
-import           Data.Pool                   (Pool, withResource)
+import           Data.Pool                   (withResource)
 import           Db                          (initConnectionPool, migrate)
 import           Dhall                       (auto, input)
 import qualified Iam                         (app)
