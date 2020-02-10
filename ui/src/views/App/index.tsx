@@ -4,13 +4,14 @@ import { Redirect } from 'react-router';
 import { Icon } from 'semantic-ui-react';
 
 import { Route, Switch } from 'react-router-dom';
-import { Dispatch, bindActionCreators } from 'redux';
+import { bindActionCreators, Dispatch } from 'redux';
 
 import ProtectedRoute from 'src/components/ProtectedRoute';
+import config from 'src/config';
+import userDuck from 'src/ducks/user';
 import { State } from 'src/reducer';
 import Login from 'src/views/Login';
 import StandupMeeting from 'src/views/StandupMeeting';
-import userDuck from 'src/ducks/user';
 
 import c from './index.module.scss';
 
@@ -22,10 +23,15 @@ interface AppCbProps {
   logout: () => void;
 }
 
+const { routes } = config;
+
 const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   return (
     <Switch>
-      <ProtectedRoute path="/login" redirectTo="/" isAuthenticated={!p.isAuthenticated}>
+      <ProtectedRoute
+        path={routes.login}
+        redirectTo={routes.root}
+        isAuthenticated={!p.isAuthenticated}>
         <Login />
       </ProtectedRoute>
 
@@ -39,12 +45,12 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
             </button>
           </div>
 
-          <ProtectedRoute isAuthenticated={p.isAuthenticated} path="/standup-meeting">
+          <ProtectedRoute isAuthenticated={p.isAuthenticated} path={routes.standupMeeting}>
             <StandupMeeting />
           </ProtectedRoute>
         </div>
 
-        <Redirect to="/standup-meeting" />
+        <Redirect to={routes.standupMeeting} />
       </Route>
     </Switch>
   );

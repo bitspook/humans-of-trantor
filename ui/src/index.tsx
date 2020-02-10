@@ -12,14 +12,16 @@ import configureStore from 'src/configureStore';
 import 'src/index.scss';
 import App from 'src/views/App';
 
-const history = createBrowserHistory();
+const history = createBrowserHistory({
+  basename: config.basename,
+});
 const { store, persistor } = configureStore(history);
 
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ConnectedRouter history={history}>
-        <Route path={`${config.basePath}`} component={App} />
+        <Route path={`${config.routes.root}`} component={App} />
       </ConnectedRouter>
     </PersistGate>
   </Provider>,
