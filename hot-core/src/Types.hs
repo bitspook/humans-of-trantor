@@ -5,18 +5,30 @@
 module Types where
 
 import           Data.Aeson                           (FromJSON, ToJSON)
+import           Data.Text.Encoding                   (decodeUtf8)
 import           Database.PostgreSQL.Simple.FromField
+import           Database.PostgreSQL.Simple.Internal  (Conversion, Field)
 import           Database.PostgreSQL.Simple.ToField
 import           Dhall                                (Interpret)
 import           RIO
 
+fromTextField
+  :: Typeable a =>
+     (Text -> a)
+     -> Field
+     -> Maybe ByteString
+     -> Conversion a
+fromTextField constructor f dat = case dat of
+    Just b  -> return $ constructor $ decodeUtf8 b
+    Nothing -> returnError ConversionFailed f (show dat)
+
 newtype Email = Email Text deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField Email where
-  fromField = fromJSONField
+  fromField = fromTextField Email
 
 instance ToField Email where
-  toField = toJSONField
+  toField (Email a) = Escape $ encodeUtf8 a
 
 data Config = Config
   { dbUrl         :: Text,

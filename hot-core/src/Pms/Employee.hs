@@ -16,17 +16,18 @@ import           Database.PostgreSQL.Simple       (Connection, Only (Only),
 import           Database.PostgreSQL.Simple.SqlQQ (sql)
 import           Iam.Session.Types                (AccessToken)
 import           Pms.Employee.Types               (API, Employee, InsecureAPI,
-                                                   SecureAPI)
+                                                   ProjectName, SecureAPI)
 import           RIO                              hiding (Identity)
 import           Servant                          as S
 import           Servant.Auth.Server
 
-getEmployees :: Pool Connection -> Maybe Text -> IO [Employee]
+getEmployees :: Pool Connection -> Maybe ProjectName -> IO [Employee]
 getEmployees pool project = do
   let baseQuery' = [sql|
             SELECT DISTINCT on (payload->>'ecode')
               payload->>'ecode' as ecode,
-              payload->>'name' as name, payload->>'email' as email,
+              payload->>'name' as name,
+              payload->>'email' as email,
               payload->>'project' as project,
               payload->>'designation' as designation
             FROM store.store
@@ -38,7 +39,7 @@ getEmployees pool project = do
         Nothing -> query conn baseQuery' ()
   withResource pool queryEmployees
 
-getEmployeesH :: Pool Connection -> Maybe Text -> S.Handler [Employee]
+getEmployeesH :: Pool Connection -> Maybe ProjectName -> S.Handler [Employee]
 getEmployeesH pool project = liftIO $ getEmployees pool project
 
 insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
