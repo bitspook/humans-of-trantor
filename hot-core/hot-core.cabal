@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 164f637116dbc78e8a9e162f8c3b2a3ebdd8844f67296d2ce9ce62a48377364b
+-- hash: 0f69860ab23131cdf593774dbe6bfd2c2bce3191ba9bad4b804a766bff02a063
 
 name:           hot-core
 version:        0.1.0.0
@@ -59,6 +59,7 @@ library
     , uuid
     , wai
     , wai-cors
+    , wai-extra
     , warp
   default-language: Haskell2010
 
@@ -91,6 +92,7 @@ executable hot
     , uuid
     , wai
     , wai-cors
+    , wai-extra
     , warp
   default-language: Haskell2010
 
@@ -124,5 +126,6 @@ test-suite hot-core-test
     , uuid
     , wai
     , wai-cors
+    , wai-extra
     , warp
   default-language: Haskell2010
