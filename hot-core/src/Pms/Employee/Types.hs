@@ -8,22 +8,22 @@
 
 module Pms.Employee.Types where
 
-import           Data.Aeson          (FromJSON, ToJSON)
-import           Iam.Session.Types   (AccessToken)
-import           RIO                 (Generic, Show, Text)
+import           Data.Aeson                         (FromJSON, ToJSON)
+import           Database.PostgreSQL.Simple.FromRow (FromRow)
+import           Iam.Session.Types                  (AccessToken)
+import           RIO                                (Generic, Maybe, Show, Text)
 import           Servant
 import           Servant.Auth.Server
 
-
 data Employee = Employee
-  { name        :: Text
-  , ecode       :: Text
+  { ecode       :: Text
+  , name        :: Text
   , email       :: Text
-  , project     :: Text
+  , project     :: Maybe Text
   , designation :: Text
-  } deriving (Show, Generic, ToJSON, FromJSON)
+  } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
-type SecureAPI = "employees" :> Get '[JSON] [Employee]
+type SecureAPI = "employees" :> QueryParam "project" Text :> Get '[JSON] [Employee]
 
 type InsecureAPI
   = "placeholder" :> Post '[JSON] NoContent
