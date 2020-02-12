@@ -49,7 +49,10 @@ data Standup = Standup
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
 type SecureAPI
-  = "standup" :> QueryParam "ecode" Ecode :> Get '[JSON] [Standup]
+  = "standup" :> QueryParam "ecode" Ecode
+              :> QueryParam "month" Integer
+              :> QueryParam "year" Integer
+    :> Get '[JSON] [Standup]
 
 type InsecureAPI = "placeholder" :> Post '[JSON] NoContent
 
