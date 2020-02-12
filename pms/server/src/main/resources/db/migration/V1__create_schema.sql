@@ -1,2 +1,0 @@
--- No schema is needed for PMS service. For now, it is going to query the store
--- directly
