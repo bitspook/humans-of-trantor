@@ -17,8 +17,7 @@
       args:
         PUBLIC_URL: "{{ ui_public_url }}"
         REACT_APP_EI_URL: "{{ ui_ei_url }}"
-        REACT_APP_PMS_URL: "{{ ui_pms_url }}"
-        REACT_APP_IAM_URL: "{{ ui_iam_url }}"
+        REACT_APP_CORE_API_URL: "{{ ui_core_url }}"
         REACT_APP_BASE_PATH: "{{ ui_base_path }}"
       pull: no
     state: present

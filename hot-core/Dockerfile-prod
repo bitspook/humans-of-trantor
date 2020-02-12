@@ -4,7 +4,7 @@
 # consumer) with just docker
 FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install libpq-dev -y
+RUN apt-get update && apt-get install libpq-dev upx -y
 
 WORKDIR /app
 

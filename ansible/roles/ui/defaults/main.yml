@@ -12,6 +12,5 @@ ui_docker_registry_password: ""
 
 ui_public_url: ""
 ui_ei_url: ""
-ui_pms_url: ""
-ui_iam_url: ""
+ui_core_url: ""
 ui_base_path: ""

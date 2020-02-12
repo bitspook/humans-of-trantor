@@ -11,5 +11,5 @@ ui_docker_registry_username: "{{ hot_docker_registry_username }}"
 ui_docker_registry_password: "{{ hot_docker_registry_password }}"
 
 ui_ei_url: "{{ hot_ei_url }}"
-ui_pms_url: "{{ hot_pms_url }}"
+ui_core_url: "{{ hot_core_url }}"
 ui_base_path: "{{ hot_base_path }}"

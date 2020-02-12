@@ -1,6 +1,6 @@
 store_version:                  "{{ hot_version }}"
 
-store_dockerfile:        "Dockerfile-prod"
+store_dockerfile:        "Dockerfile"
 store_docker_name:       "hot-store"
 store_docker_tag:        "{{ store_version }}"
 
