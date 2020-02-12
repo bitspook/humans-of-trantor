@@ -32,7 +32,7 @@ import           Types
 corsMiddleware :: Middleware
 corsMiddleware = cors
   (const $ Just
-    (simpleCorsResourcePolicy { corsRequestHeaders = ["Content-Type"] })
+    (simpleCorsResourcePolicy { corsRequestHeaders = ["Content-Type", "Authorization"] })
   )
 
 type API auths = "api" :> (Iam.API auths :<|> Pms.API auths)

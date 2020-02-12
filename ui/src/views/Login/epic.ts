@@ -8,7 +8,7 @@ import duck, { LoginPayload, LoginValues } from './duck';
 const { actions } = duck;
 
 const login = async ({ email, password }: LoginValues) => {
-  const res = await fetch(`${config.urls.iam}/session`, {
+  const res = await fetch(`${config.urls.core}/session`, {
     body: JSON.stringify({ email, password }),
     headers: {
       'content-type': 'application/json',

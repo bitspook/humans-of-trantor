@@ -1,25 +1,33 @@
 import dayjs from 'dayjs';
 import { AnyAction } from 'redux';
-import { ofType } from 'redux-observable';
+import { ofType, StateObservable } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { mergeMap, withLatestFrom } from 'rxjs/operators';
 import config from 'src/config';
+import fetchWithAuth from 'src/lib/fetchWithAuth';
+import { State } from 'src/reducer';
 import duck, { Standup } from './index';
 
 const actions = duck.actions;
 
-const fetchStandup = async (ecode: string): Promise<Standup[]> => {
-  return fetch(`${config.urls.pms}/api/v1/standup?ecode=${ecode}`)
-    .then((res) => res.json())
-    .then((res) => (res.data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) })));
+const fetchStandup = async (ecode: string, token: string): Promise<Standup[]> => {
+  const year = '2020';
+  const data = await fetchWithAuth(token)(
+    `${config.urls.core}/standup?ecode=${ecode}&year=${year}`,
+  );
+
+  return (data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) }));
 };
 
-const fetchStandupEpic = (action$: Observable<AnyAction>) =>
+const fetchStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
   action$.pipe(
     ofType(actions.fetchStart),
-    mergeMap(async ({ payload: ecode }) => {
+    withLatestFrom(state$),
+    mergeMap(async ([{ payload: ecode }, state]) => {
+      const token = state.user.session && state.user.session.accessToken;
+
       try {
-        const data = await fetchStandup(ecode);
+        const data = await fetchStandup(ecode, token || '');
 
         if (!data) {
           throw new Error(data);
