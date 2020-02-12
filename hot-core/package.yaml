@@ -75,4 +75,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam
+    - hot-core
