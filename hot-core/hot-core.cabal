@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0f69860ab23131cdf593774dbe6bfd2c2bce3191ba9bad4b804a766bff02a063
+-- hash: 49faafb55a12fcdff0438e12dc6b9249878ea2248a5eb869f6a9ca8145db6c1b
 
 name:           hot-core
 version:        0.1.0.0
@@ -32,6 +32,8 @@ library
       Pms
       Pms.Employee
       Pms.Employee.Types
+      Pms.Standup
+      Pms.Standup.Types
       Types
   other-modules:
       Paths_hot_core
