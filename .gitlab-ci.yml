@@ -56,12 +56,7 @@ build:store:image:
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags store
 
-build:pms:image:
-  stage: docker-build
-  script:
-    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags pms
-
-build:iam-binary:
+build:core-binary:
   stage: build
   image: haskell:8.6.5
   before_script:
@@ -72,21 +67,21 @@ build:iam-binary:
     key: default
     paths:
       - .stack-root
-      - ./iam/.stack-work
+      - ./hot-core/.stack-work
   script:
     - apt-get update && apt-get install libpq-dev -y
-    - cd iam
+    - cd hot-core
     - echo $PWD && stack build --copy-bins --local-bin-path ./build
   artifacts:
     paths:
-      - ./iam/build/
+      - ./hot-core/build/
 
-build:iam:image:
+build:core:image:
   stage: docker-build
   needs:
-    - "build:iam-binary"
+    - "build:core-binary"
   script:
-    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags iam
+    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags core
 
 deploy:lab:
   stage: deploy
