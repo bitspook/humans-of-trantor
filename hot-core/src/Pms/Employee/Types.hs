@@ -40,6 +40,9 @@ instance FromField Ecode where
 
 instance ToField Ecode where
   toField (Ecode a) = Escape $ encodeUtf8 a
+
+instance FromHttpApiData Ecode where
+  parseQueryParam p = Right (Ecode p)
 --
 
 -- EmployeeName

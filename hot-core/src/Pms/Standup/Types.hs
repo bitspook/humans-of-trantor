@@ -14,21 +14,11 @@ import           Database.PostgreSQL.Simple.FromRow   (FromRow (..))
 import           Database.PostgreSQL.Simple.ToField   (Action (..),
                                                        ToField (..))
 import           Iam.Session.Types                    (AccessToken)
-import           Pms.Employee.Types                   (ProjectName)
+import           Pms.Employee.Types                   (Ecode, ProjectName)
 import           RIO
 import           Servant
 import           Servant.Auth.Server
 import           Types                                (fromTextField)
-
--- ecode
-newtype Ecode = Ecode Text deriving (Show, Generic, ToJSON, FromJSON)
-
-instance FromField Ecode where
-  fromField = fromTextField Ecode
-
-instance ToField Ecode where
-  toField (Ecode a) = Escape $ encodeUtf8 a
---
 
 -- StandupBody
 newtype StandupBody = StandupBody Text deriving (Show, Generic, ToJSON, FromJSON)
@@ -59,7 +49,7 @@ data Standup = Standup
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
 type SecureAPI
-  = "standup" :> Get '[JSON] [Standup]
+  = "standup" :> QueryParam "ecode" Ecode :> Get '[JSON] [Standup]
 
 type InsecureAPI = "placeholder" :> Post '[JSON] NoContent
 
