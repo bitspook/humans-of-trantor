@@ -12,12 +12,13 @@ hot_store_db_password:        "{{ lookup('env', 'HOT_DB_PASSWORD') }}"
 
 hot_gateway_port: "5000"
 
-hot_base_path: "/"
-hot_docs_base_url: "/docs"
-hot_pms_api_prefix: "/pms"
+hot_fqdn: "http://localhost"
+hot_base_path: ""
+hot_docs_base_url: "{{ hot_base_path }}/docs"
+hot_core_api_prefix: "{{ hot_base_path }}/api"
 
-hot_ei_url: "http://localhost:{{ hot_gateway_port }}/ei"
-hot_pms_url: "http://localhost:{{ hot_gateway_port }}{{ hot_pms_api_prefix }}"
+hot_ui_url: "{{ hot_fqdn }}{{hot_base_path }}"
+hot_ei_url: "{{ hot_fqdn }}{{hot_base_path }}/ei"
+hot_core_url: "{{ hot_fqdn }}{{ hot_core_api_prefix }}"
 
-hot_iam_db_name: "iam"
-hot_iam_db_url: "postgresql://{{ hot_store_db_user }}:{{ hot_store_db_password }}@{{ hot_store_db_host }}:{{ hot_store_db_port }}/{{ hot_iam_db_name }}"
+hot_core_db_url: "postgresql://{{ hot_store_db_user }}:{{ hot_store_db_password }}@{{ hot_store_db_host }}:{{ hot_store_db_port }}/{{ hot_store_db_name }}"

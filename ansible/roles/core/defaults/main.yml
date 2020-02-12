@@ -1,0 +1,11 @@
+core_version: ""
+core_src_dir: "{{ playbook_dir }}/../hot-core"
+
+core_dockerfile: "Dockerfile"
+core_docker_name: ""
+core_docker_tag: ""
+
+core_docker_repository: ""
+core_docker_registry: ""
+core_docker_registry_username: ""
+core_docker_registry_password: ""

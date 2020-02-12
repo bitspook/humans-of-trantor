@@ -3,6 +3,8 @@
   roles:
     - name: infra
       tags: infra
+    - name: core
+      tags: core
     - name: gateway
       tags: gateway
     - name: ui
@@ -13,7 +15,3 @@
       tags: docs
     - name: store
       tags: store
-    - name: pms
-      tags: pms
-    - name: iam
-      tags: iam
