@@ -1,0 +1,28 @@
+- name: Log in to docker registry
+  docker_login:
+    registry: "{{ core_docker_registry }}"
+    username: "{{ core_docker_registry_username }}"
+    password: "{{ core_docker_registry_password }}"
+  when: core_docker_registry|default('') != ''
+
+- name: Create docker image
+  docker_image:
+    name: "{{ core_docker_name }}"
+    tag: "{{ core_docker_tag }}"
+    source: build
+    debug: yes
+    build:
+      path: "{{ core_src_dir }}"
+      dockerfile: "{{ core_dockerfile }}"
+      pull: yes
+      rm: yes
+    state: present
+    repository: "{{ core_docker_repository }}"
+    push: "{{ core_docker_repository != '' }}"
+
+- name: Destroy docker image
+  docker_image:
+    state: absent
+    name: "{{ core_docker_name }}"
+    tag: "{{ core_version }}"
+  tags: [ never, destroy ]

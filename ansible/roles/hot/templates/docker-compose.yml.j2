@@ -23,8 +23,8 @@ services:
     depends_on:
       - docs
       - ei
-      - pms
       - ui
+      - core
 
   docs:
     image: "{{ docs_docker_repository }}:{{ docs_docker_tag }}"
@@ -45,28 +45,13 @@ services:
     volumes:
       - ui-vol:/app
     depends_on:
-      - store
       - ei
-      - pms
+      - core
 
-  pms:
-    image: "{{ pms_docker_repository }}:{{ pms_docker_tag }}"
+  core:
+    image: "{{ core_docker_repository }}:{{ core_docker_tag }}"
     environment:
-      DB_USERNAME: "{{ hot_pms_db_user }}"
-      DB_PASSWORD: "{{ hot_pms_db_password }}"
-      DB_NAME: "{{ hot_pms_db_name }}"
-      DB_HOST: "{{ hot_pms_db_host }}"
-      DB_PORT: "{{ hot_pms_db_port }}"
-      HOST: "0.0.0.0"
-      PORT: "80"
-      API_PREFIX: "{{ hot_pms_api_prefix }}"
-    depends_on:
-      - store
-
-  iam:
-    image: "{{ iam_docker_repository }}:{{ iam_docker_tag }}"
-    environment:
-      DB_URL: '"{{ hot_iam_db_url }}"'
+      DB_URL: '"{{ hot_core_db_url }}"'
       PORT: "80"
     volumes:
       - "{{ hot_dir }}/jwt-keys.pem:/app/jwt-keys.pem"

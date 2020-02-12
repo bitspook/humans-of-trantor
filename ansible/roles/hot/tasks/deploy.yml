@@ -32,14 +32,3 @@
   args:
     chdir: "{{ hot_dir }}"
   tags: launch
-
-- name: Run store migrations
-  shell: "docker-compose exec -T store \
-            migrate \
-            -path /migrations \
-            -database postgres://{{ hot_store_db_user }}:{{ hot_store_db_password }}@localhost/{{ hot_store_db_name }}?sslmode=disable \
-            up"
-  args:
-    chdir: "{{ hot_dir }}"
-  tags:
-    - post-launch

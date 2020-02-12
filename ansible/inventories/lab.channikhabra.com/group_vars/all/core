@@ -1,0 +1,11 @@
+core_version:                  "{{ hot_version }}"
+
+core_dockerfile:               "Dockerfile-prod"
+core_docker_name:              "hot-core"
+core_docker_tag:               "{{ core_version }}"
+
+core_docker_registry:          "{{ hot_docker_registry }}"
+core_docker_repository:        "{{ core_docker_registry + '/' + core_docker_name if core_docker_registry else '' }}"
+
+core_docker_registry_username: "{{ hot_docker_registry_username }}"
+core_docker_registry_password: "{{ hot_docker_registry_password }}"

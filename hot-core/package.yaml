@@ -1,0 +1,78 @@
+name:                hot-core
+version:             0.1.0.0
+license:             AGPL-3
+author:              "Charanjit Singh"
+maintainer:          "charanjit.singh@trantorinc.com"
+copyright:           "2020 Charanjit Singh"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/channikhabra/humans-of-trantor/hot-core#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- servant
+- servant-client
+- servant-server
+- servant-auth-server
+- aeson
+- warp
+- rio
+- jose
+- cryptonite
+- text
+- crypto-pubkey-openssh
+- either
+- crypto-pubkey-types
+- resource-pool
+- postgresql-simple
+- postgresql-simple-migration
+- uuid
+- dhall
+- wai
+- wai-cors
+- wai-extra
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  default-extensions: []
+
+executables:
+  hot:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hot-core
+
+tests:
+  hot-core-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - iam
