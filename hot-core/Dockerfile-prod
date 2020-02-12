@@ -4,7 +4,7 @@
 # consumer) with just docker
 FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install libpq-dev upx -y
+RUN apt-get update && apt-get install libpq-dev -y
 
 WORKDIR /app
 
@@ -12,4 +12,4 @@ COPY ./build /app
 COPY ./migrations /app/migrations
 COPY ./config.dhall /app/config.dhall
 
-CMD /app/iam
+CMD /app/hot

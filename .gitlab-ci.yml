@@ -69,9 +69,11 @@ build:core-binary:
       - .stack-root
       - ./hot-core/.stack-work
   script:
-    - apt-get update && apt-get install libpq-dev -y
+    - apt-get update && apt-get install libpq-dev upx -y
     - cd hot-core
     - echo $PWD && stack build --copy-bins --local-bin-path ./build
+    - cd build
+    - upx hot
   artifacts:
     paths:
       - ./hot-core/build/

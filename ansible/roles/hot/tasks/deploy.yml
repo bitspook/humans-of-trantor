@@ -28,7 +28,7 @@
 
   # Must remove named volumes otherwise ui/docs won't load new content
 - name: (Re)Start HoT Cloud
-  shell: "docker-compose down -v && docker-compose up -d"
+  shell: "docker-compose down -v --remove-orphans && docker-compose up -d"
   args:
     chdir: "{{ hot_dir }}"
   tags: launch
