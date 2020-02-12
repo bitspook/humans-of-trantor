@@ -35,7 +35,7 @@ corsMiddleware = cors
     (simpleCorsResourcePolicy { corsRequestHeaders = ["Content-Type", "Authorization"] })
   )
 
-type API auths = "api" :> (Iam.API auths :<|> Pms.API auths)
+type API auths = Iam.API auths :<|> Pms.API auths
 
 server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
 server c j p = Iam.server c j p :<|> Pms.server c j p
