@@ -1,0 +1,7 @@
+cli_version:                  "{{ hot_version }}"
+
+cli_docker_name:              "hot-cli"
+cli_docker_tag:               "{{ cli_version }}"
+
+cli_docker_registry:          "{{ hot_docker_registry }}"
+cli_docker_repository:        "{{ cli_docker_registry + '/' + cli_docker_name if cli_docker_registry else '' }}"

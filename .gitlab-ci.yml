@@ -18,6 +18,8 @@ variables:
   DOCKER_REGISTRY_USERNAME: "$CI_REGISTRY_USER"
   DOCKER_REGISTRY_PASSWORD: "$CI_REGISTRY_PASSWORD"
 
+  DOCKER_IMAGE_PREFIX: "${CI_REGISTRY_IMAGE}/${CI_REGISTRY_USER}"
+
   HOT_VERSION: "$CI_COMMIT_SHORT_SHA"
 
   HOT_DB_HOST: "store"
@@ -84,6 +86,14 @@ build:core:image:
     - "build:core-binary"
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags core
+
+build:cli:image:
+  stage: docker-build
+  script:
+    - cd cli
+    - docker build . -t "${DOCKER_IMAGE_PREFIX}/hot-cli:${HOT_VERSION}" -f Dockerfile-prod
+    - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+    - docker push "${DOCKER_IMAGE_PREFIX}/hot-cli:${HOT_VERSION}"
 
 deploy:lab:
   stage: deploy

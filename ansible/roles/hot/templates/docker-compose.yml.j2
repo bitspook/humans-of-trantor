@@ -57,3 +57,10 @@ services:
       - "{{ hot_dir }}/jwt-keys.pem:/app/jwt-keys.pem"
     depends_on:
       - store
+
+  cli:
+    image: "{{ cli_docker_repository }}:{{ cli_docker_tag }}"
+    volumes:
+      - "{{ hot_dir }}/hotrc:/app/.hotrc"
+    depends_on:
+      - store
