@@ -61,6 +61,7 @@ services:
   cli:
     image: "{{ cli_docker_repository }}:{{ cli_docker_tag }}"
     volumes:
-      - "{{ hot_dir }}/hotrc:/app/.hotrc"
+      - {{ hot_dir }}/hotrd/hotrc:/app/.hotrc
+      - {{ hot_dir }}/hotrd:/root/.config/hot
     depends_on:
       - store
