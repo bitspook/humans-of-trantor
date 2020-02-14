@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 49faafb55a12fcdff0438e12dc6b9249878ea2248a5eb869f6a9ca8145db6c1b
+-- hash: 898e77c7d2b37ae6b4833862e7cc0562dc87ba70477fbdc93ab6707607e0172f
 
 name:           hot-core
 version:        0.1.0.0
@@ -114,7 +114,7 @@ test-suite hot-core-test
     , cryptonite
     , dhall
     , either
-    , iam
+    , hot-core
     , jose
     , postgresql-simple
     , postgresql-simple-migration

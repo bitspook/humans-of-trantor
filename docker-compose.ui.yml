@@ -2,7 +2,7 @@
 version: '3'
 services:
   store:
-    image: "registry.hub.docker.com/channikhabra/hot-store:0.0.1"
+    image: "channikhabra/hot-store:latest"
     volumes:
       - ./docker-volumes/store:/var/lib/postgresql/data
       - ./store/migrations:/migrations
@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: hot
 
   gateway:
-    image: "registry.hub.docker.com/channikhabra/hot-gateway:0.0.1"
+    image: "channikhabra/hot-gateway:latest"
     ports:
       - "5000:80"
     volumes:
@@ -42,13 +42,23 @@ services:
       - store
 
   ei:
-    image: "registry.hub.docker.com/channikhabra/hot-ei:0.0.1"
+    image: "channikhabra/hot-ei:latest"
     environment:
       ROARR_LOG: "true"
       HOST: "0.0.0.0"
       PORT: "80"
     depends_on:
       - store
+
+  core:
+    image: "channikhabra/hot-core:latest"
+    environment:
+      DB_URL: '"postgresql://hot:hot@store/hot"'
+      PORT: "80"
+    depends_on:
+      - store
+    volumes:
+      - ./hot-core/jwt-keys.pem:/app/jwt-keys.pem
 
   ui:
     image: ui

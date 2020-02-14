@@ -17,6 +17,9 @@ around with data.
 HoT itself just keeps track of all the events that happen with humans of
 Trantor.
 
+A version of =develop= branch is deployed on my [[https://lab.channikhabra.com/humans-of-trantor][lab]]. You can find the
+documentation at https://lab.channikhabra.com/humans-of-trantor/docs
+
 ** Getting started
 
 Quickest and recommended way to get started with HoT is to install:
@@ -27,7 +30,7 @@ Quickest and recommended way to get started with HoT is to install:
 And enter this command in a terminal:
 
 #+begin_example
-docker-compose up -f docker-compose.ui.yml
+docker-compose -f docker-compose.ui.yml up
 #+end_example
 
 =docker-compose.ui.yml= runs =ui= and =docs= app in development mode, and rest
@@ -38,3 +41,21 @@ This will start HoT cloud which you can navigate using URLs:
 
 1. http://localhost:5000 - for the UI
 2. http://localhost:5000/docs - for the documentation
+
+*** Troubleshooting
+
+When using docker-compose.ui.yml, =hot-core= might be too quick to start, and
+can jump the gun before =hot-store= (our database) is even up. You might see
+following error if this happens:
+
+#+begin_example
+core_1     | hot: libpq: failed (could not connect to server: Connection refused
+core_1     |    Is the server running on host "localhost" (127.0.0.1) and accepting
+core_1     |    TCP/IP connections on port 5432?
+core_1     | could not connect to server: Cannot assign requested address
+core_1     |    Is the server running on host "localhost" (::1) and accepting
+core_1     |    TCP/IP connections on port 5432?
+core_1     | )
+#+end_example
+
+Simply =dc restart core= should be enough to resolve this.
