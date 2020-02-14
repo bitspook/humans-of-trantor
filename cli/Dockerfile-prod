@@ -1,0 +1,28 @@
+FROM node:12-alpine as builder
+
+WORKDIR /app
+
+ENV NODE_ENV=development
+
+COPY src /app/src
+COPY package.json /app/
+COPY yarn.lock /app/
+COPY tsconfig.json /app/
+
+RUN yarn && yarn build
+
+FROM node:12-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/build /app/build
+COPY bin /app/bin
+COPY package.json /app/
+COPY yarn.lock /app/
+
+ENV NODE_ENV=production
+RUN yarn
+
+RUN yarn link
+
+CMD hot

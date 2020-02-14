@@ -2,6 +2,9 @@
 
 A CLI for hot-cli.
 
+> Notice: I am thinking about getting rid of this Typescript based CLI, and make HoT CLI a part of
+> hot-core instead. i.e HoT core will expose an API server, as well as CLI based UI to interact with
+> the cloud.
 
 ## Notable Commands
 

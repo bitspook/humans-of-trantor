@@ -9,10 +9,10 @@
   "scripts": {
     "fmt": "prettier-tslint fix 'src/**/*.ts'",
     "lint": "tslint -p .",
-    "clean-build": "rm -rf ./build",
+    "clean": "rm -rf ./build",
     "compile": "tsc -p .",
     "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates"
+    "build": "yarn clean && yarn compile && yarn copy-templates"
   },
   "files": [
     "tsconfig.json",
@@ -25,8 +25,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@types/cheerio": "^0.22.15",
-    "@types/tough-cookie": "^2.3.6",
     "cheerio": "^1.0.0-rc.3",
     "fecha": "^3.0.3",
     "form-data": "^3.0.0",
@@ -35,11 +33,11 @@
     "googleapis": "^45.0.0",
     "got": "^10.0.3",
     "slonik": "^21.4.1",
-    "tough-cookie": "^3.0.1",
-    "ts-node": "^8.5.4",
-    "typescript": "3.7.3"
+    "tough-cookie": "^3.0.1"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.15",
+    "@types/tough-cookie": "^2.3.6",
     "@types/fecha": "^2.3.1",
     "@types/node": "^12.12.17",
     "@types/slonik": "^21.4.0",
@@ -48,7 +46,9 @@
     "tslint": "^5.20.1",
     "tslint-config-airbnb": "^5.11.2",
     "tslint-config-prettier": "^1.17.0",
-    "tslint-config-standard": "^9.0.0"
+    "tslint-config-standard": "^9.0.0",
+    "ts-node": "^8.5.4",
+    "typescript": "3.7.3"
   },
   "prettier": {
     "semi": false,
