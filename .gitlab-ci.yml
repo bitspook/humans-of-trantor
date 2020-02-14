@@ -88,13 +88,13 @@ build:core:image:
 build:cli:image:
   stage: docker-build
   variables:
-    IMAGE: "${CI_REGISTRY_IMAGE}/hot-cli:${HOT_VERSION}"
+    IMAGE: "${CI_REGISTRY_IMAGE}/hot-cli:${CI_COMMIT_SHORT_SHA}"
   script:
     - cd cli
-    - echo "CREATING: $IMAGE"
+    - echo "CREATING $IMAGE"
     - docker build . -t $IMAGE  -f Dockerfile-prod
     - echo "${CI_REGISTRY_PASSWORD}" | docker login -u "${CI_REGISTRY_USER}" "${CI_REGISTRY}" --password-stdin
-    - docker push $IMAGE
+    - docker push "${IMAGE}"
 
 deploy:lab:
   stage: deploy
