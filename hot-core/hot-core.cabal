@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 898e77c7d2b37ae6b4833862e7cc0562dc87ba70477fbdc93ab6707607e0172f
+-- hash: d149513579498e48c68102939620e63ac86af1942ed277c3faaf15758b11738f
 
 name:           hot-core
 version:        0.1.0.0
@@ -24,6 +24,8 @@ library
       Api
       CryptoUtil
       Db
+      EventInjector
+      EventInjector.Types
       Iam
       Iam.Identity
       Iam.Identity.Types
