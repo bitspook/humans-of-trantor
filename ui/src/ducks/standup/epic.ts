@@ -14,7 +14,7 @@ const fetchStandup = async (ecode: string, token: string): Promise<Standup[]> =>
   const year = '2020';
   const data = await fetchWithAuth(token)(
     `${config.urls.core}/standup?ecode=${ecode}&year=${year}`,
-  );
+  ).then((r) => r.json());
 
   return (data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) }));
 };

@@ -8,9 +8,15 @@ import config from 'src/config';
 import standupDuck from 'src/ducks/standup';
 import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
+import fetchWithAuth from 'src/lib/fetchWithAuth';
 
-const saveStandup = (ecode: string, day: Dayjs, project: string, values: StandupFormValues) => {
-  const url = `${config.urls.ei}/events/RECEIVED_STANDUP_UPDATE`;
+const saveStandup = (token: string) => (
+  ecode: string,
+  day: Dayjs,
+  project: string,
+  values: StandupFormValues,
+) => {
+  const url = `${config.urls.core}/event/RECEIVED_STANDUP_UPDATE`;
 
   const standups = [
     { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },
@@ -18,43 +24,45 @@ const saveStandup = (ecode: string, day: Dayjs, project: string, values: Standup
     { ecode, date: day.format('YYYY-MM-DD'), type: 'impediment', standup: values.impediment },
   ].filter((s) => Boolean(s.standup));
 
+  const fetch = fetchWithAuth(token);
+
   return Promise.all(
     standups.map(async (standup) => {
+      const event = {
+        payload: {
+          ...standup,
+          project,
+        },
+        version: 'v1',
+      };
+
       const response = await fetch(url, {
-        body: JSON.stringify({
-          payload: {
-            ...standup,
-            project,
-          },
-          version: 'v1',
-        }),
+        body: JSON.stringify(event),
         headers: {
           'content-type': 'application/json',
         },
         method: 'POST',
-      }).then((res) => res.json());
+      });
 
-      if (!response.id) {
-        throw response;
-      }
-
-      return response;
+      return event;
     }),
   );
 };
 
 const { actions } = duck;
 
-const saveStandupEpic = (action$: Observable<AnyAction>) =>
+const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
   action$.pipe(
     ofType(actions.saveStandupStart),
-    mergeMap(async ({ payload }) => {
+    withLatestFrom(state$),
+    mergeMap(async ([{ payload }, state]) => {
       const { ecode, standup, project, helpers, day } = payload as SaveStandupPayload;
+      const token = (state.user.session && state.user.session.accessToken) || '';
 
       helpers.setSubmitting(true);
 
       try {
-        const responses = await saveStandup(ecode, day, project, standup);
+        const responses = await saveStandup(token)(ecode, day, project, standup);
         const toasts: AnyAction[] = responses.map((r) =>
           actions.showToast({
             body: `${r.payload.type} for ${r.payload.ecode}`,

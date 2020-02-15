@@ -41,11 +41,6 @@ build:ui:image:
   script:
     - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags ui
 
-build:ei:image:
-  stage: docker-build
-  script:
-    - ansible-playbook --inventory=ansible/inventories/lab.channikhabra.com ./ansible/build.yml --tags ei
-
 build:docs:image:
   stage: docker-build
   script:

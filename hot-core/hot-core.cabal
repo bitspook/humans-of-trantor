@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 898e77c7d2b37ae6b4833862e7cc0562dc87ba70477fbdc93ab6707607e0172f
+-- hash: 32e8c302ef3b5cd4a31d3b884826065127498cde6abcbe3bfde0e94b6ec7774e
 
 name:           hot-core
 version:        0.1.0.0
@@ -24,6 +24,8 @@ library
       Api
       CryptoUtil
       Db
+      EventInjector
+      EventInjector.Types
       Iam
       Iam.Identity
       Iam.Identity.Types
@@ -56,6 +58,7 @@ library
     , servant
     , servant-auth-server
     , servant-client
+    , servant-errors
     , servant-server
     , text
     , uuid
@@ -89,6 +92,7 @@ executable hot
     , servant
     , servant-auth-server
     , servant-client
+    , servant-errors
     , servant-server
     , text
     , uuid
@@ -123,6 +127,7 @@ test-suite hot-core-test
     , servant
     , servant-auth-server
     , servant-client
+    , servant-errors
     , servant-server
     , text
     , uuid

@@ -22,7 +22,6 @@ services:
       - ui-vol:{{ hot_gateway_ui_mount }}
     depends_on:
       - docs
-      - ei
       - ui
       - core
 
@@ -31,21 +30,11 @@ services:
     volumes:
       - docs-vol:/app
 
-  ei:
-    image: "{{ ei_docker_repository }}:{{ ei_docker_tag }}"
-    environment:
-      ROARR_LOG: "true"
-      HOST: "0.0.0.0"
-      PORT: "80"
-    depends_on:
-      - store
-
   ui:
     image: "{{ ui_docker_repository }}:{{ ui_docker_tag }}"
     volumes:
       - ui-vol:/app
     depends_on:
-      - ei
       - core
 
   core:
@@ -61,6 +50,7 @@ services:
   cli:
     image: "{{ cli_docker_repository }}:{{ cli_docker_tag }}"
     volumes:
-      - "{{ hot_dir }}/hotrc:/app/.hotrc"
+      - {{ hot_dir }}/hotrd/hotrc:/app/.hotrc
+      - {{ hot_dir }}/hotrd:/root/.config/hot
     depends_on:
       - store

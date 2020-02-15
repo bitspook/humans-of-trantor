@@ -9,8 +9,6 @@
       tags: gateway
     - name: ui
       tags: ui
-    - name: ei
-      tags: ei
     - name: docs
       tags: docs
     - name: store

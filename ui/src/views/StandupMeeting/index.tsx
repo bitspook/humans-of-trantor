@@ -62,7 +62,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   }, [p.selectedProject]); // eslint-disable-line
 
   const maybeError = p.saveStandupError && (
-    <Message error={true} header="Failed to save standup 😞" content={p.saveStandupError} />
+    <Message error={true} header="Failed to save standup 😞" content={String(p.saveStandupError)} />
   );
 
   /* prettier-ignore */

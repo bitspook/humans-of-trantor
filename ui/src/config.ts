@@ -7,16 +7,11 @@ interface Config {
   };
   urls: {
     core: string;
-    ei: string;
   };
 }
 
 if (!process.env.REACT_APP_CORE_API_URL) {
   throw new Error('REACT_APP_CORE_API_URL environment variable must be set');
-}
-
-if (!process.env.REACT_APP_EI_URL) {
-  throw new Error('REACT_APP_EI_URL environment variable must be set');
 }
 
 const basename = process.env.REACT_APP_BASE_PATH || '/';
@@ -30,7 +25,6 @@ const config: Config = {
   },
   urls: {
     core: process.env.REACT_APP_CORE_API_URL,
-    ei: process.env.REACT_APP_EI_URL,
   },
 };
 

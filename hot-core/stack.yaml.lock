@@ -5,40 +5,12 @@
 
 packages:
 - completed:
-    hackage: ekg-wai-0.1.0.3@sha256:d6b62107589f7ddd30b6c56dbb22f9904e274fd9ce24807db76833fab9506c9e,1992
+    hackage: servant-errors-0.1.3.1@sha256:775cf28693fa957b87ca68bf0445659941cde3158ec56cef4458008a559e00e9,2540
     pantry-tree:
-      size: 1343
-      sha256: 44df3e2517bad85677bdf841ce83b2b3f1b1d3d30c2c7c3ce3ab4dac75662e81
+      size: 349
+      sha256: aa09a6586b8075ce1774068761dd6a88b0ea0d985cc9cf15e1c31192156ff4e2
   original:
-    hackage: ekg-wai-0.1.0.3
-- completed:
-    hackage: refined-0.4.3@sha256:9e83de09dd03d6623bbe7a6a74afccb6d6978541296e507bb8a9ce56d5ca4e39,2405
-    pantry-tree:
-      size: 732
-      sha256: f8c89afad595916d70a58d7bd8f3de0409eac1a85b173dd544ba6e4d8e251277
-  original:
-    hackage: refined-0.4.3
-- completed:
-    hackage: wai-middleware-metrics-0.2.4@sha256:d6b6916acd41aaef4ca59a839d40a3a377f9df784ae49fd4c64926ae916b6ba2,2890
-    pantry-tree:
-      size: 330
-      sha256: 99366b831109417cd8e739fb45e9fd214cb79f28a507f8154e5528120042d0ac
-  original:
-    hackage: wai-middleware-metrics-0.2.4
-- completed:
-    size: 13935
-    url: https://github.com/myfreeweb/magicbane/archive/fb21a2d343dda91fec654bc7bb2c2d62036072c1.tar.gz
-    cabal-file:
-      size: 2167
-      sha256: 755454689192e175214a50c184f3350c480e10195578e377c020126621643956
-    name: magicbane
-    version: 0.4.1
-    sha256: e8d57bf15bf581799218336120d233051a0738ede385bc2dabd2641455b0dd9f
-    pantry-tree:
-      size: 1130
-      sha256: 7a1a2d742f179158f9c0973c01fa791e06a032d243ee3a08dbab78134cd64291
-  original:
-    url: https://github.com/myfreeweb/magicbane/archive/fb21a2d343dda91fec654bc7bb2c2d62036072c1.tar.gz
+    hackage: servant-errors-0.1.3.1@sha256:775cf28693fa957b87ca68bf0445659941cde3158ec56cef4458008a559e00e9,2540
 snapshots:
 - completed:
     size: 524162

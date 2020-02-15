@@ -9,8 +9,10 @@ import duck, { Employee } from './index';
 
 const actions = duck.actions;
 
-const fetchEmployees = async (project: string, token: string): Promise<Employee[]> => {
-  const data = await fetchWithAuth(token)(`${config.urls.core}/employees?project=${project}`);
+const fetchEmployees = (token: string) => async (project: string): Promise<Employee[]> => {
+  const data = await fetchWithAuth(token)(
+    `${config.urls.core}/employees?project=${project}`,
+  ).then((r) => r.json());
 
   return (data as Employee[]).sort((a, b) => (a.name > b.name ? 1 : -1));
 };
@@ -23,7 +25,7 @@ const fetchEmployeesEpic = (action$: Observable<AnyAction>, state$: StateObserva
       const token = state.user.session && state.user.session.accessToken;
 
       try {
-        const data = await fetchEmployees(project, token || '');
+        const data = await fetchEmployees(token || '')(project);
 
         if (!data) {
           throw new Error(data);
