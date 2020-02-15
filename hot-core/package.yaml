@@ -41,6 +41,7 @@ dependencies:
 - wai
 - wai-cors
 - wai-extra
+- servant-errors
 
 ghc-options:
 - -Wall
