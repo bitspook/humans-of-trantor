@@ -63,7 +63,7 @@ run = do
   privateKey <- fromRSA . fromRight' <$> readPemRsaKey
     (unpack . jwtKeysPath $ conf)
   Warp.run (fromIntegral $ port conf)
-    $ errorMw @JSON @["error", "status"]
     $ corsMiddleware
+    $ errorMw @JSON @["error", "status"]
     $ logStdoutDev
     $ app privateKey pool
