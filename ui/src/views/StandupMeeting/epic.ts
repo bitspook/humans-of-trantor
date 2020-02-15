@@ -28,25 +28,23 @@ const saveStandup = (token: string) => (
 
   return Promise.all(
     standups.map(async (standup) => {
+      const event = {
+        payload: {
+          ...standup,
+          project,
+        },
+        version: 'v1',
+      };
+
       const response = await fetch(url, {
-        body: JSON.stringify({
-          payload: {
-            ...standup,
-            project,
-          },
-          version: 'v1',
-        }),
+        body: JSON.stringify(event),
         headers: {
           'content-type': 'application/json',
         },
         method: 'POST',
-      }).then((res) => res.json());
+      });
 
-      if (!response.id) {
-        throw response;
-      }
-
-      return response;
+      return event;
     }),
   );
 };

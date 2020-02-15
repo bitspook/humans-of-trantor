@@ -55,7 +55,7 @@ receivedStandupUpdateEventH
 receivedStandupUpdateEventH p e = liftIO $ insertEvent p e
  where
   insertEvent pool (ReceivedStandupUpdateEvent event) = do
-    let eventName :: Text = "DISCOVERED_PROJECT"
+    let eventName :: Text = "RECEIVED_STANDUP_UPDATE"
     withResource pool $ \conn -> withTransaction conn $ do
       _ <- execute
         conn
