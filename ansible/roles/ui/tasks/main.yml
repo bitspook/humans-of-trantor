@@ -16,7 +16,6 @@
       dockerfile: "{{ ui_dockerfile }}"
       args:
         PUBLIC_URL: "{{ ui_public_url }}"
-        REACT_APP_EI_URL: "{{ ui_ei_url }}"
         REACT_APP_CORE_API_URL: "{{ ui_core_url }}"
         REACT_APP_BASE_PATH: "{{ ui_base_path }}"
       pull: no

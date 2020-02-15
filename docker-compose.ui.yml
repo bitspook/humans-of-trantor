@@ -19,7 +19,6 @@ services:
       - ./gateway/gateway.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - docs
-      - ei
       - pgadmin
       - ui
 
@@ -41,15 +40,6 @@ services:
     depends_on:
       - store
 
-  ei:
-    image: "channikhabra/hot-ei:latest"
-    environment:
-      ROARR_LOG: "true"
-      HOST: "0.0.0.0"
-      PORT: "80"
-    depends_on:
-      - store
-
   core:
     image: "channikhabra/hot-core:latest"
     environment:
@@ -66,7 +56,6 @@ services:
     environment:
       PORT: 80
       REACT_APP_CORE_API_URL: "http://localhost:5000/api"
-      REACT_APP_EI_URL: "http://localhost:5000/ei"
     volumes:
       - ./ui:/app
       - ./ui/node_modules:/app/node_modules

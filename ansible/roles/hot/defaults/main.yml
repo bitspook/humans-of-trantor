@@ -7,7 +7,6 @@ hot_store_db_password: ""
 
 hot_gateway_port: "{{ gateway_port }}"
 
-hot_ei_url: ""
 hot_core_api_url: ""
 
 hot_gateway_docs_mount: "/docs"

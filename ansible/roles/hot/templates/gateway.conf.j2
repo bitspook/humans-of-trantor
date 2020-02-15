@@ -18,12 +18,6 @@ server {
     proxy_pass http://core;
   }
 
-  location /ei {
-    rewrite ^/ei/?(.*) /$1 break;
-
-    proxy_pass http://ei;
-  }
-
   location / {
     root "{{ hot_gateway_ui_mount }}";
 
