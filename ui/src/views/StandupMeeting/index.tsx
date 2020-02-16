@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Header, Icon, Message } from 'semantic-ui-react';
+import { Dropdown, Header, Icon, Message } from 'semantic-ui-react';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -13,6 +13,7 @@ import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
+import { Project } from 'src/ducks/projects';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
 import duck, { ReportState, SaveStandupPayload } from './duck';
@@ -28,6 +29,7 @@ interface AppDataProps {
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
   report: ReportState;
+  projects: Project[];
 }
 
 interface AppCbProps {
@@ -79,9 +81,18 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     </div>
   );
 
+  const projectsDropdownOpts = p.projects.map((project) => {
+    return {
+      key: project.id,
+      value: project.id,
+      text: project.name,
+    };
+  });
+
   return (
     <div className={c.root}>
-      <div className={c.reportBar}>
+      <div className={c.topBar}>
+        <Dropdown placeholder="Select Project" search={true} selection={true} options={projectsDropdownOpts} />
         <Report
           day={p.selectedDay}
           onOpen={p.showReport}
@@ -136,6 +147,7 @@ const mapState = (state: State): AppDataProps => {
     initialStandupFormValue,
     standup: state.standup.data.filter((s) => s.ecode === state.standupMeeting.selectedEmployee),
     toasts: Object.values(state.standupMeeting.toasts),
+    projects: state.projects.data,
   };
 };
 

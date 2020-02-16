@@ -6,7 +6,7 @@ import standupMeeting, { StandupMeetingState } from './views/StandupMeeting/duck
 import standup, { StandupState } from './ducks/standup';
 import user, { UserState } from './ducks/user';
 
-import projects, {ProjectsState} from './ducks/projects';
+import projects, { ProjectsState } from './ducks/projects';
 
 export interface State {
   employees: EmployeesState;
@@ -24,7 +24,7 @@ const reducers = {
   standup: standup.reducer,
   standupMeeting: standupMeeting.reducer,
   user: user.reducer,
-  projects: projects.reducer
+  projects: projects.reducer,
 };
 
 export default reducers;

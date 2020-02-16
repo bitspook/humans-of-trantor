@@ -5,11 +5,11 @@ $color-sep-border: rgba(0,0,0,.2);
   flex-direction: column;
 }
 
-.reportBar {
+.topBar {
   display: flex;
-  flex-direction: row-reverse;
   width: 95%;
   margin: 1em auto;
+  justify-content: space-between;
 }
 
 .container {

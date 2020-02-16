@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export interface Projects {
+export interface Project {
   id: string;
   name: string;
   logo?: string;
@@ -9,7 +9,7 @@ export interface Projects {
 export interface ProjectsState {
   isLoading: boolean;
   errors: Error[];
-  data: Projects[];
+  data: Project[];
 }
 
 const initialState: ProjectsState = {
