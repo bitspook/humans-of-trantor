@@ -6,9 +6,9 @@ import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { StandupFormValues } from 'src/components/StandupForm';
 import config from 'src/config';
 import standupDuck from 'src/ducks/standup';
+import fetchWithAuth from 'src/lib/fetchWithAuth';
 import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
-import fetchWithAuth from 'src/lib/fetchWithAuth';
 
 const saveStandup = (token: string) => (
   ecode: string,
