@@ -47,8 +47,23 @@ services:
     build: ./ui
     environment:
       PORT: 80
-      REACT_APP_CORE_API_URL: "http://localhost:7000/api"
+      REACT_APP_CORE_API_URL: "http://localhost:5000/api"
     volumes:
       - ./ui/node_modules:/app/node_modules
       - ./ui:/app
     command: yarn start
+
+  core:
+    build:
+      context: ./hot-core
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: '"postgresql://hot:hot@store/hot"'
+      PORT: "80"
+    depends_on:
+      - store
+    volumes:
+      - ./hot-core/build:/app
+      - ./hot-core/migrations:/app/migrations
+      - ./hot-core/jwt-keys.pem:/app/jwt-keys.pem
+      - ./hot-core/config.dhall:/app/config.dhall
