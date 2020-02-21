@@ -18,10 +18,12 @@ import           Network.Wai.Middleware.Cors           (cors,
                                                         simpleCorsResourcePolicy)
 import           Network.Wai.Middleware.RequestLogger  (logStdoutDev)
 import           Network.Wai.Middleware.Servant.Errors (errorMw)
+import qualified Pms                                   (API, server)
 import           RIO
 import           RIO.Text                              (encodeUtf8, unpack)
 import           Servant                               hiding (runHandler)
-import           Servant.Auth.Server                   (JWTSettings,
+import           Servant.Auth.Server                   (CookieSettings, JWT,
+                                                        JWTSettings,
                                                         defaultCookieSettings)
 import           Types
 
@@ -44,13 +46,13 @@ app
 app api sctx ctx actions = serveWithContext api sctx $ srv ctx
   where srv c = hoistServerWithContext api (Proxy @w) (runHandler c) actions
 
-type API auth = Iam.API auth
+type API auths = Iam.API :<|> (Pms.API auths)
 
-proxyApi :: Proxy (API auth)
+proxyApi :: Proxy (API '[JWT])
 proxyApi = Proxy
 
-server :: JWTSettings -> ServerT (API auth) App
-server jwts = Iam.server jwts
+server :: JWTSettings -> ServerT (API auths) App
+server jwts = Iam.server jwts :<|> Pms.server
 
 run :: IO ()
 run = do
@@ -60,7 +62,7 @@ run = do
   jwts <- jwtSettings (unpack . jwtKeysPath $ conf)
 
   let sctx = defaultCookieSettings :. jwts :. EmptyContext
-      ctx  = AppContext conf pool
+      ctx  = AppContext pool conf
 
   Warp.run (fromIntegral $ port conf)
     $ corsMw

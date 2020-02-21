@@ -67,7 +67,7 @@ revokeSession pool (RefreshToken sid) = do
 refreshSession
   :: JWTSettings -> SessionOpInput -> App Session
 refreshSession jwts (SessionOpInput rt) = do
-  (AppContext _ pool) <- ask
+  (AppContext pool _) <- ask
   session' <- liftIO $ getSession pool rt
   case session' of
     Nothing            -> throwM err403
@@ -79,7 +79,7 @@ refreshSession jwts (SessionOpInput rt) = do
 
 createSessionH :: JWTSettings -> NewSessionInput -> App Session
 createSessionH jwts inp = do
-  (AppContext _ pool) <- ask
+  (AppContext pool _) <- ask
   maybeId <- liftIO $ getIdentity pool inp
   case maybeId of
     Nothing               -> throwM err401
@@ -95,7 +95,7 @@ createSessionH jwts inp = do
 
 revokeSessionH :: SessionOpInput -> App NoContent
 revokeSessionH (SessionOpInput rs) = do
-  (AppContext _ pool) <- ask
+  (AppContext pool _) <- ask
   liftIO $ revokeSession pool rs
   return NoContent
 

@@ -43,6 +43,6 @@ data Config = Config
 
 instance Interpret Config
 
-data AppContext = AppContext { config :: Config, dbPool :: Pool Connection }
+data AppContext = AppContext { dbPool :: Pool Connection,  config :: Config }
 
 type App = RIO AppContext

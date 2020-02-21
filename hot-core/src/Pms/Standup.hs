@@ -1,7 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Pms.Standup
   ( API
@@ -9,23 +8,22 @@ module Pms.Standup
   )
 where
 
-
-import           Data.Pool                        (Pool, withResource)
-import           Database.PostgreSQL.Simple       (Connection, Only (Only),
-                                                   query)
+import           Data.Pool                        (withResource)
+import           Database.PostgreSQL.Simple       (Only (Only), query)
 import           Database.PostgreSQL.Simple.SqlQQ (sql)
-import           Iam.Session.Types                (AccessToken)
+
 import           Pms.Employee.Types               (Ecode)
-import           Pms.Standup.Types                (API, InsecureAPI, SecureAPI,
-                                                   Standup)
+import           Pms.Standup.Types                (API, Standup)
 import           RIO                              hiding (Identity)
 import           Servant                          as S
 import           Servant.Auth.Server
+import           Types                            (App, AppContext (..))
 
-getStandups :: Pool Connection -> Maybe Ecode -> Maybe Integer -> Maybe Integer -> IO [Standup]
-getStandups pool ecode month year = do
-  let baseQuery' =
-        [sql|SELECT DISTINCT ON (payload->>'date', payload->>'type')
+getStandups :: Maybe Ecode -> Maybe Integer -> Maybe Integer -> App [Standup]
+getStandups ecode month year = do
+  (AppContext pool _) <- ask
+  let
+    baseQuery = [sql|SELECT DISTINCT ON (payload->>'date', payload->>'type')
             payload->>'ecode' as ecode,
             payload->>'project' as project,
             payload->>'standup' as standup,
@@ -39,30 +37,31 @@ getStandups pool ecode month year = do
           ) AS store
           WHERE 1 = 1
           |]
-      ecodeCond = [sql|AND payload->>'ecode'=?|]
-      monthCond = [sql|AND date_part('month', (payload->>'date')::Timestamp) = ?|]
-      yearCond = [sql|AND date_part('year', (payload->>'date')::Timestamp) = ?|]
-        -- FIXME: WHAT THE F
-      queryStandups conn = case (ecode, month, year) of
-        (Just ecode', Just month', Just year') -> query conn (mconcat [baseQuery', ecodeCond, monthCond, yearCond]) (ecode', month', year')
-        (Nothing, Just month', Just year') -> query conn (mconcat [baseQuery', monthCond, yearCond]) (month', year')
-        (Just ecode', Nothing, Just year') -> query conn (mconcat [baseQuery', ecodeCond, yearCond]) (ecode', year')
-        (Just ecode', Just month', Nothing) -> query conn (mconcat [baseQuery', ecodeCond, monthCond]) (ecode', month')
-        (Nothing, Nothing, Just year') -> query conn (mconcat [baseQuery', yearCond]) (Only year')
-        (Just ecode', Nothing, Nothing) -> query conn (mconcat [baseQuery', ecodeCond]) (Only ecode')
-        (Nothing, Just month', Nothing) -> query conn (mconcat [baseQuery', monthCond]) (Only month')
-        (Nothing, Nothing, Nothing) -> query conn baseQuery' ()
-  withResource pool queryStandups
+    ecodeCond = [sql|AND payload->>'ecode'=?|]
+    monthCond =
+      [sql|AND date_part('month', (payload->>'date')::Timestamp) = ?|]
+    yearCond = [sql|AND date_part('year', (payload->>'date')::Timestamp) = ?|]
+  -- FIXME: WHAT THE F
+    queryStandups conn = case (ecode, month, year) of
+      (Just ecode', Just month', Just year') -> query
+        conn
+        (mconcat [baseQuery, ecodeCond, monthCond, yearCond])
+        (ecode', month', year')
+      (Nothing, Just month', Just year') ->
+        query conn (mconcat [baseQuery, monthCond, yearCond]) (month', year')
+      (Just ecode', Nothing, Just year') ->
+        query conn (mconcat [baseQuery, ecodeCond, yearCond]) (ecode', year')
+      (Just ecode', Just month', Nothing) ->
+        query conn (mconcat [baseQuery, ecodeCond, monthCond]) (ecode', month')
+      (Nothing, Nothing, Just year') ->
+        query conn (mconcat [baseQuery, yearCond]) (Only year')
+      (Just ecode', Nothing, Nothing) ->
+        query conn (mconcat [baseQuery, ecodeCond]) (Only ecode')
+      (Nothing, Just month', Nothing) ->
+        query conn (mconcat [baseQuery, monthCond]) (Only month')
+      (Nothing, Nothing, Nothing) -> query conn baseQuery ()
+  liftIO $ withResource pool queryStandups
 
-getStandupsH :: Pool Connection -> Maybe Ecode -> Maybe Integer -> Maybe Integer -> S.Handler [Standup]
-getStandupsH pool e m y = liftIO $ getStandups pool e m y
-
-insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
-insecureServer _ _ = throwError err500
-
-secureServer :: Pool Connection -> AuthResult AccessToken -> Server SecureAPI
-secureServer pool (Authenticated _) = getStandupsH pool
-secureServer _    _                 = \_ _ _ -> throwError err401
-
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server _ jwts pool = secureServer pool :<|> insecureServer jwts pool
+server :: ServerT (API auth) App
+server (Authenticated _) = getStandups
+server _                 = \_ _ _ -> throwM err401

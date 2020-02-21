@@ -23,7 +23,7 @@ import           Types                             (App, AppContext (..),
 
 registerIdentity :: NewIdentityPayload -> App Identity
 registerIdentity (NewIdentityPayload (Email email') password') = do
-  (AppContext _ pool)                          <- ask
+  (AppContext pool _)                          <- ask
   rows :: Either SqlError [(UUID, ByteString)] <-
     liftIO $ try $ withResource pool $ \conn -> query
       conn [sql|

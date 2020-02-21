@@ -73,9 +73,4 @@ data Employee = Employee
   , designation :: Designation
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
-type SecureAPI
-  = "employees" :> QueryParam "project" ProjectName :> Get '[JSON] [Employee]
-
-type InsecureAPI = "placeholder" :> Post '[JSON] NoContent
-
-type API auths = (Auth auths AccessToken :> SecureAPI) :<|> InsecureAPI
+type API auths = Auth auths AccessToken :> "employees" :> QueryParam "project" ProjectName :> Get '[JSON] [Employee]

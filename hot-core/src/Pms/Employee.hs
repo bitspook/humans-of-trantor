@@ -1,6 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Pms.Employee
@@ -9,20 +6,18 @@ module Pms.Employee
   )
 where
 
-
-import           Data.Pool                        (Pool, withResource)
-import           Database.PostgreSQL.Simple       (Connection, Only (Only),
-                                                   query)
+import           Data.Pool                        (withResource)
+import           Database.PostgreSQL.Simple       (Only (Only), query)
 import           Database.PostgreSQL.Simple.SqlQQ (sql)
-import           Iam.Session.Types                (AccessToken)
-import           Pms.Employee.Types               (API, Employee, InsecureAPI,
-                                                   ProjectName, SecureAPI)
+import           Pms.Employee.Types               (API, Employee, ProjectName)
 import           RIO                              hiding (Identity)
-import           Servant                          as S
-import           Servant.Auth.Server
+import           Servant                          (ServerT, err401)
+import           Servant.Auth.Server              (AuthResult (..))
+import           Types                            (App, AppContext (..))
 
-getEmployees :: Pool Connection -> Maybe ProjectName -> IO [Employee]
-getEmployees pool project = do
+getEmployees :: Maybe ProjectName -> App [Employee]
+getEmployees project = do
+  (AppContext pool _) <- ask
   let baseQuery' = [sql|
             SELECT DISTINCT on (payload->>'ecode')
               payload->>'ecode' as ecode,
@@ -37,17 +32,8 @@ getEmployees pool project = do
       queryEmployees conn = case project of
         Just p  -> query conn (mappend baseQuery' projectCond) (Only p)
         Nothing -> query conn baseQuery' ()
-  withResource pool queryEmployees
+  liftIO $ withResource pool queryEmployees
 
-getEmployeesH :: Pool Connection -> Maybe ProjectName -> S.Handler [Employee]
-getEmployeesH pool project = liftIO $ getEmployees pool project
-
-insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
-insecureServer _ _ = throwError err500
-
-secureServer :: Pool Connection -> AuthResult AccessToken -> Server SecureAPI
-secureServer pool (Authenticated _) = getEmployeesH pool
-secureServer _    _                 = \_ -> throwError err401
-
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server _ jwts pool = secureServer pool :<|> insecureServer jwts pool
+server :: ServerT (API auth) App
+server (Authenticated _) = getEmployees
+server _                 = \_ -> throwM err401

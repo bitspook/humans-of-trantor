@@ -48,12 +48,10 @@ data Standup = Standup
   , standupType :: StandupType
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
-type SecureAPI
-  = "standup" :> QueryParam "ecode" Ecode
-              :> QueryParam "month" Integer
-              :> QueryParam "year" Integer
-    :> Get '[JSON] [Standup]
-
-type InsecureAPI = "placeholder" :> Post '[JSON] NoContent
-
-type API auths = (Auth auths AccessToken :> SecureAPI) :<|> InsecureAPI
+type API auths
+  = Auth auths AccessToken :> (
+    "standup" :> QueryParam "ecode" Ecode
+      :> QueryParam "month" Integer
+      :> QueryParam "year" Integer
+      :> Get '[JSON] [Standup]
+    )
