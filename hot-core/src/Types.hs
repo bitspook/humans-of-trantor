@@ -44,4 +44,5 @@ data Config = Config
 instance Interpret Config
 
 data AppContext = AppContext { config :: Config, dbPool :: Pool Connection }
+
 type App = RIO AppContext

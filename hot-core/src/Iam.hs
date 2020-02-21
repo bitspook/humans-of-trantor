@@ -12,7 +12,7 @@ import           Servant
 import           Servant.Auth.Server
 import           Types
 
-type API auth = Identity.API :<|> Session.API auth
+type API = Identity.API :<|> Session.API
 
-server :: JWTSettings -> ServerT (API auth) App
+server :: JWTSettings -> ServerT API App
 server jwts = Identity.server :<|> Session.server jwts

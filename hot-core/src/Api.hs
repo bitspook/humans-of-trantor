@@ -44,10 +44,11 @@ app
 app api sctx ctx actions = serveWithContext api sctx $ srv ctx
   where srv c = hoistServerWithContext api (Proxy @w) (runHandler c) actions
 
+type API auth = Iam.API auth
+
 proxyApi :: Proxy (API auth)
 proxyApi = Proxy
 
-type API auth = Iam.API auth
 server :: JWTSettings -> ServerT (API auth) App
 server jwts = Iam.server jwts
 

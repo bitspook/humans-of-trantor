@@ -26,11 +26,12 @@ registerIdentity (NewIdentityPayload (Email email') password') = do
   (AppContext _ pool)                          <- ask
   rows :: Either SqlError [(UUID, ByteString)] <-
     liftIO $ try $ withResource pool $ \conn -> query
-      conn [sql|INSERT INTO iam.identity
-               (email, password)
-               VALUES (?, crypt(?, gen_salt('bf', 10)))
-               RETURNING id, email
-               |]
+      conn [sql|
+        INSERT INTO iam.identity
+        (email, password)
+        VALUES (?, crypt(?, gen_salt('bf', 10)))
+        RETURNING id, email
+        |]
       (toLower email', password')
   case rows of
     Right (x : _) -> return (Identity (fst x) (Email $ decodeUtf8 . snd $ x))

@@ -99,5 +99,5 @@ revokeSessionH (SessionOpInput rs) = do
   liftIO $ revokeSession pool rs
   return NoContent
 
-server :: JWTSettings -> ServerT (API auths) App
+server :: JWTSettings -> ServerT API App
 server jwts = createSessionH jwts :<|> refreshSession jwts :<|> revokeSessionH

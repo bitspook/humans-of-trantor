@@ -32,7 +32,7 @@ data NewSessionInput = NewSessionInput
   , password :: Text
   } deriving (Show, Generic, FromJSON)
 
-type API auths
+type API
   = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
     :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Put '[JSON] Session
     :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Delete '[JSON] NoContent
