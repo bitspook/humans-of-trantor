@@ -1,24 +1,15 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeOperators       #-}
 
-module Api
-  ( run
-  )
-where
-import           Crypto.JOSE                           (Alg (RS256),
-                                                        JWKSet (JWKSet),
-                                                        fromRSA)
-import           Crypto.JOSE.JWK                       (JWK)
-import           CryptoUtil                            (readPemRsaKey)
-import           Data.Either.Combinators               (fromRight')
-import           Data.Pool                             (Pool, withResource)
-import           Database.PostgreSQL.Simple            (Connection)
+module Api where
+import           Control.Monad.Trans.Except            (ExceptT (..))
+import           CryptoUtil                            (jwtSettings)
+import           Data.Pool                             (withResource)
 import           Db                                    (initConnectionPool,
                                                         migrate)
 import           Dhall                                 (auto, input)
-import qualified EventInjector                         (API, server)
 import qualified Iam                                   (API, server)
 import           Network.Wai                           (Middleware)
 import qualified Network.Wai.Handler.Warp              as Warp (run)
@@ -27,43 +18,51 @@ import           Network.Wai.Middleware.Cors           (cors,
                                                         simpleCorsResourcePolicy)
 import           Network.Wai.Middleware.RequestLogger  (logStdoutDev)
 import           Network.Wai.Middleware.Servant.Errors (errorMw)
-import qualified Pms                                   (API, server)
+import           RIO
 import           RIO.Text                              (encodeUtf8, unpack)
-import           Servant
-import           Servant.Auth.Server
-
+import           Servant                               hiding (runHandler)
+import           Servant.Auth.Server                   (JWTSettings,
+                                                        defaultCookieSettings)
 import           Types
 
-corsMiddleware :: Middleware
-corsMiddleware = cors
-  (const $ Just
-    (simpleCorsResourcePolicy { corsRequestHeaders = ["Content-Type", "Authorization"] })
-  )
+corsMw :: Middleware
+corsMw = cors $ const $ Just $ simpleCorsResourcePolicy
+  { corsRequestHeaders = ["Content-Type", "Authorization"]
+  }
 
-type API auths = Iam.API auths :<|> Pms.API auths :<|> EventInjector.API auths
+runHandler :: c -> RIO c a -> Servant.Handler a
+runHandler ctx a = Servant.Handler $ ExceptT $ try $ runReaderT (unRIO a) ctx
 
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server c j p = Iam.server c j p :<|> Pms.server c j p :<|> EventInjector.server c j p
+app
+  :: forall c x w
+   . (HasServer x w)
+  => Proxy x
+  -> Context w
+  -> c
+  -> ServerT x (RIO c)
+  -> Application
+app api sctx ctx actions = serveWithContext api sctx $ srv ctx
+  where srv c = hoistServerWithContext api (Proxy @w) (runHandler c) actions
 
-app :: JWK -> Pool Connection -> Application
-app privateKey pool = do
-  let jwtCfg = JWTSettings privateKey
-                           (Just RS256)
-                           (JWKSet [privateKey])
-                           (const Matches)
-      cfg = defaultCookieSettings :. jwtCfg :. EmptyContext
-      api = Proxy :: Proxy (API '[JWT])
-  serveWithContext api cfg (server defaultCookieSettings jwtCfg pool)
+proxyApi :: Proxy (API auth)
+proxyApi = Proxy
+
+type API auth = Iam.API auth
+server :: JWTSettings -> ServerT (API auth) App
+server jwts = Iam.server jwts
 
 run :: IO ()
 run = do
-  conf       <- input auto "./config.dhall"
-  pool       <- initConnectionPool . encodeUtf8 . dbUrl $ conf
-  _          <- withResource pool $ migrate (unpack . migrationsDir $ conf)
-  privateKey <- fromRSA . fromRight' <$> readPemRsaKey
-    (unpack . jwtKeysPath $ conf)
+  conf <- input auto "./config.dhall"
+  pool <- initConnectionPool . encodeUtf8 . dbUrl $ conf
+  _    <- withResource pool $ migrate (unpack . migrationsDir $ conf)
+  jwts <- jwtSettings (unpack . jwtKeysPath $ conf)
+
+  let sctx = defaultCookieSettings :. jwts :. EmptyContext
+      ctx  = AppContext conf pool
+
   Warp.run (fromIntegral $ port conf)
-    $ corsMiddleware
-    $ errorMw @JSON @["error", "status"]
+    $ corsMw
+    $ errorMw @JSON @'["error", "status"]
     $ logStdoutDev
-    $ app privateKey pool
+    $ app proxyApi sctx ctx (server jwts)

@@ -1,11 +1,15 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Types where
 
 import           Data.Aeson                           (FromJSON, ToJSON)
+import           Data.Pool
 import           Data.Text.Encoding                   (decodeUtf8)
+import           Database.PostgreSQL.Simple           (Connection)
 import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.Internal  (Conversion, Field)
 import           Database.PostgreSQL.Simple.ToField
@@ -38,3 +42,6 @@ data Config = Config
   } deriving (Generic, Show)
 
 instance Interpret Config
+
+data AppContext = AppContext { config :: Config, dbPool :: Pool Connection }
+type App = RIO AppContext
