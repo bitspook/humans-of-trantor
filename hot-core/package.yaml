@@ -58,7 +58,6 @@ library:
   default-extensions:
     - NoImplicitPrelude
     - OverloadedStrings
-    - QuasiQuotes
 
 executables:
   hot:
