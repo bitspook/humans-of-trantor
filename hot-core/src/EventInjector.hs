@@ -17,55 +17,58 @@ import           Servant.Auth.Server
 import           Types
 
 discoveredEmployeeEvent
-  :: DiscoveredEmployeeEvent -> App NoContent
+  :: DiscoveredEmployee -> App NoContent
 discoveredEmployeeEvent e = do
   (AppContext p _) <- ask
   liftIO $ insertEvent p e
   where
-    insertEvent pool (DiscoveredEmployeeEvent event) = do
+    insertEvent pool payload = do
       let eventName :: Text = "DISCOVERED_EMPLOYEE"
+      let version :: Text = "v1"
       withResource pool $ \conn -> withTransaction conn $ do
         _ <- execute
           conn
           [sql|
             INSERT INTO store.store (name, version, payload)
             VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
+          |] (eventName, version, payload)
         return NoContent
 
 discoveredProjectEvent
-  :: DiscoveredProjectEvent -> App NoContent
+  :: DiscoveredProject -> App NoContent
 discoveredProjectEvent e = do
   (AppContext p _) <- ask
   liftIO $ insertEvent p e
   where
-    insertEvent pool (DiscoveredProjectEvent event) = do
+    insertEvent pool payload = do
       let eventName :: Text = "DISCOVERED_PROJECT"
+      let version :: Text = "v1"
       withResource pool $ \conn -> withTransaction conn $ do
         _ <- execute
           conn
           [sql|
             INSERT INTO store.store (name, version, payload)
             VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
+          |] (eventName, version, payload)
         return NoContent
 
 
 receivedStandupUpdateEvent
-  :: ReceivedStandupUpdateEvent -> App NoContent
+  :: ReceivedStandupUpdate -> App NoContent
 receivedStandupUpdateEvent e = do
   (AppContext p _) <- ask
   liftIO $ insertEvent p e
   where
-    insertEvent pool (ReceivedStandupUpdateEvent event) = do
+    insertEvent pool payload = do
       let eventName :: Text = "RECEIVED_STANDUP_UPDATE"
+      let version :: Text = "v1"
       withResource pool $ \conn -> withTransaction conn $ do
         _ <- execute
           conn
           [sql|
             INSERT INTO store.store (name, version, payload)
             VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
+          |] (eventName, version, payload)
         return NoContent
 
 server :: ServerT (API auths) App

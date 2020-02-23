@@ -36,17 +36,6 @@ instance ToJSON StandupType where
     Delivered  -> String "delivered"
     Impediment -> String "impediment"
 
--- EventVersion
-data EventVersion = V1 deriving (Show)
-
-instance FromJSON EventVersion where
-  parseJSON (String "v1") = return V1
-  parseJSON _             = fail "Invalid Event version. Valid values: [ v1 ]"
-
-instance ToField EventVersion where
-  toField V1 = Escape $ encodeUtf8 "v1"
----
-
 -- Standup
 newtype Standup = Standup Text deriving (Show, Generic, FromJSON, ToJSON)
 
@@ -115,23 +104,9 @@ instance ToJSON ReceivedStandupUpdate where
     ]
 ---
 
-data Event p = Event
-  { version :: EventVersion
-  , payload :: p
-  } deriving (Show, Generic, FromJSON)
-
-newtype DiscoveredEmployeeEvent = DiscoveredEmployeeEvent (Event DiscoveredEmployee)
-  deriving (Show, Generic, FromJSON)
-
-newtype DiscoveredProjectEvent = DiscoveredProjectEvent (Event DiscoveredProject)
-  deriving (Show, Generic, FromJSON)
-
-newtype ReceivedStandupUpdateEvent = ReceivedStandupUpdateEvent (Event ReceivedStandupUpdate)
-  deriving (Show, Generic, FromJSON)
-
 type API auths =  Auth auths AccessToken :>
   "event" :> (
-  "DISCOVERED_EMPLOYEE" :> ReqBody '[JSON] DiscoveredEmployeeEvent :> Post '[JSON] NoContent
-    :<|> "DISCOVERED_PROJECT" :> ReqBody '[JSON] DiscoveredProjectEvent :> Post '[JSON] NoContent
-    :<|> "RECEIVED_STANDUP_UPDATE" :> ReqBody '[JSON] ReceivedStandupUpdateEvent :> Post '[JSON] NoContent
+  "DISCOVERED_EMPLOYEE" :> "v1" :> ReqBody '[JSON] DiscoveredEmployee :> Post '[JSON] NoContent
+    :<|> "DISCOVERED_PROJECT" :> "v1" :> ReqBody '[JSON] DiscoveredProject :> Post '[JSON] NoContent
+    :<|> "RECEIVED_STANDUP_UPDATE" :> "v1" :> ReqBody '[JSON] ReceivedStandupUpdate :> Post '[JSON] NoContent
   )
