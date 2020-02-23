@@ -15,7 +15,7 @@ import           Database.PostgreSQL.Simple.ToField (Action (Escape),
 import           Iam.Session.Types                  (AccessToken)
 import           Pms.Employee.Types                 (Designation, Ecode,
                                                      EmployeeName, ProjectName)
-import           RIO
+import           RIO                                hiding (id)
 import           Servant
 import           Servant.Auth.Server
 import           Types                              (Email)
@@ -89,18 +89,58 @@ instance FromJSON ReceivedStandupUpdate where
   parseJSON = withObject "event" $ \o ->
     ReceivedStandupUpdate
     <$> o .: "ecode"
-    <*> o.: "project"
-    <*> o.: "type"
-    <*> o.: "date"
-    <*> o.: "standup"
+    <*> o .: "project"
+    <*> o .: "type"
+    <*> o .: "date"
+    <*> o .: "standup"
 
 instance ToJSON ReceivedStandupUpdate where
   toJSON p = object
     [ "ecode" .= ecode (p :: ReceivedStandupUpdate)
     , "project" .= project (p :: ReceivedStandupUpdate)
-    , "type" .= standupType p
-    , "date" .= date p
-    , "standup" .= standup p
+    , "type" .= standupType (p :: ReceivedStandupUpdate)
+    , "date" .= date (p :: ReceivedStandupUpdate)
+    , "standup" .= standup (p :: ReceivedStandupUpdate)
+    ]
+---
+
+-- ReceivedStandupUpdateV2
+data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
+  { id          :: Maybe UUID
+  , ecode       :: Ecode
+  , project     :: ProjectName
+  , standup     :: Standup
+  , date        :: Date
+  , isDelivered :: Bool
+  , issues      :: [UUID]
+  , notes       :: [UUID]
+  } deriving (Show, Generic)
+
+instance ToField ReceivedStandupUpdateV2 where
+  toField = toJSONField
+
+instance FromJSON ReceivedStandupUpdateV2 where
+  parseJSON = withObject "payload" $ \o ->
+    ReceivedStandupUpdateV2
+    <$> o .: "id"
+    <*> o .: "ecode"
+    <*> o .: "project"
+    <*> o .: "standup"
+    <*> o .: "date"
+    <*> o .: "isDelivered"
+    <*> o .: "notes"
+    <*> o .: "issues"
+
+instance ToJSON ReceivedStandupUpdateV2 where
+  toJSON p = object
+    [ "id" .= id (p :: ReceivedStandupUpdateV2)
+    , "ecode" .= ecode (p :: ReceivedStandupUpdateV2)
+    , "project" .= project (p :: ReceivedStandupUpdateV2)
+    , "standup" .= standup (p :: ReceivedStandupUpdateV2)
+    , "date" .= date (p :: ReceivedStandupUpdateV2)
+    , "isDelivered" .= date (p :: ReceivedStandupUpdateV2)
+    , "issues" .= issues (p :: ReceivedStandupUpdateV2)
+    , "notes" .= notes (p :: ReceivedStandupUpdateV2)
     ]
 ---
 
@@ -109,4 +149,5 @@ type API auths =  Auth auths AccessToken :>
   "DISCOVERED_EMPLOYEE" :> "v1" :> ReqBody '[JSON] DiscoveredEmployee :> Post '[JSON] NoContent
     :<|> "DISCOVERED_PROJECT" :> "v1" :> ReqBody '[JSON] DiscoveredProject :> Post '[JSON] NoContent
     :<|> "RECEIVED_STANDUP_UPDATE" :> "v1" :> ReqBody '[JSON] ReceivedStandupUpdate :> Post '[JSON] NoContent
+    :<|> "RECEIVED_STANDUP_UPDATE" :> "v2" :> ReqBody '[JSON] ReceivedStandupUpdateV2 :> Post '[JSON] NoContent
   )
