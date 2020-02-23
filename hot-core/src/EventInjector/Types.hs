@@ -129,10 +129,9 @@ newtype DiscoveredProjectEvent = DiscoveredProjectEvent (Event DiscoveredProject
 newtype ReceivedStandupUpdateEvent = ReceivedStandupUpdateEvent (Event ReceivedStandupUpdate)
   deriving (Show, Generic, FromJSON)
 
-type SecureAPI = "event" :>
-  ( "DISCOVERED_EMPLOYEE" :> ReqBody '[JSON] DiscoveredEmployeeEvent :> Post '[JSON] NoContent
+type API auths =  Auth auths AccessToken :>
+  "event" :> (
+  "DISCOVERED_EMPLOYEE" :> ReqBody '[JSON] DiscoveredEmployeeEvent :> Post '[JSON] NoContent
     :<|> "DISCOVERED_PROJECT" :> ReqBody '[JSON] DiscoveredProjectEvent :> Post '[JSON] NoContent
     :<|> "RECEIVED_STANDUP_UPDATE" :> ReqBody '[JSON] ReceivedStandupUpdateEvent :> Post '[JSON] NoContent
   )
-
-type API auths = (Auth auths AccessToken :> SecureAPI)

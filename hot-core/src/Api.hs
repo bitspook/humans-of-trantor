@@ -10,6 +10,7 @@ import           Data.Pool                             (withResource)
 import           Db                                    (initConnectionPool,
                                                         migrate)
 import           Dhall                                 (auto, input)
+import qualified EventInjector                         (API, server)
 import qualified Iam                                   (API, server)
 import           Network.Wai                           (Middleware)
 import qualified Network.Wai.Handler.Warp              as Warp (run)
@@ -22,8 +23,7 @@ import qualified Pms                                   (API, server)
 import           RIO
 import           RIO.Text                              (encodeUtf8, unpack)
 import           Servant                               hiding (runHandler)
-import           Servant.Auth.Server                   (CookieSettings, JWT,
-                                                        JWTSettings,
+import           Servant.Auth.Server                   (JWT, JWTSettings,
                                                         defaultCookieSettings)
 import           Types
 
@@ -46,13 +46,13 @@ app
 app api sctx ctx actions = serveWithContext api sctx $ srv ctx
   where srv c = hoistServerWithContext api (Proxy @w) (runHandler c) actions
 
-type API auths = Iam.API :<|> (Pms.API auths)
+type API auths = Iam.API :<|> Pms.API auths :<|> EventInjector.API auths
 
 proxyApi :: Proxy (API '[JWT])
 proxyApi = Proxy
 
 server :: JWTSettings -> ServerT (API auths) App
-server jwts = Iam.server jwts :<|> Pms.server
+server jwts = Iam.server jwts :<|> Pms.server :<|> EventInjector.server
 
 run :: IO ()
 run = do
