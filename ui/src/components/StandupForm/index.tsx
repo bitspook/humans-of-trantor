@@ -1,6 +1,6 @@
-import { Field, FieldArray, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
+import { Field, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
 import React from 'react';
-import { Button, Form, TextArea, Input } from 'semantic-ui-react';
+import { Button, Form, TextArea } from 'semantic-ui-react';
 import * as yup from 'yup';
 import c from './index.module.scss';
 
@@ -34,24 +34,22 @@ const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
   );
 };
 
-const StandupInputField = (props: FieldProps & SemanticFieldProps) => {
-  const error =
-    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
-
-  return (
-    <Form.Field error={Boolean(error)}>
-      <Input {...props.field} fluid={props.fluid} disabled={props.form.isSubmitting} />
-      {error && <span className={c.error}>{error}</span>}
-    </Form.Field>
-  );
-};
-
 const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
   <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
-    <h2>Standup Update</h2>
-    <Field name="standup" component={StandupInputField} />
+    <h2>Committed</h2>
+    <Field component={SemanticTextAreaField} name="committed" />
 
-    <Button>Add Commitment</Button>
+    <h2>Delivered</h2>
+    <Field component={SemanticTextAreaField} name="delivered" />
+
+    <h2>Impediment</h2>
+    <Field component={SemanticTextAreaField} name="impediment" />
+
+    <Button primary={true} type="submit" disabled={props.isSubmitting}>
+      Save
+    </Button>
+
+    <p>*Empty values will not be saved</p>
   </Form>
 );
 
