@@ -1,9 +1,7 @@
-FROM haskell:8.6.5
+FROM archlinux:latest
 
-RUN apt-get update && apt-get install libpq-dev -y
+RUN pacman -Sy && pacman -S postgresql-libs --noconfirm
 
 WORKDIR /app
 
-COPY . /app
-
-CMD stack run --allow-different-user
+CMD /app/hot

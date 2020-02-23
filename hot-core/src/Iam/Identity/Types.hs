@@ -2,8 +2,6 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE NoImplicitPrelude     #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module Iam.Identity.Types where
@@ -25,7 +23,5 @@ data NewIdentityPayload = NewIdentityPayload
   , password :: Text
   } deriving(Show, Generic, FromJSON)
 
-type InsecureAPI
+type API
   = "identity" :> ReqBody '[JSON] NewIdentityPayload :> Post '[JSON] Identity
-
-type API = InsecureAPI

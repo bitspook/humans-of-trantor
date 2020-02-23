@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Iam
   ( API,
@@ -9,15 +6,13 @@ module Iam
   )
 where
 
-
-import           Data.Pool
-import           Database.PostgreSQL.Simple (Connection)
-import qualified Iam.Identity               as Identity (API, server)
-import qualified Iam.Session                as Session (API, server)
+import qualified Iam.Identity        as Identity (API, server)
+import qualified Iam.Session         as Session (API, server)
 import           Servant
-import           Servant.Auth.Server        as SAS
+import           Servant.Auth.Server
+import           Types
 
-type API auths = Identity.API :<|> Session.API auths
+type API = Identity.API :<|> Session.API
 
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server c j p = Identity.server c j p :<|> Session.server c j p
+server :: JWTSettings -> ServerT API App
+server jwts = Identity.server :<|> Session.server jwts

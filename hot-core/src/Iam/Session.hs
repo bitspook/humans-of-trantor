@@ -1,6 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Iam.Session
   ( API
@@ -44,7 +45,7 @@ getSession pool (RefreshToken sid) = do
 
 createSession :: Pool Connection -> UUID -> IO (Maybe RefreshToken)
 createSession pool aid = do
-  rows :: Either SqlError [(Only UUID)] <-
+  rows :: Either SqlError [Only UUID] <-
     liftIO $ try $ withResource pool $ \conn -> query
       conn
       "INSERT INTO iam.session (identity_id) VALUES (?) RETURNING id"
@@ -56,7 +57,7 @@ createSession pool aid = do
 
 revokeSession :: Pool Connection -> RefreshToken -> IO ()
 revokeSession pool (RefreshToken sid) = do
-  _ :: Either SqlError [(Only UUID)] <-
+  _ :: Either SqlError [Only UUID] <-
     liftIO $ try $ withResource pool $ \conn -> query
       conn
       "UPDATE iam.session SET revoked_at = NOW() WHERE id = ? and revoked_at IS NULL RETURNING id"
@@ -64,50 +65,39 @@ revokeSession pool (RefreshToken sid) = do
   return ()
 
 refreshSession
-  :: JWTSettings -> Pool Connection -> SessionOpInput -> S.Handler Session
-refreshSession jwts pool (SessionOpInput rt) = do
+  :: JWTSettings -> SessionOpInput -> App Session
+refreshSession jwts (SessionOpInput rt) = do
+  (AppContext pool _) <- ask
   session' <- liftIO $ getSession pool rt
   case session' of
-    Nothing            -> throwError err403
+    Nothing            -> throwM err403
     Just (rtoken, iid) -> do
       token <- liftIO $ makeJWT (AccessToken iid) jwts Nothing
       case token of
-        Left  e -> throwError err500 { errBody = fromString . show $ e }
+        Left  e -> throwM err500 { errBody = fromString . show $ e }
         Right t -> return $ Session (decodeUtf8 . toStrict $ t) rtoken
 
-createSessionH
-  :: JWTSettings -> Pool Connection -> NewSessionInput -> S.Handler Session
-createSessionH jwts pool inp = do
+createSessionH :: JWTSettings -> NewSessionInput -> App Session
+createSessionH jwts inp = do
+  (AppContext pool _) <- ask
   maybeId <- liftIO $ getIdentity pool inp
   case maybeId of
-    Nothing               -> throwError err401
+    Nothing               -> throwM err401
     Just (Identity id' _) -> do
       session' <- liftIO $ createSession pool id'
       case session' of
-        Nothing      -> throwError err500
+        Nothing      -> throwM err500
         Just session -> do
           token <- liftIO $ makeJWT (AccessToken id') jwts Nothing
           case token of
-            Left  e -> throwError err500 { errBody = fromString . show $ e }
+            Left  e -> throwM err500 { errBody = fromString . show $ e }
             Right t -> return $ Session (decodeUtf8 $ toStrict t) session
 
-revokeSessionH :: Pool Connection -> SessionOpInput -> S.Handler NoContent
-revokeSessionH pool (SessionOpInput rs) = do
+revokeSessionH :: SessionOpInput -> App NoContent
+revokeSessionH (SessionOpInput rs) = do
+  (AppContext pool _) <- ask
   liftIO $ revokeSession pool rs
   return NoContent
 
-insecureServer :: JWTSettings -> Pool Connection -> Server InsecureAPI
-insecureServer jwts pool =
-  createSessionH jwts pool
-    :<|> refreshSession jwts pool
-    :<|> revokeSessionH pool
-
-secureServer
-  :: JWTSettings
-  -> Pool Connection
-  -> AuthResult AccessToken
-  -> Server SecureAPI
-secureServer _ _ _ = throwAll err401
-
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server _ jwts pool = secureServer jwts pool :<|> insecureServer jwts pool
+server :: JWTSettings -> ServerT API App
+server jwts = createSessionH jwts :<|> refreshSession jwts :<|> revokeSessionH

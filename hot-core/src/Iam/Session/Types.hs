@@ -2,8 +2,6 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE NoImplicitPrelude     #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module Iam.Session.Types where
@@ -34,9 +32,7 @@ data NewSessionInput = NewSessionInput
   , password :: Text
   } deriving (Show, Generic, FromJSON)
 
-type SecureAPI = "placeholder" :> Post '[JSON] NoContent
-type InsecureAPI
+type API
   = "session" :> ReqBody '[JSON] NewSessionInput :> Post '[JSON] Session
     :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Put '[JSON] Session
     :<|> "session" :> ReqBody '[JSON] SessionOpInput :> Delete '[JSON] NoContent
-type API auths = (Auth auths AccessToken :> SecureAPI) :<|> InsecureAPI

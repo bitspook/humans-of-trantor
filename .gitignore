@@ -6,3 +6,4 @@ tsconfig.tsbuildinfo
 /env/*.sh
 dist-newstyle
 .log
+/hot-core/build/

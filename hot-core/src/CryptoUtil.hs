@@ -5,15 +5,19 @@
 {-# LANGUAGE TypeOperators         #-}
 
 module CryptoUtil
-  ( readPemRsaKey
+  ( jwtSettings
   )
 where
 
+import           Crypto.JOSE             (Alg (RS256), JWKSet (JWKSet), fromRSA)
 import qualified Crypto.PubKey.OpenSsh   as D
-import           Crypto.PubKey.RSA.Types
+import           Crypto.PubKey.RSA.Types (PrivateKey (..), PublicKey (..))
 import qualified Crypto.Types.PubKey.RSA as CRSA
+import           Data.Either.Combinators (fromRight')
 import           RIO
 import qualified RIO.ByteString          as B
+import           Servant.Auth.Server     (IsMatch (Matches),
+                                          JWTSettings (JWTSettings))
 
 data PrivateKeyError = NotRSA | ParseErr String
 
@@ -41,3 +45,11 @@ convertPri' pk = PrivateKey { private_pub  = convertPub' . CRSA.private_pub $ pk
                             , private_dQ   = CRSA.private_dQ pk
                             , private_qinv = CRSA.private_qinv pk
                             }
+
+jwtSettings :: FilePath -> IO JWTSettings
+jwtSettings keyPath = do
+  privateKey <- fromRSA . fromRight' <$> readPemRsaKey keyPath
+  return $ JWTSettings privateKey
+                       (Just RS256)
+                       (JWKSet [privateKey])
+                       (const Matches)

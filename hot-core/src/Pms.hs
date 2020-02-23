@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Pms
@@ -6,14 +5,13 @@ module Pms
     server
   )
 where
-import           Data.Pool
-import           Database.PostgreSQL.Simple (Connection)
-import qualified Pms.Employee               as Employee (API, server)
-import qualified Pms.Standup                as Standup (API, server)
+
+import qualified Pms.Employee as Employee (API, server)
+import qualified Pms.Standup  as Standup (API, server)
 import           Servant
-import           Servant.Auth.Server        as SAS
+import           Types
 
 type API auths = Employee.API auths :<|> Standup.API auths
 
-server :: CookieSettings -> JWTSettings -> Pool Connection -> Server (API auths)
-server c j p = Employee.server c j p :<|> Standup.server c j p
+server :: ServerT (API auths) App
+server = Employee.server :<|> Standup.server
