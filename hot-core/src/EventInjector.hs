@@ -2,7 +2,7 @@
 {-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module EventInjector
-  ( server
+  ( api
   , API
   )
 where
@@ -51,14 +51,14 @@ receivedStandupUpdateEventV2 e = do
   _ <- insertEvent "RECEIVED_STANDUP_UPDATE" "v2" e
   return NoContent
 
-server :: ServerT (API auths) App
-server (Authenticated _) =
+api :: ServerT (API auths) App
+api (Authenticated _) =
   discoveredEmployeeEvent
     :<|> discoveredProjectEvent
     :<|> receivedStandupUpdateEvent
     :<|> receivedStandupUpdateEventV2
 -- FIXME: There have to be a better way
-server _ =
+api _ =
   (\_ -> throwM err403)
     :<|> (\_ -> throwM err403)
     :<|> (\_ -> throwM err403)

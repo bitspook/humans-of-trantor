@@ -5,7 +5,7 @@
 
 module Iam.Session
   ( API
-  , server
+  , api
   )
 where
 
@@ -99,5 +99,5 @@ revokeSessionH (SessionOpInput rs) = do
   liftIO $ revokeSession pool rs
   return NoContent
 
-server :: JWTSettings -> ServerT API App
-server jwts = createSessionH jwts :<|> refreshSession jwts :<|> revokeSessionH
+api :: JWTSettings -> ServerT API App
+api jwts = createSessionH jwts :<|> refreshSession jwts :<|> revokeSessionH

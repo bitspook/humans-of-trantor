@@ -3,7 +3,7 @@
 
 module Iam.Identity
   ( API
-  , server
+  , api
   )
 where
 
@@ -40,5 +40,5 @@ registerIdentity (NewIdentityPayload (Email email') password') = do
       Just (UniqueViolation _) -> throwM err409
       _                        -> throwM err500
 
-server :: ServerT API App
-server = registerIdentity
+api :: ServerT API App
+api = registerIdentity

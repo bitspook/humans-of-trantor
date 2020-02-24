@@ -4,7 +4,7 @@
 
 module Pms.Standup
   ( API
-  , server
+  , api
   )
 where
 
@@ -62,6 +62,6 @@ getStandups ecode month year = do
       (Nothing, Nothing, Nothing) -> query conn baseQuery ()
   liftIO $ withResource pool queryStandups
 
-server :: ServerT (API auth) App
-server (Authenticated _) = getStandups
-server _                 = \_ _ _ -> throwM err401
+api :: ServerT (API auth) App
+api (Authenticated _) = getStandups
+api _                 = \_ _ _ -> throwM err401

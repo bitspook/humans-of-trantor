@@ -10,8 +10,8 @@ import           Data.Pool                             (withResource)
 import           Db                                    (initConnectionPool,
                                                         migrate)
 import           Dhall                                 (auto, input)
-import qualified EventInjector                         (API, server)
-import qualified Iam                                   (API, server)
+import qualified EventInjector                         (API, api)
+import qualified Iam                                   (API, api)
 import           Network.Wai                           (Middleware)
 import qualified Network.Wai.Handler.Warp              as Warp (run)
 import           Network.Wai.Middleware.Cors           (cors,
@@ -19,7 +19,7 @@ import           Network.Wai.Middleware.Cors           (cors,
                                                         simpleCorsResourcePolicy)
 import           Network.Wai.Middleware.RequestLogger  (logStdoutDev)
 import           Network.Wai.Middleware.Servant.Errors (errorMw)
-import qualified Pms                                   (API, server)
+import qualified Pms                                   (API, api)
 import           RIO
 import           RIO.Text                              (encodeUtf8, unpack)
 import           Servant                               hiding (runHandler)
@@ -43,16 +43,16 @@ app
   -> c
   -> ServerT x (RIO c)
   -> Application
-app api sctx ctx actions = serveWithContext api sctx $ srv ctx
-  where srv c = hoistServerWithContext api (Proxy @w) (runHandler c) actions
+app proxy sctx ctx actions = serveWithContext proxy sctx $ srv ctx
+  where srv c = hoistServerWithContext proxy (Proxy @w) (runHandler c) actions
 
 type API auths = Iam.API :<|> Pms.API auths :<|> EventInjector.API auths
 
 proxyApi :: Proxy (API '[JWT])
 proxyApi = Proxy
 
-server :: JWTSettings -> ServerT (API auths) App
-server jwts = Iam.server jwts :<|> Pms.server :<|> EventInjector.server
+api :: JWTSettings -> ServerT (API auths) App
+api jwts = Iam.api jwts :<|> Pms.api :<|> EventInjector.api
 
 run :: IO ()
 run = do
@@ -68,4 +68,4 @@ run = do
     $ corsMw
     $ errorMw @JSON @'["error", "status"]
     $ logStdoutDev
-    $ app proxyApi sctx ctx (server jwts)
+    $ app proxyApi sctx ctx (api jwts)
