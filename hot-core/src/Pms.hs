@@ -6,8 +6,8 @@ module Pms
   )
 where
 
-import qualified Pms.Employee as Employee (API, api)
-import qualified Pms.Standup  as Standup (API, api)
+import qualified Pms.Employee    as Employee (API, api)
+import qualified Pms.Standup.Api as Standup (API, api)
 import           Servant
 import           Types
 

@@ -13,7 +13,7 @@ weight: 20
 - Every entry in a day's standup emit a new event of this type
 
 {{% notice tip %}}
-`id` field should be used to pick latest representation of a single standup update for an employee
+`source` field should be used to pick latest representation of a single standup update for an employee
 of given project on a given day
 {{% /notice %}}
 
@@ -21,7 +21,7 @@ Following fields can be present in the event payload:
 
 | Field       | Is Required? | Description                                             | Type     |
 | :--         | :--          | :--                                                     | :--      |
-| id          | No           | ID of the original standup update (null for new update) | String   |
+| source      | No           | ID of the original standup update (null for new update) | String   |
 | ecode       | Yes          | ECode of employee                                       | String   |
 | project     | Yes          | Project name                                            | String   |
 | standup     | Yes          | Content of the update itself                            | String   |

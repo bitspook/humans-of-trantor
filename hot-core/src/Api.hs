@@ -10,7 +10,8 @@ import           Data.Pool                             (withResource)
 import           Db                                    (initConnectionPool,
                                                         migrate)
 import           Dhall                                 (auto, input)
-import qualified EventInjector                         (API, api)
+import qualified EventInjector.Api                     as EventInjector (API,
+                                                                         api)
 import qualified Iam                                   (API, api)
 import           Network.Wai                           (Middleware)
 import qualified Network.Wai.Handler.Warp              as Warp (run)

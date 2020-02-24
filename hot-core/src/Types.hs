@@ -26,6 +26,7 @@ fromTextField constructor f dat = case dat of
     Just b  -> return $ constructor $ decodeUtf8 b
     Nothing -> returnError ConversionFailed f (show dat)
 
+-- Email
 newtype Email = Email Text deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField Email where
@@ -33,6 +34,17 @@ instance FromField Email where
 
 instance ToField Email where
   toField (Email a) = Escape $ encodeUtf8 a
+---
+
+-- Date
+newtype Date = Date Text deriving (Show, Generic, FromJSON, ToJSON)
+
+instance ToField Date where
+  toField (Date d) = Escape $ encodeUtf8 d
+
+instance FromField Date where
+  fromField = fromTextField Date
+---
 
 data Config = Config
   { dbUrl         :: Text,
