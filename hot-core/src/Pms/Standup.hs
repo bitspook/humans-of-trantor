@@ -48,7 +48,7 @@ data StandupData = StandupData
 data Standup = Standup StandupId StandupData deriving (Show)
 
 instance ToJSON Standup where
-  toJSON (Standup id StandupData {..} ) = object
+  toJSON (Standup id StandupData {..}) = object
     [ "id" .= id
     , "ecode" .= ecode
     , "project" .= project
@@ -59,16 +59,16 @@ instance ToJSON Standup where
 
 instance FromJSON Standup where
   parseJSON = withObject "standup" $ \o -> do
-    id <- o .: "id"
-    ecode <- o .: "ecode"
-    project <- o .: "project"
-    standup <- o .: "standup"
-    date <- o .: "date"
+    id          <- o .: "id"
+    ecode       <- o .: "ecode"
+    project     <- o .: "project"
+    standup     <- o .: "standup"
+    date        <- o .: "date"
     isDelivered <- o .: "isDelivered"
-    return $ Standup id StandupData{..}
+    return $ Standup id StandupData { .. }
 
 instance FromRow Standup where
   fromRow = do
-    id <- field
+    id  <- field
     dat <- StandupData <$> field <*> field <*> field <*> field <*> field
     return $ Standup id dat

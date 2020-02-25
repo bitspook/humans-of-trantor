@@ -13,7 +13,7 @@ import           Data.UUID                          (UUID)
 import           Database.PostgreSQL.Simple.ToField (ToField (..), toJSONField)
 import           Pms.Employee.Types                 (Designation, Ecode,
                                                      EmployeeName, ProjectName)
-import           Pms.Standup                        (StandupBody)
+import           Pms.Standup                        (StandupBody, StandupId)
 import           RIO                                hiding (id)
 import           Types                              (Date, Email)
 
@@ -89,7 +89,7 @@ instance ToJSON ReceivedStandupUpdate where
 
 -- ReceivedStandupUpdateV2
 data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
-  { source      :: Maybe UUID
+  { source      :: Maybe StandupId
   , ecode       :: Ecode
   , project     :: ProjectName
   , standup     :: StandupBody

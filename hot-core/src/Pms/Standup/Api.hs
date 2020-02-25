@@ -5,18 +5,19 @@ module Pms.Standup.Api where
 import           Iam.Session.Types   (AccessToken)
 import           Pms.Employee.Types  (Ecode)
 import           Pms.Standup
+import           Pms.Standup.Command
 import           Pms.Standup.Query
-import           RIO                 hiding (Identity)
+import           RIO                 (throwM)
 import           Servant
 import           Servant.Auth.Server
 import           Types               (App)
 
 type API auths
   = Auth auths AccessToken :> (
-    "standup" :> QueryParam "ecode" Ecode
-      :> Get '[JSON] [Standup]
+    "standup" :> QueryParam "ecode" Ecode :> Get '[JSON] [Standup]
+    :<|> "standup" :> ReqBody '[JSON] StandupData :> Post '[JSON] Standup
     )
 
 api :: ServerT (API auth) App
-api (Authenticated _) = getStandups
-api _                 = \_ -> throwM err401
+api (Authenticated _) = getStandups :<|> addStandup
+api _                 = (\_ -> throwM err401):<|> (\_ -> throwM err401)
