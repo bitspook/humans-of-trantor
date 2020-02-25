@@ -18,6 +18,7 @@ import           Database.PostgreSQL.Simple.ToField   (Action (..),
                                                        ToField (..))
 import           Pms.Employee.Types                   (Ecode, ProjectName)
 import           RIO                                  hiding (id)
+import           Servant                              (FromHttpApiData (..))
 import           Types                                (Date, fromTextField)
 
 -- StandupId
@@ -25,6 +26,13 @@ newtype StandupId = StandupId UUID deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField StandupId where
   fromField = fromJSONField
+
+instance FromHttpApiData StandupId where
+  parseQueryParam sid =  suid
+    where
+      suid = case StandupId <$> fromText sid of
+        Just suid' -> Right suid'
+        Nothing    -> Left "Invalid Standup Id"
 ---
 
 -- StandupBody
