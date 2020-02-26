@@ -15,21 +15,22 @@ getStandups :: Maybe Ecode -> App [Standup]
 getStandups ecode = do
   (AppContext pool _) <- ask
   let
-    baseQuery = [sql|SELECT DISTINCT ON (payload->>'date', payload->>'type')
-            payload->>'ecode' as ecode,
-            payload->>'project' as project,
-            payload->>'standup' as standup,
-            payload->>'date' as date,
-            payload->>'type' as standupType
-          FROM (
-            SELECT payload from store.store
-            WHERE name = 'RECEIVED_STANDUP_UPDATE'
-            AND version = 'v1'
-            ORDER BY created_at DESC
-          ) AS store
-          WHERE 1 = 1
-          |]
-    ecodeCond = [sql|AND payload->>'ecode'=?|]
+    baseQuery = [sql|
+      WITH standups AS (
+        SELECT DISTINCT ON (id)
+          id,
+          payload->>'ecode' AS ecode,
+  	      payload->>'project' AS project,
+          payload->>'standup' AS standup,
+          payload->>'date' AS date,
+          (payload->>'isDelivered')::boolean AS isDelivered
+        FROM store.store
+        WHERE name = 'RECEIVED_STANDUP_UPDATE'
+          AND version = 'v2'
+	      ORDER BY id, created_at DESC
+      ) SELECT * from standups WHERE 1 = 1
+    |]
+    ecodeCond = [sql|AND ecode=?|]
   -- FIXME: WHAT THE F
     queryStandups conn = case ecode of
       Nothing ->

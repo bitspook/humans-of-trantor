@@ -10,9 +10,9 @@
 module Pms.Standup where
 
 import           Data.Aeson
+import           Data.Text.Encoding                   (decodeUtf8)
 import           Data.UUID
-import           Database.PostgreSQL.Simple.FromField (FromField (..),
-                                                       fromJSONField)
+import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.FromRow   (FromRow (..), field)
 import           Database.PostgreSQL.Simple.ToField   (Action (..),
                                                        ToField (..))
@@ -25,7 +25,11 @@ import           Types                                (Date, fromTextField)
 newtype StandupId = StandupId UUID deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField StandupId where
-  fromField = fromJSONField
+  fromField f dat = case dat of
+    Just b  -> case fromText $ decodeUtf8 b of
+      Just sid -> return $ StandupId sid
+      Nothing  -> returnError ConversionFailed f (show dat)
+    Nothing -> returnError ConversionFailed f (show dat)
 
 instance FromHttpApiData StandupId where
   parseQueryParam sid =  suid
