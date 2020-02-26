@@ -11,14 +11,11 @@ import           Types
 addStandup :: StandupData -> App Standup
 addStandup StandupData{..} = do
   let event = ReceivedStandupUpdateV2 Nothing ecode project standup date isDelivered [] []
-
   eventId <- receivedStandupUpdateEventV2 event
-
   return $ Standup (coerce eventId) StandupData{..}
 
 replaceStandup :: StandupId -> StandupData -> App Standup
 replaceStandup sid dat@StandupData{..} = do
   let event = ReceivedStandupUpdateV2 (Just sid) ecode project standup date isDelivered [] []
   _ <- receivedStandupUpdateEventV2 event
-
   return $ Standup sid dat

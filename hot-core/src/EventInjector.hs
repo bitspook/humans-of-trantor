@@ -121,7 +121,7 @@ instance ToJSON ReceivedStandupUpdateV2 where
     , "project" .= project (p :: ReceivedStandupUpdateV2)
     , "standup" .= standup (p :: ReceivedStandupUpdateV2)
     , "date" .= date (p :: ReceivedStandupUpdateV2)
-    , "isDelivered" .= date (p :: ReceivedStandupUpdateV2)
+    , "isDelivered" .= isDelivered (p :: ReceivedStandupUpdateV2)
     , "issues" .= issues (p :: ReceivedStandupUpdateV2)
     , "notes" .= notes (p :: ReceivedStandupUpdateV2)
     ]
