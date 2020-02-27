@@ -18,7 +18,7 @@ getStandups ecode = do
     baseQuery = [sql|
       WITH standups AS (
         SELECT DISTINCT ON (id)
-          id,
+          CASE WHEN payload->>'source' IS NULL THEN id ELSE (payload->>'source')::UUID END AS id,
           payload->>'ecode' AS ecode,
   	      payload->>'project' AS project,
           payload->>'standup' AS standup,
