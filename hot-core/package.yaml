@@ -43,6 +43,7 @@ dependencies:
 - wai-extra
 - servant-errors
 - transformers
+- time
 
 ghc-options:
 - -Wall
