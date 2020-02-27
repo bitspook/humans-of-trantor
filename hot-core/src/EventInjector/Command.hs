@@ -36,10 +36,5 @@ discoveredProjectEvent e = do
   _ <- insertEvent "DISCOVERED_PROJECT" "v1" e
   return NoContent
 
-receivedStandupUpdateEvent :: ReceivedStandupUpdate -> App NoContent
-receivedStandupUpdateEvent e = do
-  _ <- insertEvent "RECEIVED_STANDUP_UPDATE" "v1" e
-  return NoContent
-
 receivedStandupUpdateEventV2 :: ReceivedStandupUpdateV2 -> App UUID
 receivedStandupUpdateEventV2 = insertEvent "RECEIVED_STANDUP_UPDATE" "v2"

@@ -56,37 +56,6 @@ instance ToField DiscoveredProject where
   toField = toJSONField
 ---
 
--- ReceivedStandupUpdate
-data ReceivedStandupUpdate = ReceivedStandupUpdate
-  { ecode       :: Ecode
-  , project     :: ProjectName
-  , standupType :: StandupType
-  , date        :: Date
-  , standup     :: StandupBody
-  } deriving (Show, Generic)
-
-instance ToField ReceivedStandupUpdate where
-  toField = toJSONField
-
-instance FromJSON ReceivedStandupUpdate where
-  parseJSON = withObject "event" $ \o ->
-    ReceivedStandupUpdate
-    <$> o .: "ecode"
-    <*> o .: "project"
-    <*> o .: "type"
-    <*> o .: "date"
-    <*> o .: "standup"
-
-instance ToJSON ReceivedStandupUpdate where
-  toJSON p = object
-    [ "ecode" .= ecode (p :: ReceivedStandupUpdate)
-    , "project" .= project (p :: ReceivedStandupUpdate)
-    , "type" .= standupType (p :: ReceivedStandupUpdate)
-    , "date" .= date (p :: ReceivedStandupUpdate)
-    , "standup" .= standup (p :: ReceivedStandupUpdate)
-    ]
----
-
 -- ReceivedStandupUpdateV2
 data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
   { source      :: Maybe StandupId
