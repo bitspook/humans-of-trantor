@@ -13,7 +13,8 @@ import           Data.UUID                          (UUID)
 import           Database.PostgreSQL.Simple.ToField (ToField (..), toJSONField)
 import           Pms.Employee.Types                 (Designation, Ecode,
                                                      EmployeeName, ProjectName)
-import           Pms.Standup                        (StandupBody, StandupId)
+import           Pms.Standup                        (StandupBody, StandupId,
+                                                     StandupPriority)
 import           RIO                                hiding (id)
 import           Types                              (Date, Email)
 
@@ -66,6 +67,7 @@ data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
   , isDelivered :: Bool
   , issues      :: [UUID]
   , notes       :: [UUID]
+  , priority    :: StandupPriority
   } deriving (Show, Generic)
 
 instance ToField ReceivedStandupUpdateV2 where
@@ -82,6 +84,7 @@ instance FromJSON ReceivedStandupUpdateV2 where
     <*> o .: "isDelivered"
     <*> o .: "notes"
     <*> o .: "issues"
+    <*> o .: "priority"
 
 instance ToJSON ReceivedStandupUpdateV2 where
   toJSON p = object
@@ -93,5 +96,6 @@ instance ToJSON ReceivedStandupUpdateV2 where
     , "isDelivered" .= isDelivered (p :: ReceivedStandupUpdateV2)
     , "issues" .= issues (p :: ReceivedStandupUpdateV2)
     , "notes" .= notes (p :: ReceivedStandupUpdateV2)
+    , "priority" .= priority (p :: ReceivedStandupUpdateV2)
     ]
 ---

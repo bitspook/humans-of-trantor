@@ -1,8 +1,9 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE DeriveAnyClass      #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Types where
 
@@ -10,6 +11,7 @@ import           Data.Aeson
 import           Data.Pool
 import           Data.Text                            as T
 import           Data.Text.Encoding                   (decodeUtf8)
+import           Data.Text.Read                       (decimal)
 import           Data.Time.Format
 import           Data.Time.LocalTime
 import           Database.PostgreSQL.Simple           (Connection)
@@ -20,14 +22,18 @@ import           Dhall                                (Interpret)
 import           RIO
 
 fromTextField
-  :: Typeable a =>
-     (Text -> a)
-     -> Field
-     -> Maybe ByteString
-     -> Conversion a
+  :: Typeable a => (Text -> a) -> Field -> Maybe ByteString -> Conversion a
 fromTextField constructor f dat = case dat of
-    Just b  -> return $ constructor $ decodeUtf8 b
-    Nothing -> returnError ConversionFailed f (show dat)
+  Just b  -> return $ constructor $ decodeUtf8 b
+  Nothing -> returnError ConversionFailed f (show dat)
+
+fromIntField
+  :: Typeable a => (Int -> a) -> Field -> Maybe ByteString -> Conversion a
+fromIntField constructor f dat = case dat of
+  Just b -> case decimal $ decodeUtf8 b of
+    Right (d :: (Int, Text)) -> return $ constructor $ fst d
+    Left  s                  -> returnError ConversionFailed f s
+  Nothing -> returnError ConversionFailed f (show dat)
 
 -- Email
 newtype Email = Email Text deriving (Show, Generic, ToJSON, FromJSON)
@@ -43,22 +49,29 @@ instance ToField Email where
 newtype Date = Date LocalTime deriving (Show, Generic)
 
 instance FromJSON Date where
-  parseJSON (String d) = case parseTimeM False defaultTimeLocale "%Y-%m-%d" (T.unpack d) of
-    Just t  -> return $ Date t
-    Nothing -> fail "Invalid Date. Date should be in format 'YYYY-MM-DD'"
-  parseJSON _ = fail "Invalid Date. Date should be a string in format 'YYYY-MM-DD'"
+  parseJSON (String d) =
+    case parseTimeM False defaultTimeLocale "%Y-%m-%d" (T.unpack d) of
+      Just t  -> return $ Date t
+      Nothing -> fail "Invalid Date. Date should be in format 'YYYY-MM-DD'"
+  parseJSON _ =
+    fail "Invalid Date. Date should be a string in format 'YYYY-MM-DD'"
 
 instance ToJSON Date where
   toJSON (Date d) = fromString $ formatTime defaultTimeLocale "%Y-%m-%d" d
 
 instance ToField Date where
-  toField (Date d) = Escape $ fromString $ formatTime defaultTimeLocale "%Y-%m-%d" d
+  toField (Date d) =
+    Escape $ fromString $ formatTime defaultTimeLocale "%Y-%m-%d" d
 
 instance FromField Date where
   fromField f dat = case dat of
-    Just b  -> case parseTimeM False defaultTimeLocale "%Y-%m-%d" $ T.unpack $ decodeUtf8 b of
-      Just t  -> return $ Date t
-      Nothing -> returnError ConversionFailed f (show dat)
+    Just b ->
+      case
+          parseTimeM False defaultTimeLocale "%Y-%m-%d" $ T.unpack $ decodeUtf8
+            b
+        of
+          Just t  -> return $ Date t
+          Nothing -> returnError ConversionFailed f (show dat)
     Nothing -> returnError ConversionFailed f (show dat)
 ---
 

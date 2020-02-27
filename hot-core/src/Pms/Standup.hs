@@ -14,29 +14,29 @@ import           Data.Text.Encoding                   (decodeUtf8)
 import           Data.UUID
 import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.FromRow   (FromRow (..), field)
-import           Database.PostgreSQL.Simple.ToField   (Action (..),
-                                                       ToField (..))
+import           Database.PostgreSQL.Simple.ToField
 import           Pms.Employee.Types                   (Ecode, ProjectName)
 import           RIO                                  hiding (id)
 import           Servant                              (FromHttpApiData (..))
-import           Types                                (Date, fromTextField)
+import           Types                                (Date, fromIntField,
+                                                       fromTextField)
 
 -- StandupId
 newtype StandupId = StandupId UUID deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField StandupId where
   fromField f dat = case dat of
-    Just b  -> case fromText $ decodeUtf8 b of
+    Just b -> case fromText $ decodeUtf8 b of
       Just sid -> return $ StandupId sid
       Nothing  -> returnError ConversionFailed f (show dat)
     Nothing -> returnError ConversionFailed f (show dat)
 
 instance FromHttpApiData StandupId where
-  parseQueryParam sid =  suid
-    where
-      suid = case StandupId <$> fromText sid of
-        Just suid' -> Right suid'
-        Nothing    -> Left "Invalid Standup Id"
+  parseQueryParam sid = suid
+   where
+    suid = case StandupId <$> fromText sid of
+      Just suid' -> Right suid'
+      Nothing    -> Left "Invalid Standup Id"
 ---
 
 -- StandupBody
@@ -49,12 +49,23 @@ instance ToField StandupBody where
   toField (StandupBody a) = Escape $ encodeUtf8 a
 ---
 
+-- StandupPriority
+newtype StandupPriority = StandupPriority Int deriving (Show, Generic, ToJSON, FromJSON)
+
+instance FromField StandupPriority where
+  fromField = fromIntField StandupPriority
+
+instance ToField StandupPriority where
+  toField = toJSONField
+---
+
 data StandupData = StandupData
   { ecode       :: Ecode
   , project     :: ProjectName
   , standup     :: StandupBody
   , date        :: Date
   , isDelivered :: Bool
+  , priority    :: StandupPriority
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
 data Standup = Standup StandupId StandupData deriving (Show)
@@ -67,6 +78,7 @@ instance ToJSON Standup where
     , "standup" .= standup
     , "date" .= date
     , "isDelivered" .= isDelivered
+    , "priority" .= priority
     ]
 
 instance FromJSON Standup where
@@ -77,10 +89,12 @@ instance FromJSON Standup where
     standup     <- o .: "standup"
     date        <- o .: "date"
     isDelivered <- o .: "isDelivered"
+    priority    <- o .: "priority"
     return $ Standup id StandupData { .. }
 
 instance FromRow Standup where
   fromRow = do
     id  <- field
-    dat <- StandupData <$> field <*> field <*> field <*> field <*> field
+    dat <-
+      StandupData <$> field <*> field <*> field <*> field <*> field <*> field
     return $ Standup id dat
