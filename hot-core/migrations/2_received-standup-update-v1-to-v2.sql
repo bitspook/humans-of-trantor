@@ -16,19 +16,19 @@ WITH
   individual_standup_v1 AS (
     SELECT
       uuid_generate_v1mc() as id, project, ecode, date, created_at,
-	  btrim(regexp_split_to_table(standup, E'\\n+')) as standup
+	    btrim(regexp_split_to_table(standup, E'\\n+')) as standup
       FROM collective_standups_v1
   ),
   clean_standup_v1 AS (
-      SELECT
-	  id, project, ecode, date, created_at,
+    SELECT
+	    id, project, ecode, date, created_at,
       regexp_replace(standup, E'^-?\\s*\\[.*\]+', '') as standup,
-	  CASE WHEN starts_with(standup, '- [X]') OR starts_with(standup, '-[X]') THEN true ELSE false END AS isDelivered
-	  FROM individual_standup_v1
+	    CASE WHEN starts_with(standup, '- [X]') OR starts_with(standup, '-[X]') THEN true ELSE false END AS isDelivered
+    FROM individual_standup_v1
   )
   SELECT
-   id, project, ecode, date, created_at, standup, isDelivered
-   FROM clean_standup_v1 WHERE standup != ''
+    id, project, ecode, date, created_at, btrim(regexp_split_to_table(standup, E'\\n+')) as standup, isDelivered
+    FROM clean_standup_v1 WHERE standup != ''
 );
 
 CREATE MATERIALIZED VIEW sources AS (
