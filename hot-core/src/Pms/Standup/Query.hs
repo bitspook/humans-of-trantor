@@ -16,7 +16,7 @@ getStandups ecode = do
   (AppContext pool _) <- ask
   let
     baseQuery = [sql|SELECT * from standup WHERE 1 = 1|]
-    ecodeCond = [sql|AND ecode=?|]
+    ecodeCond = [sql| AND ecode=?|]
   -- FIXME: WHAT THE F
     queryStandups conn = case ecode of
       Nothing ->

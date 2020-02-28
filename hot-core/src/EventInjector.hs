@@ -66,7 +66,6 @@ data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
   , date        :: Date
   , isDelivered :: Bool
   , issues      :: [UUID]
-  , notes       :: [UUID]
   , priority    :: StandupPriority
   } deriving (Show, Generic)
 
@@ -82,7 +81,6 @@ instance FromJSON ReceivedStandupUpdateV2 where
     <*> o .: "standup"
     <*> o .: "date"
     <*> o .: "isDelivered"
-    <*> o .: "notes"
     <*> o .: "issues"
     <*> o .: "priority"
 
@@ -95,7 +93,6 @@ instance ToJSON ReceivedStandupUpdateV2 where
     , "date" .= date (p :: ReceivedStandupUpdateV2)
     , "isDelivered" .= isDelivered (p :: ReceivedStandupUpdateV2)
     , "issues" .= issues (p :: ReceivedStandupUpdateV2)
-    , "notes" .= notes (p :: ReceivedStandupUpdateV2)
     , "priority" .= priority (p :: ReceivedStandupUpdateV2)
     ]
 ---
