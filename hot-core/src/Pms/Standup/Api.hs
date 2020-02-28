@@ -17,8 +17,9 @@ type API auths
     "standup" :> QueryParam "ecode" Ecode :> Get '[JSON] [Standup]
     :<|> "standup" :> ReqBody '[JSON] StandupData :> Post '[JSON] Standup
     :<|> "standup" :> Capture "sid" StandupId :> ReqBody '[JSON] StandupData :> Put '[JSON] Standup
+    :<|> "standup" :> Capture "sid" StandupId :> Delete '[JSON] NoContent
     )
 
 api :: ServerT (API auth) App
-api (Authenticated _) = getStandups :<|> addStandup :<|> replaceStandup
-api _                 = (\_ -> throwM err401):<|> (\_ -> throwM err401) :<|> (\_ _ -> throwM err401)
+api (Authenticated _) = getStandups :<|> addStandup :<|> replaceStandup :<|> deleteStandup
+api _                 = (\_ -> throwM err401):<|> (\_ -> throwM err401) :<|> (\_ _ -> throwM err401) :<|> (\_ -> throwM err401)

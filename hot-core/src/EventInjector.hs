@@ -18,22 +18,6 @@ import           Pms.Standup                        (StandupBody, StandupId,
 import           RIO                                hiding (id)
 import           Types                              (Date, Email)
 
-data StandupType = Committed | Delivered | Impediment deriving (Show, Generic)
-
-instance FromJSON StandupType where
-  parseJSON (String s) = case s of
-    "committed"  -> return Committed
-    "delivered"  -> return Delivered
-    "impediment" -> return Impediment
-    _ -> fail "Invalid standup type. Valid values: [ committed, delivered, impediment ]"
-  parseJSON _ = fail "Invalid standup type. Valid values: [ committed, delivered, impediment ]"
-
-instance ToJSON StandupType where
-  toJSON st = case st of
-    Committed  -> String "committed"
-    Delivered  -> String "delivered"
-    Impediment -> String "impediment"
-
 -- DiscoveredEmployee
 data DiscoveredEmployee = DiscoveredEmployee
   { email       :: Email
@@ -93,3 +77,10 @@ instance ToJSON ReceivedStandupUpdateV2 where
     , "priority" .= priority (p :: ReceivedStandupUpdateV2)
     ]
 ---
+
+newtype DeleteStandupUpdate = DeleteStandupUpdate
+  { source :: StandupId
+  } deriving (Show, Generic, FromJSON, ToJSON)
+
+instance ToField DeleteStandupUpdate where
+  toField = toJSONField

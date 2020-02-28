@@ -7,10 +7,17 @@ CREATE VIEW standup AS (
       payload->>'standup' AS standup,
       payload->>'date' AS DATE,
       (payload->>'isDelivered')::boolean AS isDelivered,
-      CASE WHEN payload->>'priority' IS NULL THEN 0 ELSE (payload->>'priority')::Int END AS priority
+      CASE WHEN payload->>'priority' IS NULL THEN 0 ELSE (payload->>'priority')::Int END AS priority,
+	    created_at AS updated_at
       FROM store.store
      WHERE name = 'RECEIVED_STANDUP_UPDATE'
        AND version = 'v2'
      ORDER BY id, created_at DESC
-  ) SELECT * from unordered_standup ORDER BY date DESC, priority ASC
+  )
+  SELECT
+    *,
+    (SELECT created_at FROM store.store WHERE id = unordered_standup.id) as created_at
+    FROM unordered_standup
+   WHERE id NOT IN (SELECT (payload->>'source')::UUID FROM store.store WHERE NAME = 'DELETE_STANDUP_UPDATE')
+   ORDER BY updated_at DESC, date DESC, priority ASC
 )

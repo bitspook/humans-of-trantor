@@ -2,10 +2,13 @@
 module Pms.Standup.Command where
 
 import           Data.Coerce           (coerce)
-import           EventInjector         (ReceivedStandupUpdateV2 (..))
-import           EventInjector.Command (receivedStandupUpdateEventV2)
+import           EventInjector         (DeleteStandupUpdate (..),
+                                        ReceivedStandupUpdateV2 (..))
+import           EventInjector.Command
 import           Pms.Standup
+import qualified Pms.Standup.Query     as Query
 import           RIO
+import           Servant
 import           Types
 
 addStandup :: StandupData -> App Standup
@@ -19,3 +22,11 @@ replaceStandup sid dat@StandupData{..} = do
   let event = ReceivedStandupUpdateV2 (Just sid) ecode project standup date isDelivered priority
   _ <- receivedStandupUpdateEventV2 event
   return $ Standup sid dat
+
+deleteStandup :: StandupId -> App NoContent
+deleteStandup sid = do
+  _ <- Query.standup sid
+  let event = DeleteStandupUpdate sid
+  _ <- deleteStandupUpdateEvent event
+
+  return NoContent

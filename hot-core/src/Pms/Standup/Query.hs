@@ -7,8 +7,9 @@ import           Data.Pool                        (withResource)
 import           Database.PostgreSQL.Simple       (Only (Only), query)
 import           Database.PostgreSQL.Simple.SqlQQ (sql)
 import           Pms.Employee.Types               (Ecode)
-import           Pms.Standup                      (Standup)
+import           Pms.Standup                      (Standup, StandupId)
 import           RIO                              hiding (Identity)
+import           Servant
 import           Types                            (App, AppContext (..))
 
 getStandups :: Maybe Ecode -> App [Standup]
@@ -24,3 +25,12 @@ getStandups ecode = do
       Just ecode' ->
         query conn (mconcat [baseQuery, ecodeCond]) (Only ecode')
   liftIO $ withResource pool queryStandups
+
+standup :: StandupId -> App Standup
+standup sid = do
+  (AppContext pool _) <- ask
+  liftIO $ withResource pool $ \conn -> do
+    res :: [Standup] <- query conn [sql|SELECT * FROM standup WHERE id = ?|] (Only sid)
+    case res of
+      [s] -> return s
+      _   -> throwM err400

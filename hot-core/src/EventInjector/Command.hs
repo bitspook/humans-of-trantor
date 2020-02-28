@@ -38,3 +38,6 @@ discoveredProjectEvent e = do
 
 receivedStandupUpdateEventV2 :: ReceivedStandupUpdateV2 -> App UUID
 receivedStandupUpdateEventV2 = insertEvent "RECEIVED_STANDUP_UPDATE" "v2"
+
+deleteStandupUpdateEvent :: DeleteStandupUpdate -> App UUID
+deleteStandupUpdateEvent = insertEvent "DELETE_STANDUP_UPDATE" "v1"

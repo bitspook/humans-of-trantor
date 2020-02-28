@@ -10,7 +10,6 @@
 module Pms.Standup where
 
 import           Data.Aeson
-import           Data.Text.Encoding                   (decodeUtf8)
 import           Data.UUID
 import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.FromRow   (FromRow (..), field)
@@ -19,17 +18,17 @@ import           Pms.Employee.Types                   (Ecode, ProjectName)
 import           RIO                                  hiding (id)
 import           Servant                              (FromHttpApiData (..))
 import           Types                                (Date, fromIntField,
-                                                       fromTextField)
+                                                       fromTextField,
+                                                       fromUUIDField)
 
 -- StandupId
 newtype StandupId = StandupId UUID deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FromField StandupId where
-  fromField f dat = case dat of
-    Just b -> case fromText $ decodeUtf8 b of
-      Just sid -> return $ StandupId sid
-      Nothing  -> returnError ConversionFailed f (show dat)
-    Nothing -> returnError ConversionFailed f (show dat)
+  fromField = fromUUIDField StandupId
+
+instance ToField StandupId where
+  toField (StandupId s) = Escape $ encodeUtf8 $ toText s
 
 instance FromHttpApiData StandupId where
   parseQueryParam sid = suid

@@ -14,6 +14,7 @@ import           Data.Text.Encoding                   (decodeUtf8)
 import           Data.Text.Read                       (decimal)
 import           Data.Time.Format
 import           Data.Time.LocalTime
+import qualified Data.UUID                            as UUID
 import           Database.PostgreSQL.Simple           (Connection)
 import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.Internal  (Conversion, Field)
@@ -33,6 +34,14 @@ fromIntField constructor f dat = case dat of
   Just b -> case decimal $ decodeUtf8 b of
     Right (d :: (Int, Text)) -> return $ constructor $ fst d
     Left  s                  -> returnError ConversionFailed f s
+  Nothing -> returnError ConversionFailed f (show dat)
+
+fromUUIDField
+  :: Typeable a => (UUID.UUID -> a) -> Field -> Maybe ByteString -> Conversion a
+fromUUIDField constructor f dat = case dat of
+  Just b -> case UUID.fromText $ decodeUtf8 b of
+    Just sid -> return $ constructor sid
+    Nothing  -> returnError ConversionFailed f (show dat)
   Nothing -> returnError ConversionFailed f (show dat)
 
 -- Email
