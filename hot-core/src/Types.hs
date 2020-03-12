@@ -96,3 +96,8 @@ instance Interpret Config
 data AppContext = AppContext { dbPool :: Pool Connection,  config :: Config }
 
 type App = RIO AppContext
+
+data Timestamps = Timestamps
+  { createdAt :: LocalTime
+  , updatedAt :: LocalTime }
+  deriving (Show, Generic, ToJSON, FromJSON)

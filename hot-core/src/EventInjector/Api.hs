@@ -18,7 +18,7 @@ type API auths =  Auth auths AccessToken :>
   "event" :> (
   "DISCOVERED_EMPLOYEE" :> "v1" :> ReqBody '[JSON] DiscoveredEmployee :> Post '[JSON] NoContent
     :<|> "DISCOVERED_PROJECT" :> "v1" :> ReqBody '[JSON] DiscoveredProject :> Post '[JSON] NoContent
-    :<|> "RECEIVED_STANDUP_UPDATE" :> "v2" :> ReqBody '[JSON] ReceivedStandupUpdateV2 :> Post '[JSON] UUID
+    :<|> "RECEIVED_STANDUP_UPDATE" :> "v2" :> ReqBody '[JSON] ReceivedStandupUpdateV2 :> Post '[JSON] (UUID, Timestamps)
   )
 
 api :: ServerT (API auths) App

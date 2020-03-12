@@ -17,7 +17,8 @@ import           Database.PostgreSQL.Simple.ToField
 import           Pms.Employee.Types                   (Ecode, ProjectName)
 import           RIO                                  hiding (id)
 import           Servant                              (FromHttpApiData (..))
-import           Types                                (Date, fromIntField,
+import           Types                                (Date, Timestamps (..),
+                                                       fromIntField,
                                                        fromTextField,
                                                        fromUUIDField)
 
@@ -67,10 +68,10 @@ data StandupData = StandupData
   , priority    :: StandupPriority
   } deriving (Show, Generic, ToJSON, FromJSON, FromRow)
 
-data Standup = Standup StandupId StandupData deriving (Show)
+data Standup = Standup StandupId StandupData Timestamps deriving (Show)
 
 instance ToJSON Standup where
-  toJSON (Standup id StandupData {..}) = object
+  toJSON (Standup id StandupData {..} Timestamps {..}) = object
     [ "id" .= id
     , "ecode" .= ecode
     , "project" .= project
@@ -78,6 +79,8 @@ instance ToJSON Standup where
     , "date" .= date
     , "isDelivered" .= isDelivered
     , "priority" .= priority
+    , "createdAt" .= createdAt
+    , "updatedAt" .= updatedAt
     ]
 
 instance FromJSON Standup where
@@ -89,11 +92,14 @@ instance FromJSON Standup where
     date        <- o .: "date"
     isDelivered <- o .: "isDelivered"
     priority    <- o .: "priority"
-    return $ Standup id StandupData { .. }
+    createdAt <- o .: "createdAt"
+    updatedAt <- o .: "updatedAt"
+    return $ Standup id StandupData { .. } Timestamps {..}
 
 instance FromRow Standup where
   fromRow = do
     id  <- field
     dat <-
       StandupData <$> field <*> field <*> field <*> field <*> field <*> field
-    return $ Standup id dat
+    ts <- Timestamps <$> field <*> field
+    return $ Standup id dat ts
