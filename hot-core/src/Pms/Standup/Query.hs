@@ -4,26 +4,33 @@
 module Pms.Standup.Query where
 
 import           Data.Pool                        (withResource)
+import           Data.Time.Clock
+import           Data.Time.LocalTime
 import           Database.PostgreSQL.Simple       (Only (Only), query)
 import           Database.PostgreSQL.Simple.SqlQQ (sql)
 import           Pms.Employee.Types               (Ecode)
 import           Pms.Standup                      (Standup, StandupId)
 import           RIO                              hiding (Identity)
 import           Servant
-import           Types                            (App, AppContext (..))
+import           Types                            (App, AppContext (..),
+                                                   Date (..))
 
-getStandups :: Maybe Ecode -> App [Standup]
-getStandups ecode = do
+getStandups :: Maybe Ecode -> Maybe Date -> Maybe Date -> App [Standup]
+getStandups ecode' before' after' = do
   (AppContext pool _) <- ask
+  now <- liftIO getCurrentTime
   let
-    baseQuery = [sql|SELECT * from standup WHERE 1 = 1|]
+    before = fromMaybe (Date $ utcToLocalTime utc now) before'
+    after = fromMaybe (Date $ utcToLocalTime utc now) after'
+    baseQuery = [sql|SELECT * from standup WHERE DATE(date) < ? AND DATE(date) > ?|]
     ecodeCond = [sql| AND ecode=?|]
+    finalQuery = [sql| LIMIT 1000|]
   -- FIXME: WHAT THE F
-    queryStandups conn = case ecode of
+    queryStandups conn = case ecode' of
       Nothing ->
-        query conn (mconcat [baseQuery]) ()
-      Just ecode' ->
-        query conn (mconcat [baseQuery, ecodeCond]) (Only ecode')
+        query conn (mconcat [baseQuery, finalQuery]) (before, after)
+      Just ecode ->
+        query conn (mconcat [baseQuery, ecodeCond, finalQuery]) (before, after, ecode)
   liftIO $ withResource pool queryStandups
 
 standup :: StandupId -> App Standup

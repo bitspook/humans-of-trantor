@@ -21,6 +21,7 @@ import           Database.PostgreSQL.Simple.Internal  (Conversion, Field)
 import           Database.PostgreSQL.Simple.ToField
 import           Dhall                                (Interpret)
 import           RIO
+import           Servant                              (FromHttpApiData (..))
 
 fromTextField
   :: Typeable a => (Text -> a) -> Field -> Maybe ByteString -> Conversion a
@@ -82,6 +83,13 @@ instance FromField Date where
           Just t  -> return $ Date t
           Nothing -> returnError ConversionFailed f (show dat)
     Nothing -> returnError ConversionFailed f (show dat)
+
+instance FromHttpApiData Date where
+  parseQueryParam dat = suid
+   where
+    suid = case Date <$> parseTimeM False defaultTimeLocale "%Y-%m-%d" (T.unpack dat) of
+      Just date -> Right date
+      Nothing   -> Left "Invalid Date. Valid format: YYYY-MM-DD"
 ---
 
 data Config = Config

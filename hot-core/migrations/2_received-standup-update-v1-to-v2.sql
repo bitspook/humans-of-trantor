@@ -1,3 +1,5 @@
+SET search_path TO store, PUBLIC;
+
 CREATE MATERIALIZED VIEW standup_updates_v1_no_source AS (
 WITH
   collective_standups_v1 as (

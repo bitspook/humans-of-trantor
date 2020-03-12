@@ -1,4 +1,6 @@
-CREATE VIEW standup AS (
+SET search_path TO store, PUBLIC;
+
+CREATE VIEW public.standup AS (
   WITH unordered_standup AS (
 	  SELECT
       DISTINCT ON (id) CASE WHEN payload->>'source' IS NULL THEN id ELSE (payload->>'source')::UUID END AS id,
