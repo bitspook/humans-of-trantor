@@ -1,77 +1,42 @@
-import { Field, FieldArray, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
 import React from 'react';
-import { Button, Form, TextArea, Input } from 'semantic-ui-react';
-import * as yup from 'yup';
 import c from './index.module.scss';
+import { Standup } from 'src/ducks/standup';
 
-export interface StandupFormValues {
-  delivered: string;
-  committed: string;
-  impediment: string;
+interface StandupFieldDP {
+  standup: Standup;
 }
 
-const StandupSchema = yup.object().shape({
-  committed: yup.string(),
-  delivered: yup.string(),
-  impediment: yup.string(),
-});
-
-interface SemanticFieldProps {
-  label: string;
-  type?: string;
-  fluid?: boolean;
-}
-
-const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
-  const error =
-    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
-
+const StandupField = (p: StandupFieldDP) => {
   return (
-    <Form.Field error={Boolean(error)}>
-      <TextArea {...props.field} fluid={props.fluid} disabled={props.form.isSubmitting} />
-      {error && <span className={c.error}>{error}</span>}
-    </Form.Field>
+    <div className={c.standupRow}>
+      <div className={c.isDeliveredCheckbox}>
+        <label
+          className={p.standup.isDelivered ? c.checked : ''}
+          htmlFor="standup-is-delivered"></label>
+        <input name="standup-is-delivered" type="checkbox" defaultChecked={p.standup.isDelivered} />
+      </div>
+
+      <input type="text" value={p.standup.standup} />
+    </div>
   );
 };
-
-const StandupInputField = (props: FieldProps & SemanticFieldProps) => {
-  const error =
-    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
-
-  return (
-    <Form.Field error={Boolean(error)}>
-      <Input {...props.field} fluid={props.fluid} disabled={props.form.isSubmitting} />
-      {error && <span className={c.error}>{error}</span>}
-    </Form.Field>
-  );
-};
-
-const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
-  <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
-    <h2>Standup Update</h2>
-    <Field name="standup" component={StandupInputField} />
-
-    <Button>Add Commitment</Button>
-  </Form>
-);
 
 interface DataProps {
-  initialValues: StandupFormValues;
+  ecode: string;
+  standups: Standup[];
 }
 
 interface CbProps {
-  onSave: (values: StandupFormValues, helpers: FormikHelpers<StandupFormValues>) => void;
+  onSave: (standup: Standup) => void;
 }
 
 const StandupForm: React.FC<CbProps & DataProps> = (p) => {
   return (
-    <Formik
-      enableReinitialize={true}
-      initialValues={p.initialValues}
-      validationSchema={StandupSchema}
-      onSubmit={p.onSave}
-      component={InnerForm}
-    />
+    <div>
+      {p.standups.map((s) => (
+        <StandupField standup={s} />
+      ))}
+    </div>
   );
 };
 

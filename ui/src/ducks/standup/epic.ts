@@ -11,9 +11,11 @@ import duck, { Standup } from './index';
 const actions = duck.actions;
 
 const fetchStandup = async (ecode: string, token: string): Promise<Standup[]> => {
-  const year = '2020';
+  const after = dayjs()
+    .subtract(30, 'day')
+    .format('YYYY-MM-DD');
   const data = await fetchWithAuth(token)(
-    `${config.urls.core}/standup?ecode=${ecode}&year=${year}`,
+    `${config.urls.core}/standup?ecode=${ecode}&after=${after}`,
   ).then((r) => r.json());
 
   return (data as Standup[]).map((s) => ({ ...s, date: dayjs(s.date) }));

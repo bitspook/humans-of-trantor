@@ -3,7 +3,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 import { List } from 'semantic-ui-react';
 import CalendarIcon from 'src/components/CalendarIcon';
-import { Standup } from 'src/ducks/standup';
 import c from './index.module.scss';
 
 interface CalendarListItemProps {
@@ -34,7 +33,6 @@ const CalendarListItem = ({ day, onClick, isHighlighted }: CalendarListItemProps
 };
 
 interface DataProps {
-  standup: Standup[];
   selectedDay: Dayjs;
 }
 

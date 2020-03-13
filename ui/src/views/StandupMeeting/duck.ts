@@ -2,15 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import dayjs, { Dayjs } from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { Report } from 'src/components/Report';
-import { StandupFormValues } from 'src/components/StandupForm';
 import { ToastDataProps } from 'src/components/Toaster';
+import { Standup } from 'src/ducks/standup';
 
 export interface SaveStandupPayload {
-  day: Dayjs;
-  ecode: string;
-  project: string;
-  standup: StandupFormValues;
-  helpers: FormikHelpers<StandupFormValues>;
+  standup: Standup;
 }
 
 export interface ReportState {
