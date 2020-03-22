@@ -32,6 +32,10 @@ $color-sep-border: rgba(0,0,0,.2);
   border-right: 1px solid $color-sep-border;
 }
 
+.loader{
+  margin-top: 15vw;
+}
+
 .calendar {
   flex-grow: 0.5;
   border-right: 1px solid $color-sep-border;

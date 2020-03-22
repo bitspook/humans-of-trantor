@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Header, Icon, Message } from 'semantic-ui-react';
+import { Header, Icon, Loader, Message } from 'semantic-ui-react';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -81,7 +81,9 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   );
 
   const maybeEmployeeList = p.isLoadingEmployees ? (
-    <span>Loading...</span>
+    <div className="loader" style={{marginTop: '15vw'}}>
+      <Loader active={true} inline="centered" />
+    </div>
   ) : (
     <EmployeesList
       selectedEmployee={p.selectedEmployee}
