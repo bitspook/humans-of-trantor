@@ -28,6 +28,7 @@ interface AppDataProps {
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
   report: ReportState;
+  isLoadingEmployees: boolean;
 }
 
 interface AppCbProps {
@@ -79,6 +80,16 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     </div>
   );
 
+  const maybeEmployeeList = p.isLoadingEmployees ? (
+    <span>Loading...</span>
+  ) : (
+    <EmployeesList
+      selectedEmployee={p.selectedEmployee}
+      employees={p.employees}
+      onSelect={p.selectEmployee}
+    />
+  );
+
   return (
     <div className={c.root}>
       <div className={c.reportBar}>
@@ -92,13 +103,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       </div>
 
       <div className={c.container}>
-        <div className={c.employeesListSidebar}>
-          <EmployeesList
-            selectedEmployee={p.selectedEmployee}
-            employees={p.employees}
-            onSelect={p.selectEmployee}
-          />
-        </div>
+        <div className={c.employeesListSidebar}>{maybeEmployeeList}</div>
 
         {maybeCalendarCol}
 
@@ -134,6 +139,7 @@ const mapState = (state: State): AppDataProps => {
     ...state.standupMeeting,
     employees: state.employees.data,
     initialStandupFormValue,
+    isLoadingEmployees: state.employees.isLoading,
     standup: state.standup.data.filter((s) => s.ecode === state.standupMeeting.selectedEmployee),
     toasts: Object.values(state.standupMeeting.toasts),
   };
