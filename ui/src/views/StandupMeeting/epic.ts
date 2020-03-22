@@ -1,25 +1,28 @@
-import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
 import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import config from 'src/config';
 import standupDuck, { Standup } from 'src/ducks/standup';
+import fetchWithAuth from 'src/lib/fetchWithAuth';
 import { State } from 'src/reducer';
 import duck, { SaveStandupPayload } from './duck';
-import fetchWithAuth from 'src/lib/fetchWithAuth';
 
 const saveStandup = (token: string) => async (standup: Standup) => {
-  const url = `${config.urls.core}/api/standup`;
+  const url = `${config.urls.core}/standup/${standup.id}`;
 
   const fetch = fetchWithAuth(token);
+  const payload = {
+    ...standup,
+    date: standup.date.format('YYYY-MM-DD'),
+  };
 
   const response = await fetch(url, {
-    body: JSON.stringify(standup),
+    body: JSON.stringify(payload),
     headers: {
       'content-type': 'application/json',
     },
-    method: 'POST',
+    method: 'PUT',
   });
 
   return response;
@@ -32,11 +35,13 @@ const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable
     ofType(actions.saveStandupStart),
     withLatestFrom(state$),
     mergeMap(async ([{ payload }, state]) => {
-      const { standup } = payload as SaveStandupPayload;
+      const { data, helpers } = payload as SaveStandupPayload;
+      const standup = data.standup;
       const token = (state.user.session && state.user.session.accessToken) || '';
 
       try {
-        await saveStandup(token)(standup);
+        helpers.setSubmitting(true);
+        await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
         const toasts: AnyAction[] = [
           actions.showToast({
             body: `Standup saved`,
@@ -60,6 +65,7 @@ const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable
           }),
         );
 
+        helpers.setFieldError('standup', errors[0]);
         return toasts.concat([actions.saveStandupFail(errors)]);
       }
     }),

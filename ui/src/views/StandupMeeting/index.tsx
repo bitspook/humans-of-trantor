@@ -9,7 +9,7 @@ import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
 import Report from 'src/components/Report';
 import StandupCalendar from 'src/components/StandupCalendar';
-import StandupForm from 'src/components/StandupForm';
+import StandupForm, { StandupRowFormData } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
@@ -49,9 +49,13 @@ const SelectEmployeeInstruction = () => (
 );
 
 const App: React.FC<StandupMeetingDP & StandupMeetingCP> = (p) => {
-  const handleSaveStandup = (standup: Standup) => {
+  const handleSaveStandup = (
+    data: StandupRowFormData,
+    helpers: FormikHelpers<StandupRowFormData>,
+  ) => {
     p.saveStandupStart({
-      standup,
+      data,
+      helpers,
     });
   };
 
