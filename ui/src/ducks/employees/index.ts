@@ -20,7 +20,7 @@ const initialState: EmployeesState = {
 };
 
 export default createSlice({
- initialState,
+  initialState,
   name: 'employees',
   reducers: {
     fetchFail: (state, { payload }) => {

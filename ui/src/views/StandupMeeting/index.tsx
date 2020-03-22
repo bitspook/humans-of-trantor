@@ -81,7 +81,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   );
 
   const maybeEmployeeList = p.isLoadingEmployees ? (
-    <div className="loader" style={{marginTop: '15vw'}}>
+    <div className="loader" style={{ marginTop: '15vw' }}>
       <Loader active={true} inline="centered" />
     </div>
   ) : (
