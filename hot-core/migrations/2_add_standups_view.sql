@@ -21,5 +21,5 @@ CREATE VIEW public.standup AS (
     (SELECT created_at FROM store.store WHERE id = unordered_standup.id) as created_at
     FROM unordered_standup
    WHERE id NOT IN (SELECT (payload->>'source')::UUID FROM store.store WHERE NAME = 'DELETE_STANDUP_UPDATE')
-   ORDER BY updated_at DESC, date DESC, priority ASC
+   ORDER BY date DESC, created_at DESC, priority ASC
 )

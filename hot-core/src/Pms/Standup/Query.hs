@@ -22,7 +22,7 @@ getStandups ecode' before' after' = do
   let
     before = fromMaybe (Date $ utcToLocalTime utc now) before'
     after = fromMaybe (Date $ utcToLocalTime utc now) after'
-    baseQuery = [sql|SELECT * from standup WHERE DATE(date) < ? AND DATE(date) > ?|]
+    baseQuery = [sql|SELECT * from standup WHERE DATE(date) <= ? AND DATE(date) > ?|]
     ecodeCond = [sql| AND ecode=?|]
     finalQuery = [sql| LIMIT 1000|]
   -- FIXME: WHAT THE F

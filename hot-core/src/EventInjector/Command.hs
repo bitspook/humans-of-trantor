@@ -20,10 +20,10 @@ insertEvent eventName version payload = do
   liftIO $ withResource pool $ \conn -> withTransaction conn $ do
     rows :: [(UUID, LocalTime)] <- query
       conn
-      [sql|INSERT INTO store.store (name, version, payload) VALUES (?, ?, ?) RETURNING (id, created_at)|]
+      [sql|INSERT INTO store.store (name, version, payload) VALUES (?, ?, ?) RETURNING id, created_at|]
       (eventName, version, payload)
     case rows of
-      [(x, t)] -> return (x, (Timestamps t t))
+      [(x, t)] -> return (x, Timestamps t t)
       _        -> throwM err400 { errBody = "Failed to add standup" }
 
 discoveredEmployeeEvent :: DiscoveredEmployee -> App NoContent
