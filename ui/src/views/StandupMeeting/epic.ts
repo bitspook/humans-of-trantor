@@ -65,6 +65,8 @@ const createStandupEpic = (action$: Observable<AnyAction>, state$: StateObservab
         helpers.setSubmitting(true);
         await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
 
+        helpers.resetForm();
+
         return [actions.createStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
       } catch (err) {
         const errors = Array.isArray(err) ? err : [err];

@@ -40,11 +40,11 @@ export default createSlice({
       state.isLoading = true;
       state.errors = [];
     },
-    fetchSuccess: (state, { payload }) => {
+    fetchSuccess: (state, { payload }: { payload: Standup[] }) => {
       state.isLoading = false;
       state.errors = [];
-      state.data = state.data
-        .concat(payload)
+      state.data = payload
+        .concat(state.data)
         .filter((standup, index, arr) => {
           const isDuplicate = arr.findIndex((s) => s.id === standup.id) !== index;
 
