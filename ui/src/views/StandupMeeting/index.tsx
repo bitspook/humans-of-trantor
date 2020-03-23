@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { Dayjs } from 'dayjs';
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Header, Icon, Message } from 'semantic-ui-react';
+import { Header, Icon, Loader, Message } from 'semantic-ui-react';
 
 import { FormikHelpers } from 'formik';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -28,6 +28,7 @@ interface AppDataProps {
   initialStandupFormValue: StandupFormValues;
   toasts: ToastDataProps[];
   report: ReportState;
+  isLoadingEmployees: boolean;
 }
 
 interface AppCbProps {
@@ -79,6 +80,18 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
     </div>
   );
 
+  const maybeEmployeeList = p.isLoadingEmployees ? (
+    <div className={c.loader}>
+      <Loader active={true} inline="centered" />
+    </div>
+  ) : (
+    <EmployeesList
+      selectedEmployee={p.selectedEmployee}
+      employees={p.employees}
+      onSelect={p.selectEmployee}
+    />
+  );
+
   return (
     <div className={c.root}>
       <div className={c.reportBar}>
@@ -92,13 +105,7 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       </div>
 
       <div className={c.container}>
-        <div className={c.employeesListSidebar}>
-          <EmployeesList
-            selectedEmployee={p.selectedEmployee}
-            employees={p.employees}
-            onSelect={p.selectEmployee}
-          />
-        </div>
+        <div className={c.employeesListSidebar}>{maybeEmployeeList}</div>
 
         {maybeCalendarCol}
 
@@ -134,6 +141,7 @@ const mapState = (state: State): AppDataProps => {
     ...state.standupMeeting,
     employees: state.employees.data,
     initialStandupFormValue,
+    isLoadingEmployees: state.employees.isLoading,
     standup: state.standup.data.filter((s) => s.ecode === state.standupMeeting.selectedEmployee),
     toasts: Object.values(state.standupMeeting.toasts),
   };
