@@ -1,5 +1,16 @@
 @import 'src/variables.scss';
 
+.newStandupInput {
+  width: 80%;
+  border: 1px solid $color-text-inverted;
+  font-size: 1.2em;
+  padding: 0.3em 0.6em;
+  border-radius: 0.3em;
+  margin: 0.5em 0;
+  margin-left: 3.8em;
+  outline: none;
+}
+
 .standupRow {
   display: flex;
   margin: 1em;

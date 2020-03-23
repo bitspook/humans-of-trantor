@@ -3,13 +3,23 @@ import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import config from 'src/config';
-import standupDuck, { Standup } from 'src/ducks/standup';
+import standupDuck, { NewStandup } from 'src/ducks/standup';
 import fetchWithAuth from 'src/lib/fetchWithAuth';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload } from './duck';
+import duck, { SaveStandupPayload, CreateStandupPayload } from './duck';
 
-const saveStandup = (token: string) => async (standup: Standup) => {
-  const url = `${config.urls.core}/standup/${standup.id}`;
+interface SaveStandupApiPayload extends NewStandup {
+  id?: string;
+}
+
+const saveStandup = (token: string) => async (standup: SaveStandupApiPayload) => {
+  let url = `${config.urls.core}/standup`;
+  let method = 'POST';
+
+  if (standup.id) {
+    url = `${url}/${standup.id}`;
+    method = 'PUT';
+  }
 
   const fetch = fetchWithAuth(token);
   const payload = {
@@ -22,13 +32,49 @@ const saveStandup = (token: string) => async (standup: Standup) => {
     headers: {
       'content-type': 'application/json',
     },
-    method: 'PUT',
+    method,
   });
 
   return response;
 };
 
 const { actions } = duck;
+
+const createStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
+  action$.pipe(
+    ofType(actions.createStandupStart),
+    withLatestFrom(state$),
+    mergeMap(async ([{ payload }, state]) => {
+      const { data, helpers } = payload as CreateStandupPayload;
+
+      if (!state.standupMeeting.selectedEmployee) {
+        return [actions.createStandupFail(new Error('No Employee Selected'))];
+      }
+
+      const standup: NewStandup = {
+        ecode: state.standupMeeting.selectedEmployee,
+        project: state.standupMeeting.selectedProject,
+        standup: data.standup,
+        isDelivered: false,
+        priority: 0,
+        date: state.standupMeeting.selectedDay,
+      };
+      const token = (state.user.session && state.user.session.accessToken) || '';
+
+      try {
+        helpers.setSubmitting(true);
+        await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
+
+        return [actions.createStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
+      } catch (err) {
+        const errors = Array.isArray(err) ? err : [err];
+
+        helpers.setFieldError('standup', errors[0]);
+        return [actions.createStandupFail(errors)];
+      }
+    }),
+    mergeMap((arr) => from(arr)),
+  );
 
 const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
   action$.pipe(
@@ -42,31 +88,13 @@ const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable
       try {
         helpers.setSubmitting(true);
         await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
-        const toasts: AnyAction[] = [
-          actions.showToast({
-            body: `Standup saved`,
-            header: 'Standup saved successfully!',
-            key: `${new Date().getTime()}`,
-          }),
-        ];
 
-        return toasts.concat([
-          actions.saveStandupSuccess(),
-          standupDuck.actions.fetchStart(standup.ecode),
-        ]);
+        return [actions.saveStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
       } catch (err) {
         const errors = Array.isArray(err) ? err : [err];
 
-        const toasts: AnyAction[] = errors.map((e) =>
-          actions.showToast({
-            body: `${e.name}`,
-            header: 'Failed to save standup',
-            key: new Date().getTime(),
-          }),
-        );
-
         helpers.setFieldError('standup', errors[0]);
-        return toasts.concat([actions.saveStandupFail(errors)]);
+        return [actions.saveStandupFail()];
       }
     }),
     mergeMap((arr) => from(arr)),
@@ -118,6 +146,7 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
   );
 
 export default combineEpics(
+  createStandupEpic,
   saveStandupEpic,
   fetchEmployeeStandupEpic,
   autoHideToastEpic,

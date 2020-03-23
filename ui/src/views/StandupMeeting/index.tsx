@@ -9,13 +9,13 @@ import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
 import Report from 'src/components/Report';
 import StandupCalendar from 'src/components/StandupCalendar';
-import StandupForm, { StandupRowFormData } from 'src/components/StandupForm';
+import StandupForm, { StandupRowFormData, NewStandupFormData } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { ReportState, SaveStandupPayload } from './duck';
+import duck, { ReportState, SaveStandupPayload, CreateStandupPayload } from './duck';
 import c from './index.module.scss';
 
 interface StandupMeetingDP {
@@ -23,7 +23,7 @@ interface StandupMeetingDP {
   selectedDay: Dayjs;
   selectedEmployee?: string;
   selectedProject: string;
-  saveStandupError?: Error;
+  createStandupError?: Error;
   selectedStandups: Standup[];
   toasts: ToastDataProps[];
   report: ReportState;
@@ -33,6 +33,7 @@ interface StandupMeetingCP {
   fetchEmployeesStart: (project: string) => void;
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
+  createStandupStart: (payload: CreateStandupPayload) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
   showReport: () => void;
   hideReport: () => void;
@@ -58,21 +59,31 @@ const App: React.FC<StandupMeetingDP & StandupMeetingCP> = (p) => {
       helpers,
     });
   };
+  const handleCreateStandup = (
+    data: NewStandupFormData,
+    helpers: FormikHelpers<NewStandupFormData>,
+  ) => {
+    p.createStandupStart({ data, helpers });
+  };
 
   useEffect(() => {
     p.fetchEmployeesStart(p.selectedProject);
   }, [p.selectedProject]); // eslint-disable-line
 
-  const maybeError = p.saveStandupError && (
-    <Message error={true} header="Failed to save standup 😞" content={String(p.saveStandupError)} />
+  const maybeError = p.createStandupError && (
+    <Message
+      error={true}
+      header="Failed to add standup 😞"
+      content={String(p.createStandupError)}
+    />
   );
 
   /* prettier-ignore */
   const standupFormCol = p.selectedEmployee ? (
     <StandupForm
-      ecode={p.selectedEmployee}
       standups={p.selectedStandups}
       onSave={handleSaveStandup}
+      onCreate={handleCreateStandup}
     />
   ) : (<SelectEmployeeInstruction />);
 

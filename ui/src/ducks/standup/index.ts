@@ -1,14 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 import dayjs, { Dayjs } from 'dayjs';
 
-export interface Standup {
-  id: string;
+export interface NewStandup {
   ecode: string;
   project: string;
   standup: string;
   date: Dayjs;
   isDelivered: boolean;
   priority: number;
+}
+
+export interface Standup extends NewStandup {
+  id: string;
   createdAt: Dayjs;
   updatedAt: Dayjs;
 }

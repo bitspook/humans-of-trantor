@@ -1,6 +1,7 @@
 import { Field, FieldProps, Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { ChangeEvent } from 'react';
 import { Standup } from 'src/ducks/standup';
+import * as yup from 'yup';
 import c from './index.module.scss';
 
 const StandupField = (p: FieldProps<Standup>) => {
@@ -42,6 +43,10 @@ const StandupField = (p: FieldProps<Standup>) => {
   );
 };
 
+const NewStandupField: React.FC<FieldProps<string>> = (p) => {
+  return <input className={c.newStandupInput} type="text" {...p.field} />;
+};
+
 interface StandupRowProps {
   standup: Standup;
   onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
@@ -65,21 +70,52 @@ const StandupRow = (p: StandupRowProps) => {
   );
 };
 
-interface DataProps {
-  ecode: string;
+export interface NewStandupFormData {
+  standup: string;
+}
+
+interface NewStandupFormProps {
+  onSubmit: (value: NewStandupFormData, helpers: FormikHelpers<NewStandupFormData>) => void;
+}
+
+const NewStandupForm: React.FC<NewStandupFormProps> = (p) => {
+  const InnerForm = (formik: FormikProps<{}>) => (
+    <form onSubmit={formik.handleSubmit}>
+      <Field name="standup" component={NewStandupField} />
+    </form>
+  );
+
+  const validationSchema = yup.object().shape({
+    standup: yup.string().required(),
+  });
+
+  return (
+    <Formik
+      initialValues={{ standup: '' }}
+      validationSchema={validationSchema}
+      onSubmit={p.onSubmit}>
+      {InnerForm}
+    </Formik>
+  );
+};
+
+interface StandupFormProps {
   standups: Standup[];
-}
-
-interface CbProps {
   onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
+  onCreate: (data: NewStandupFormData, helpers: FormikHelpers<NewStandupFormData>) => void;
 }
 
-const StandupForm: React.FC<CbProps & DataProps> = (p) => {
+const StandupForm: React.FC<StandupFormProps> = (p) => {
   const standupRows = p.standups.map((s) => (
     <StandupRow key={s.id} standup={s} onSave={p.onSave} />
   ));
 
-  return <>{standupRows}</>;
+  return (
+    <>
+      <NewStandupForm onSubmit={p.onCreate} />
+      {standupRows}
+    </>
+  );
 };
 
 export default StandupForm;
