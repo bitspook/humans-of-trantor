@@ -35,16 +35,25 @@ const StandupField = (p: FieldProps<Standup>) => {
           type="checkbox"
           defaultChecked={standup.isDelivered}
           onChange={handleChange}
+          disabled={p.form.isSubmitting}
         />
       </div>
 
-      <input type="text" name="standup" value={standup.standup} onChange={handleChange} />
+      <input
+        type="text"
+        name="standup"
+        value={standup.standup}
+        onChange={handleChange}
+        disabled={p.form.isSubmitting}
+      />
     </div>
   );
 };
 
 const NewStandupField: React.FC<FieldProps<string>> = (p) => {
-  return <input className={c.newStandupInput} type="text" {...p.field} />;
+  return (
+    <input className={c.newStandupInput} type="text" {...p.field} disabled={p.form.isSubmitting} />
+  );
 };
 
 interface StandupRowProps {

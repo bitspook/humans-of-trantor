@@ -61,6 +61,10 @@
     &.checked {
       border-color: $color-success;
       background-color: $color-success;
+      background-image: url('./tick.svg');
+      background-size: 60%;
+      background-repeat: no-repeat;
+      background-position: center;
     }
   }
 }
