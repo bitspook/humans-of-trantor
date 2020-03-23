@@ -1,10 +1,10 @@
 import { Field, FieldProps, Formik, FormikHelpers, FormikProps } from 'formik';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, SyntheticEvent } from 'react';
 import { Standup } from 'src/ducks/standup';
 import * as yup from 'yup';
 import c from './index.module.scss';
 
-const StandupField = (p: FieldProps<Standup>) => {
+const StandupField = (p: FieldProps<Standup> & { onDelete: (e: SyntheticEvent) => void }) => {
   const standup = p.field.value;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +46,8 @@ const StandupField = (p: FieldProps<Standup>) => {
         onChange={handleChange}
         disabled={p.form.isSubmitting}
       />
+
+      <button type="button" className={c.delete} onClick={p.onDelete} />
     </div>
   );
 };
@@ -59,6 +61,7 @@ const NewStandupField: React.FC<FieldProps<string>> = (p) => {
 interface StandupRowProps {
   standup: Standup;
   onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
+  onDelete: (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => void;
 }
 
 export interface StandupRowFormData {
@@ -68,7 +71,11 @@ export interface StandupRowFormData {
 const StandupRow = (p: StandupRowProps) => {
   const InnerForm = (formik: FormikProps<StandupRowFormData>) => (
     <form onSubmit={formik.handleSubmit}>
-      <Field component={StandupField} name="standup" />
+      <Field
+        component={StandupField}
+        name="standup"
+        onDelete={() => p.onDelete(p.standup, formik)}
+      />
     </form>
   );
 
@@ -112,11 +119,12 @@ interface StandupFormProps {
   standups: Standup[];
   onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
   onCreate: (data: NewStandupFormData, helpers: FormikHelpers<NewStandupFormData>) => void;
+  onDelete: (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => void;
 }
 
 const StandupForm: React.FC<StandupFormProps> = (p) => {
   const standupRows = p.standups.map((s) => (
-    <StandupRow key={s.id} standup={s} onSave={p.onSave} />
+    <StandupRow key={s.id} standup={s} onSave={p.onSave} onDelete={p.onDelete} />
   ));
 
   return (

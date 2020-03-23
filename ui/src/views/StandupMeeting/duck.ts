@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { Report } from 'src/components/Report';
 import { NewStandupFormData, StandupRowFormData } from 'src/components/StandupForm';
 import { ToastDataProps } from 'src/components/Toaster';
+import { Standup } from 'src/ducks/standup';
 
 export interface CreateStandupPayload {
   data: NewStandupFormData;
@@ -12,6 +13,11 @@ export interface CreateStandupPayload {
 
 export interface SaveStandupPayload {
   data: StandupRowFormData;
+  helpers: FormikHelpers<StandupRowFormData>;
+}
+
+export interface DeleteStandupPayload {
+  standup: Standup;
   helpers: FormikHelpers<StandupRowFormData>;
 }
 
@@ -61,6 +67,9 @@ export default createSlice({
     createStandupSuccess: (state: StandupMeetingState) => {
       state.isCreatingStandup = false;
     },
+    deleteStandupFail: (s) => s,
+    deleteStandupStart: (s) => s,
+    deleteStandupSuccess: (s) => s,
     hideReport: (state: StandupMeetingState) => {
       state.report.isVisible = false;
     },

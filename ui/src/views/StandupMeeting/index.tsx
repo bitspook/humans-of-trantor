@@ -15,7 +15,12 @@ import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { ReportState, SaveStandupPayload, CreateStandupPayload } from './duck';
+import duck, {
+  ReportState,
+  SaveStandupPayload,
+  CreateStandupPayload,
+  DeleteStandupPayload,
+} from './duck';
 import c from './index.module.scss';
 
 interface StandupMeetingDP {
@@ -33,6 +38,7 @@ interface StandupMeetingCP {
   fetchEmployeesStart: (project: string) => void;
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
+  deleteStandupStart: (payload: DeleteStandupPayload) => void;
   createStandupStart: (payload: CreateStandupPayload) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
   showReport: () => void;
@@ -65,6 +71,9 @@ const App: React.FC<StandupMeetingDP & StandupMeetingCP> = (p) => {
   ) => {
     p.createStandupStart({ data, helpers });
   };
+  const handleDeleteStandup = (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => {
+    p.deleteStandupStart({ standup, helpers });
+  };
 
   useEffect(() => {
     p.fetchEmployeesStart(p.selectedProject);
@@ -84,6 +93,7 @@ const App: React.FC<StandupMeetingDP & StandupMeetingCP> = (p) => {
       standups={p.selectedStandups}
       onSave={handleSaveStandup}
       onCreate={handleCreateStandup}
+      onDelete={handleDeleteStandup}
     />
   ) : (<SelectEmployeeInstruction />);
 
