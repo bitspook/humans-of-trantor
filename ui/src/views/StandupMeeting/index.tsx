@@ -13,14 +13,9 @@ import StandupForm, { StandupRowFormData, NewStandupFormData } from 'src/compone
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
-import { Standup } from 'src/ducks/standup';
+import standupD, { Standup, DeleteStandupPayload } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, {
-  ReportState,
-  SaveStandupPayload,
-  CreateStandupPayload,
-  DeleteStandupPayload,
-} from './duck';
+import duck, { ReportState, SaveStandupPayload, CreateStandupPayload } from './duck';
 import c from './index.module.scss';
 
 interface StandupMeetingDP {
@@ -164,6 +159,7 @@ const mapState = (state: State): StandupMeetingDP => {
 
 const mapDispatch = (dispatch: Dispatch): StandupMeetingCP => ({
   ...bindActionCreators(duck.actions, dispatch),
+  deleteStandupStart: bindActionCreators(standupD.actions.deleteStandupStart, dispatch),
   fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchStart, dispatch),
 });
 

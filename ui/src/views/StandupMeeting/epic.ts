@@ -3,10 +3,10 @@ import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
 import config from 'src/config';
-import standupDuck, { NewStandup, Standup } from 'src/ducks/standup';
+import standupDuck, { NewStandup } from 'src/ducks/standup';
 import fetchWithAuth from 'src/lib/fetchWithAuth';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload, CreateStandupPayload, DeleteStandupPayload } from './duck';
+import duck, { SaveStandupPayload, CreateStandupPayload } from './duck';
 
 interface SaveStandupApiPayload extends NewStandup {
   id?: string;
@@ -29,21 +29,6 @@ const saveStandup = (token: string) => async (standup: SaveStandupApiPayload) =>
 
   const response = await fetch(url, {
     body: JSON.stringify(payload),
-    headers: {
-      'content-type': 'application/json',
-    },
-    method,
-  });
-
-  return response;
-};
-
-const deleteStandup = (token: string) => async (standup: Standup) => {
-  let url = `${config.urls.core}/standup/${standup.id}`;
-  let method = 'DELETE';
-
-  const fetch = fetchWithAuth(token);
-  const response = await fetch(url, {
     headers: {
       'content-type': 'application/json',
     },
@@ -117,29 +102,6 @@ const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable
     mergeMap((arr) => from(arr)),
   );
 
-const deleteStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
-  action$.pipe(
-    ofType(actions.deleteStandupStart),
-    withLatestFrom(state$),
-    mergeMap(async ([{ payload }, state]) => {
-      const { standup, helpers } = payload as DeleteStandupPayload;
-      const token = (state.user.session && state.user.session.accessToken) || '';
-
-      try {
-        helpers.setSubmitting(true);
-        await deleteStandup(token)(standup).finally(() => helpers.setSubmitting(false));
-
-        return [actions.deleteStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
-      } catch (err) {
-        const errors = Array.isArray(err) ? err : [err];
-
-        helpers.setFieldError('standup', errors[0]);
-        return [actions.deleteStandupFail()];
-      }
-    }),
-    mergeMap((arr) => from(arr)),
-  );
-
 const fetchEmployeeStandupEpic: Epic = (action$) =>
   action$.pipe(
     ofType(actions.selectEmployee),
@@ -191,5 +153,4 @@ export default combineEpics(
   fetchEmployeeStandupEpic,
   autoHideToastEpic,
   createReportEpic,
-  deleteStandupEpic,
 );

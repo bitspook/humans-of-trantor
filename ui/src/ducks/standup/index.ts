@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import dayjs, { Dayjs } from 'dayjs';
+import { FormikHelpers } from 'formik';
+import { StandupRowFormData } from 'src/components/StandupForm';
 
 export interface NewStandup {
   ecode: string;
@@ -14,6 +16,11 @@ export interface Standup extends NewStandup {
   id: string;
   createdAt: Dayjs;
   updatedAt: Dayjs;
+}
+
+export interface DeleteStandupPayload {
+  standup: Standup;
+  helpers: FormikHelpers<StandupRowFormData>;
 }
 
 export interface StandupState {
@@ -32,6 +39,11 @@ export default createSlice({
   initialState,
   name: 'standup',
   reducers: {
+    deleteStandupFail: (s) => s,
+    deleteStandupStart: (s) => s,
+    deleteStandupSuccess: (state, { payload }: { payload: Standup }) => {
+      state.data = state.data.filter((s) => s.id !== payload.id);
+    },
     fetchFail: (state, { payload }) => {
       state.isLoading = false;
       state.errors = payload;
