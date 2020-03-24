@@ -6,9 +6,8 @@ import { Standup } from 'src/ducks/standup';
 
 export interface Report {
   employee: Employee;
-  yesterday?: Standup;
-  today?: Standup;
-  impediment?: Standup;
+  yesterday?: Standup[];
+  today?: Standup[];
 }
 
 interface ReportDataProps {
@@ -22,31 +21,33 @@ interface ReportCbProps {
   onClose: () => void;
 }
 
+const StandupReportRow = (s: Standup) => (
+  <Segment attached={true} key={s.id}>
+    <b>{String.fromCharCode(s.isDelivered ? 9989 : 10066)} </b>
+    <span> {s.standup}</span>
+  </Segment>
+);
+
 const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
-  const yesterday = r.yesterday?.standup && (
-    <Fragment>
-      <Header as="h3" attached="top">
-        Yesterday ({r.yesterday?.date.format('dddd, MMM DD')})
-      </Header>
-      <Segment attached={true}>{r.yesterday?.standup}</Segment>
-    </Fragment>
-  );
-  const today = r.today?.standup && (
-    <Fragment>
-      <Header as="h3" attached="top">
-        Today ({r.today?.date.format('dddd, MMM DD')})
-      </Header>
-      <Segment attached={true}>{r.today?.standup}</Segment>
-    </Fragment>
-  );
-  const impediment = r.impediment?.standup && (
-    <Fragment>
-      <Header as="h3" attached="top">
-        Impediments ({r.impediment?.date.format('dddd, MMM DD')})
-      </Header>
-      <Segment attached={true}>{r.impediment?.standup}</Segment>
-    </Fragment>
-  );
+  const yesterday =
+    r.yesterday && r.yesterday.length ? (
+      <Fragment>
+        <Header as="h3" attached="top">
+          Yesterday ({r.yesterday[0].date.format('dddd, MMM DD')})
+        </Header>
+        {r.yesterday.map(StandupReportRow)}
+      </Fragment>
+    ) : null;
+
+  const today =
+    r.today && r.today.length ? (
+      <Fragment>
+        <Header as="h3" attached="top">
+          Today ({r.today[0].date.format('dddd, MMM DD')})
+        </Header>
+        {r.today.map(StandupReportRow)}
+      </Fragment>
+    ) : null;
 
   return (
     <div key={r.employee.ecode}>
@@ -56,7 +57,6 @@ const RenderReport: FC<{ report: Report }> = ({ report: r }) => {
       <Segment attached={true}>
         {yesterday}
         {today}
-        {impediment}
       </Segment>
     </div>
   );

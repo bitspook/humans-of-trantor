@@ -128,12 +128,18 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
             .filter((s) => s.ecode === employee.ecode)
             .sort((s1, s2) => (s1.date.isBefore(s2.date) ? 1 : -1));
 
-          const yesterday = standup.find((s) => s.date.isBefore(selectedDay, 'day'));
-          const today = standup.find((s) => s.date.isSame(selectedDay, 'day'));
+          const today = standup.filter((s) => s.date.isSame(selectedDay, 'day'));
+          let yesterday = standup.filter((s) => s.date.isBefore(selectedDay, 'day'));
 
-          if (!yesterday && !today) {
+          if (!yesterday.length && !today.length) {
             return null;
           }
+
+          const dayBeforeSelectedDay = yesterday.reduce((accum, s) => {
+            return accum.date.isAfter(s.date, 'day') ? accum : s;
+          }).date;
+
+          yesterday = yesterday.filter((s) => s.date.isSame(dayBeforeSelectedDay));
 
           return {
             employee,
