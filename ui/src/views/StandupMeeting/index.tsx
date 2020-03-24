@@ -156,6 +156,7 @@ const mapState = (state: State): StandupMeetingDP => {
   return {
     ...state.standupMeeting,
     employees: state.employees.data,
+    isLoadingEmployees: state.employees.isLoading,
     selectedStandups,
     toasts: Object.values(state.standupMeeting.toasts),
   };
