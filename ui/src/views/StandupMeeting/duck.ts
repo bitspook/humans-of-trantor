@@ -1,16 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { FormikHelpers } from 'formik';
 import { Report } from 'src/components/Report';
-import { StandupFormValues } from 'src/components/StandupForm';
+import { NewStandupFormData, StandupRowFormData } from 'src/components/StandupForm';
 import { ToastDataProps } from 'src/components/Toaster';
+import { Standup } from 'src/ducks/standup';
+
+export interface CreateStandupPayload {
+  data: NewStandupFormData;
+  helpers: FormikHelpers<NewStandupFormData>;
+}
 
 export interface SaveStandupPayload {
-  day: Dayjs;
-  ecode: string;
-  project: string;
-  standup: StandupFormValues;
-  helpers: FormikHelpers<StandupFormValues>;
+  data: StandupRowFormData;
+  helpers: FormikHelpers<StandupRowFormData>;
+}
+
+export interface DeleteStandupPayload {
+  standup: Standup;
+  helpers: FormikHelpers<StandupRowFormData>;
 }
 
 export interface ReportState {
@@ -20,8 +28,8 @@ export interface ReportState {
 
 export interface StandupMeetingState {
   selectedEmployee?: string;
-  isSavingStandup: boolean;
-  saveStandupError?: Error;
+  isCreatingStandup: boolean;
+  createStandupError?: Error;
   selectedDay: dayjs.Dayjs;
   selectedProject: string;
   toasts: { [key: string]: ToastDataProps };
@@ -29,12 +37,12 @@ export interface StandupMeetingState {
 }
 
 const initialState: StandupMeetingState = {
-  isSavingStandup: false,
+  createStandupError: undefined,
+  isCreatingStandup: false,
   report: {
     data: [],
     isVisible: false,
   },
-  saveStandupError: undefined,
   selectedDay: dayjs(new Date()),
   selectedEmployee: undefined,
   selectedProject: 'Veriown',
@@ -48,6 +56,20 @@ export default createSlice({
     createReport: (state: StandupMeetingState, { payload }) => {
       state.report.data = payload;
     },
+    createStandupFail: (state: StandupMeetingState, { payload }) => {
+      state.isCreatingStandup = false;
+      state.createStandupError = payload;
+    },
+    createStandupStart: (state: StandupMeetingState) => {
+      state.isCreatingStandup = true;
+      state.createStandupError = undefined;
+    },
+    createStandupSuccess: (state: StandupMeetingState) => {
+      state.isCreatingStandup = false;
+    },
+    deleteStandupFail: (s) => s,
+    deleteStandupStart: (s) => s,
+    deleteStandupSuccess: (s) => s,
     hideReport: (state: StandupMeetingState) => {
       state.report.isVisible = false;
     },
@@ -60,16 +82,14 @@ export default createSlice({
           return accum;
         }, {} as { [key: string]: ToastDataProps });
     },
-    saveStandupFail: (state: StandupMeetingState, { payload }) => {
-      state.isSavingStandup = false;
-      state.saveStandupError = payload;
+    saveStandupFail: (state: StandupMeetingState) => {
+      return state;
     },
     saveStandupStart: (state: StandupMeetingState) => {
-      state.isSavingStandup = true;
-      state.saveStandupError = undefined;
+      return state;
     },
     saveStandupSuccess: (state: StandupMeetingState) => {
-      state.isSavingStandup = false;
+      return state;
     },
     selectDay: (state: StandupMeetingState, { payload }) => {
       state.selectedDay = payload;

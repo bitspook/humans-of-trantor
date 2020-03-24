@@ -1,76 +1,86 @@
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE QuasiQuotes         #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-module EventInjector
-  ( server
-  , API
-  )
-where
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeOperators         #-}
 
-import           Data.Pool                        (withResource)
-import           Database.PostgreSQL.Simple       (execute, withTransaction)
-import           Database.PostgreSQL.Simple.SqlQQ
-import           EventInjector.Types
-import           RIO
-import           Servant                          as S
-import           Servant.Auth.Server
-import           Types
+module EventInjector where
 
-discoveredEmployeeEvent
-  :: DiscoveredEmployeeEvent -> App NoContent
-discoveredEmployeeEvent e = do
-  (AppContext p _) <- ask
-  liftIO $ insertEvent p e
-  where
-    insertEvent pool (DiscoveredEmployeeEvent event) = do
-      let eventName :: Text = "DISCOVERED_EMPLOYEE"
-      withResource pool $ \conn -> withTransaction conn $ do
-        _ <- execute
-          conn
-          [sql|
-            INSERT INTO store.store (name, version, payload)
-            VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
-        return NoContent
+import           Data.Aeson
+import           Data.UUID                          (UUID)
+import           Database.PostgreSQL.Simple.ToField (ToField (..), toJSONField)
+import           Pms.Employee.Types                 (Designation, Ecode,
+                                                     EmployeeName, ProjectName)
+import           Pms.Standup                        (StandupBody, StandupId,
+                                                     StandupPriority)
+import           RIO                                hiding (id)
+import           Types                              (Date, Email)
 
-discoveredProjectEvent
-  :: DiscoveredProjectEvent -> App NoContent
-discoveredProjectEvent e = do
-  (AppContext p _) <- ask
-  liftIO $ insertEvent p e
-  where
-    insertEvent pool (DiscoveredProjectEvent event) = do
-      let eventName :: Text = "DISCOVERED_PROJECT"
-      withResource pool $ \conn -> withTransaction conn $ do
-        _ <- execute
-          conn
-          [sql|
-            INSERT INTO store.store (name, version, payload)
-            VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
-        return NoContent
+-- DiscoveredEmployee
+data DiscoveredEmployee = DiscoveredEmployee
+  { email       :: Email
+  , ecode       :: Ecode
+  , name        :: EmployeeName
+  , project     :: Maybe ProjectName
+  , designation :: Designation
+  } deriving (Show, Generic, FromJSON, ToJSON)
 
+instance ToField DiscoveredEmployee where
+  toField = toJSONField
+---
 
-receivedStandupUpdateEvent
-  :: ReceivedStandupUpdateEvent -> App NoContent
-receivedStandupUpdateEvent e = do
-  (AppContext p _) <- ask
-  liftIO $ insertEvent p e
-  where
-    insertEvent pool (ReceivedStandupUpdateEvent event) = do
-      let eventName :: Text = "RECEIVED_STANDUP_UPDATE"
-      withResource pool $ \conn -> withTransaction conn $ do
-        _ <- execute
-          conn
-          [sql|
-            INSERT INTO store.store (name, version, payload)
-            VALUES (?, ?, ?)
-          |] (eventName, version event, payload event)
-        return NoContent
+-- DiscoveredProject
+data DiscoveredProject = DiscoveredProject
+  { id      :: UUID
+  , project :: ProjectName
+  } deriving (Show, Generic, FromJSON, ToJSON)
 
-server :: ServerT (API auths) App
-server (Authenticated _) = discoveredEmployeeEvent
-    :<|> discoveredProjectEvent
-    :<|> receivedStandupUpdateEvent
--- FIXME: There have to be a better way
-server _ = (\_ -> throwM err403) :<|> (\_ -> throwM err403) :<|> (\_ -> throwM err403)
+instance ToField DiscoveredProject where
+  toField = toJSONField
+---
+
+-- ReceivedStandupUpdateV2
+data ReceivedStandupUpdateV2 = ReceivedStandupUpdateV2
+  { source      :: Maybe StandupId
+  , ecode       :: Ecode
+  , project     :: ProjectName
+  , standup     :: StandupBody
+  , date        :: Date
+  , isDelivered :: Bool
+  , priority    :: StandupPriority
+  } deriving (Show, Generic)
+
+instance ToField ReceivedStandupUpdateV2 where
+  toField = toJSONField
+
+instance FromJSON ReceivedStandupUpdateV2 where
+  parseJSON = withObject "payload" $ \o ->
+    ReceivedStandupUpdateV2
+    <$> o .: "source"
+    <*> o .: "ecode"
+    <*> o .: "project"
+    <*> o .: "standup"
+    <*> o .: "date"
+    <*> o .: "isDelivered"
+    <*> o .: "priority"
+
+instance ToJSON ReceivedStandupUpdateV2 where
+  toJSON p = object
+    [ "source" .= source (p :: ReceivedStandupUpdateV2)
+    , "ecode" .= ecode (p :: ReceivedStandupUpdateV2)
+    , "project" .= project (p :: ReceivedStandupUpdateV2)
+    , "standup" .= standup (p :: ReceivedStandupUpdateV2)
+    , "date" .= date (p :: ReceivedStandupUpdateV2)
+    , "isDelivered" .= isDelivered (p :: ReceivedStandupUpdateV2)
+    , "priority" .= priority (p :: ReceivedStandupUpdateV2)
+    ]
+---
+
+newtype DeleteStandupUpdate = DeleteStandupUpdate
+  { source :: StandupId
+  } deriving (Show, Generic, FromJSON, ToJSON)
+
+instance ToField DeleteStandupUpdate where
+  toField = toJSONField

@@ -5,9 +5,6 @@ const fecha = require('fecha');
 
 const { format } = fecha;
 
-const eventName = 'RECEIVED_STANDUP_UPDATE';
-const eventVersion = 'v1';
-
 interface StandupEmployee {
   ecode: string;
   sheetName: string;
@@ -28,6 +25,7 @@ module.exports = {
     } = toolbox;
 
     const month = parseInt(options.month, 10) || 12;
+    const year = 2020;
 
     if (month <= 0 && month > 12) {
       print.error(`--month should be a number between 1 and 12`);
@@ -88,18 +86,13 @@ module.exports = {
         `${spinnerPermaText}: Requesting recorded standup updates`,
       );
       const standupRows = await db.any(sql`
-        SELECT DISTINCT ON (payload->>'date', payload->>'type')
-          payload->>'date' as date,
-          payload->>'standup' as standup
-          FROM (
-            SELECT payload from store.store
-            WHERE name = ${eventName}
-              AND version = ${eventVersion}
-              AND payload->>'type' = 'delivered'
-              AND payload->>'ecode' = ${employee.ecode}
-              AND date_part('month', (payload->>'date')::Timestamp) = ${month}
-              ORDER BY created_at DESC
-          ) AS store
+        SELECT date, standup
+        FROM standup
+        WHERE ecode = '${employee.ecode}'
+          AND isDelivered = true
+          AND date_part('month', date::Timestamp) = '${month}'
+          AND date_part('year', date::Timestamp) = '${year}'
+        ORDER BY created_at DESC
         `);
       spinner.succeed(
         `${spinnerPermaText}: Found ${standupRows.length} updates`,

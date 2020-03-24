@@ -9,32 +9,38 @@ import { bindActionCreators, Dispatch } from 'redux';
 import EmployeesList from 'src/components/EmployeesList';
 import Report from 'src/components/Report';
 import StandupCalendar from 'src/components/StandupCalendar';
-import StandupForm, { StandupFormValues } from 'src/components/StandupForm';
+import StandupForm, { StandupRowFormData, NewStandupFormData } from 'src/components/StandupForm';
 import Toaster, { ToastDataProps } from 'src/components/Toaster';
 import { Employee } from 'src/ducks/employees';
 import employeesD from 'src/ducks/employees';
 import { Standup } from 'src/ducks/standup';
 import { State } from 'src/reducer';
-import duck, { ReportState, SaveStandupPayload } from './duck';
+import duck, {
+  ReportState,
+  SaveStandupPayload,
+  CreateStandupPayload,
+  DeleteStandupPayload,
+} from './duck';
 import c from './index.module.scss';
 
-interface AppDataProps {
+interface StandupMeetingDP {
   employees: Employee[];
   selectedDay: Dayjs;
   selectedEmployee?: string;
   selectedProject: string;
-  saveStandupError?: Error;
-  standup: Standup[];
-  initialStandupFormValue: StandupFormValues;
+  createStandupError?: Error;
+  selectedStandups: Standup[];
   toasts: ToastDataProps[];
   report: ReportState;
   isLoadingEmployees: boolean;
 }
 
-interface AppCbProps {
+interface StandupMeetingCP {
   fetchEmployeesStart: (project: string) => void;
   selectDay: (d: Dayjs) => void;
   selectEmployee: (e: Employee) => void;
+  deleteStandupStart: (payload: DeleteStandupPayload) => void;
+  createStandupStart: (payload: CreateStandupPayload) => void;
   saveStandupStart: (payload: SaveStandupPayload) => void;
   showReport: () => void;
   hideReport: () => void;
@@ -50,33 +56,51 @@ const SelectEmployeeInstruction = () => (
   </Header>
 );
 
-const App: React.FC<AppDataProps & AppCbProps> = (p) => {
-  const handleSaveStandup = (ecode: string) => (
-    standup: StandupFormValues,
-    helpers: FormikHelpers<StandupFormValues>,
+const App: React.FC<StandupMeetingDP & StandupMeetingCP> = (p) => {
+  const handleSaveStandup = (
+    data: StandupRowFormData,
+    helpers: FormikHelpers<StandupRowFormData>,
   ) => {
-    p.saveStandupStart({ ecode, standup, project: p.selectedProject, day: p.selectedDay, helpers });
+    p.saveStandupStart({
+      data,
+      helpers,
+    });
+  };
+  const handleCreateStandup = (
+    data: NewStandupFormData,
+    helpers: FormikHelpers<NewStandupFormData>,
+  ) => {
+    p.createStandupStart({ data, helpers });
+  };
+  const handleDeleteStandup = (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => {
+    p.deleteStandupStart({ standup, helpers });
   };
 
   useEffect(() => {
     p.fetchEmployeesStart(p.selectedProject);
   }, [p.selectedProject]); // eslint-disable-line
 
-  const maybeError = p.saveStandupError && (
-    <Message error={true} header="Failed to save standup 😞" content={String(p.saveStandupError)} />
+  const maybeError = p.createStandupError && (
+    <Message
+      error={true}
+      header="Failed to add standup 😞"
+      content={String(p.createStandupError)}
+    />
   );
 
   /* prettier-ignore */
   const standupFormCol = p.selectedEmployee ? (
     <StandupForm
-      initialValues={p.initialStandupFormValue}
-      onSave={handleSaveStandup(p.selectedEmployee)}
+      standups={p.selectedStandups}
+      onSave={handleSaveStandup}
+      onCreate={handleCreateStandup}
+      onDelete={handleDeleteStandup}
     />
   ) : (<SelectEmployeeInstruction />);
 
   const maybeCalendarCol = p.selectedEmployee && (
     <div className={classNames(c.calendar, { [c.empty]: !p.selectedEmployee })}>
-      <StandupCalendar standup={p.standup} onSelect={p.selectDay} selectedDay={p.selectedDay} />
+      <StandupCalendar onSelect={p.selectDay} selectedDay={p.selectedDay} />
     </div>
   );
 
@@ -85,12 +109,12 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
       <Loader active={true} inline="centered" />
     </div>
   ) : (
-    <EmployeesList
-      selectedEmployee={p.selectedEmployee}
-      employees={p.employees}
-      onSelect={p.selectEmployee}
-    />
-  );
+      <EmployeesList
+        selectedEmployee={p.selectedEmployee}
+        employees={p.employees}
+        onSelect={p.selectEmployee}
+      />
+    );
 
   return (
     <div className={c.root}>
@@ -122,32 +146,22 @@ const App: React.FC<AppDataProps & AppCbProps> = (p) => {
   );
 };
 
-const mapState = (state: State): AppDataProps => {
-  const activeStandup = state.standup.data.filter(
+const mapState = (state: State): StandupMeetingDP => {
+  const selectedStandups = state.standup.data.filter(
     (s) =>
       s.ecode === state.standupMeeting.selectedEmployee &&
       s.date.isSame(state.standupMeeting.selectedDay, 'day'),
   );
-  const initialStandupFormValue = {
-    committed: (activeStandup.find((s) => s.standupType === 'committed') || { standup: '' })
-      .standup,
-    delivered: (activeStandup.find((s) => s.standupType === 'delivered') || { standup: '' })
-      .standup,
-    impediment: (activeStandup.find((s) => s.standupType === 'impediment') || { standup: '' })
-      .standup,
-  };
 
   return {
     ...state.standupMeeting,
     employees: state.employees.data,
-    initialStandupFormValue,
-    isLoadingEmployees: state.employees.isLoading,
-    standup: state.standup.data.filter((s) => s.ecode === state.standupMeeting.selectedEmployee),
+    selectedStandups,
     toasts: Object.values(state.standupMeeting.toasts),
   };
 };
 
-const mapDispatch = (dispatch: Dispatch): AppCbProps => ({
+const mapDispatch = (dispatch: Dispatch): StandupMeetingCP => ({
   ...bindActionCreators(duck.actions, dispatch),
   fetchEmployeesStart: bindActionCreators(employeesD.actions.fetchStart, dispatch),
 });

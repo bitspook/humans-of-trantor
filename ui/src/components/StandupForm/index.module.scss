@@ -1,3 +1,85 @@
-.error {
-  color: #a22;
+@import 'src/variables.scss';
+
+.newStandupInput {
+  width: 80%;
+  border: 1px solid $color-text-inverted;
+  font-size: 1.2em;
+  padding: 0.3em 0.6em;
+  border-radius: 0.3em;
+  margin: 0.5em 0;
+  margin-left: 3.8em;
+  outline: none;
+}
+
+.standupRow {
+  display: flex;
+  margin: 1em;
+  padding: 0 1px;
+  width: 100%;
+  align-items: center;
+
+  input[type=text] {
+    width: 80%;
+    border: none;
+    font-size: 1.2em;
+    outline: none;
+    padding: 0.4em 0.6em;
+    border-radius: 0.3em;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-text-inverted;
+    }
+  }
+}
+
+.isDeliveredCheckbox {
+  padding: 0.2em;
+  width: 2em;
+  height: 2em;
+  position: relative;
+  margin-right: 1em;
+
+  input {
+    width: inherit;
+    height: inherit;
+    cursor: pointer;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  label {
+    width: inherit;
+    height: inherit;
+    left: 0;
+    top: 0;
+    position: absolute;
+    border: 1px solid $color-primary-3;
+    border-radius: 50%;
+    z-index: -1;
+
+    &.checked {
+      border-color: $color-success;
+      background-color: $color-success;
+      background-image: url('./tick.svg');
+      background-size: 60%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+}
+
+.delete {
+  display: block;
+  width: 1.8em;
+  height: 2em;
+  background: url('./trash.svg');
+  background-size: 100%;
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  &:hover {
+    background: url('./trash-red.svg');
+  }
 }

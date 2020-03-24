@@ -1,75 +1,137 @@
-import { Field, FieldProps, Formik, FormikHelpers, FormikProps, getIn } from 'formik';
-import React from 'react';
-import { Button, Form, TextArea } from 'semantic-ui-react';
+import { Field, FieldProps, Formik, FormikHelpers, FormikProps } from 'formik';
+import React, { ChangeEvent, SyntheticEvent } from 'react';
+import { Standup } from 'src/ducks/standup';
 import * as yup from 'yup';
 import c from './index.module.scss';
 
-export interface StandupFormValues {
-  delivered: string;
-  committed: string;
-  impediment: string;
-}
+const StandupField = (p: FieldProps<Standup> & { onDelete: (e: SyntheticEvent) => void }) => {
+  const standup = p.field.value;
 
-const StandupSchema = yup.object().shape({
-  committed: yup.string(),
-  delivered: yup.string(),
-  impediment: yup.string(),
-});
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const haveChangedDelivery = event.target.name === 'is-delivered';
 
-interface SemanticFieldProps {
-  label: string;
-  type?: string;
-  fluid?: boolean;
-}
+    const newStandup = {
+      ...p.field.value,
+      isDelivered: haveChangedDelivery ? event.target.checked : standup.isDelivered,
+      standup: haveChangedDelivery ? standup.standup : event.target.value,
+    };
 
-const SemanticTextAreaField = (props: FieldProps & SemanticFieldProps) => {
-  const error =
-    getIn(props.form.touched, props.field.name) && getIn(props.form.errors, props.field.name);
+    p.field.onChange({
+      ...event,
+      target: { ...event.target, name: p.field.name, value: newStandup },
+    });
+
+    if (haveChangedDelivery) {
+      p.form.submitForm();
+    }
+  };
 
   return (
-    <Form.Field error={Boolean(error)}>
-      <TextArea {...props.field} fluid={props.fluid} disabled={props.form.isSubmitting} />
-      {error && <span className={c.error}>{error}</span>}
-    </Form.Field>
+    <div className={c.standupRow}>
+      <div className={c.isDeliveredCheckbox}>
+        <label className={standup.isDelivered ? c.checked : ''} htmlFor="standup-is-delivered" />
+        <input
+          name="is-delivered"
+          type="checkbox"
+          defaultChecked={standup.isDelivered}
+          onChange={handleChange}
+          disabled={p.form.isSubmitting}
+        />
+      </div>
+
+      <input
+        type="text"
+        name="standup"
+        value={standup.standup}
+        onChange={handleChange}
+        disabled={p.form.isSubmitting}
+      />
+
+      <button type="button" className={c.delete} onClick={p.onDelete} />
+    </div>
   );
 };
 
-const InnerForm: React.FC<FormikProps<StandupFormValues>> = (props) => (
-  <Form onSubmit={props.handleSubmit} disabled={props.isSubmitting}>
-    <h2>Committed</h2>
-    <Field component={SemanticTextAreaField} name="committed" />
+const NewStandupField: React.FC<FieldProps<string>> = (p) => {
+  return (
+    <input className={c.newStandupInput} type="text" {...p.field} disabled={p.form.isSubmitting} />
+  );
+};
 
-    <h2>Delivered</h2>
-    <Field component={SemanticTextAreaField} name="delivered" />
-
-    <h2>Impediment</h2>
-    <Field component={SemanticTextAreaField} name="impediment" />
-
-    <Button primary={true} type="submit" disabled={props.isSubmitting}>
-      Save
-    </Button>
-
-    <p>*Empty values will not be saved</p>
-  </Form>
-);
-
-interface DataProps {
-  initialValues: StandupFormValues;
+interface StandupRowProps {
+  standup: Standup;
+  onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
+  onDelete: (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => void;
 }
 
-interface CbProps {
-  onSave: (values: StandupFormValues, helpers: FormikHelpers<StandupFormValues>) => void;
+export interface StandupRowFormData {
+  standup: Standup;
 }
 
-const StandupForm: React.FC<CbProps & DataProps> = (p) => {
+const StandupRow = (p: StandupRowProps) => {
+  const InnerForm = (formik: FormikProps<StandupRowFormData>) => (
+    <form onSubmit={formik.handleSubmit}>
+      <Field
+        component={StandupField}
+        name="standup"
+        onDelete={() => p.onDelete(p.standup, formik)}
+      />
+    </form>
+  );
+
+  return (
+    <Formik initialValues={{ standup: p.standup }} onSubmit={p.onSave}>
+      {InnerForm}
+    </Formik>
+  );
+};
+
+export interface NewStandupFormData {
+  standup: string;
+}
+
+interface NewStandupFormProps {
+  onSubmit: (value: NewStandupFormData, helpers: FormikHelpers<NewStandupFormData>) => void;
+}
+
+const NewStandupForm: React.FC<NewStandupFormProps> = (p) => {
+  const InnerForm = (formik: FormikProps<{}>) => (
+    <form onSubmit={formik.handleSubmit}>
+      <Field name="standup" component={NewStandupField} />
+    </form>
+  );
+
+  const validationSchema = yup.object().shape({
+    standup: yup.string().required(),
+  });
+
   return (
     <Formik
-      enableReinitialize={true}
-      initialValues={p.initialValues}
-      validationSchema={StandupSchema}
-      onSubmit={p.onSave}
-      component={InnerForm}
-    />
+      initialValues={{ standup: '' }}
+      validationSchema={validationSchema}
+      onSubmit={p.onSubmit}>
+      {InnerForm}
+    </Formik>
+  );
+};
+
+interface StandupFormProps {
+  standups: Standup[];
+  onSave: (data: StandupRowFormData, helpers: FormikHelpers<StandupRowFormData>) => void;
+  onCreate: (data: NewStandupFormData, helpers: FormikHelpers<NewStandupFormData>) => void;
+  onDelete: (standup: Standup, helpers: FormikHelpers<StandupRowFormData>) => void;
+}
+
+const StandupForm: React.FC<StandupFormProps> = (p) => {
+  const standupRows = p.standups.map((s) => (
+    <StandupRow key={s.id} standup={s} onSave={p.onSave} onDelete={p.onDelete} />
+  ));
+
+  return (
+    <>
+      <NewStandupForm onSubmit={p.onCreate} />
+      {standupRows}
+    </>
   );
 };
 

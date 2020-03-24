@@ -1,91 +1,140 @@
-import { Dayjs } from 'dayjs';
 import { AnyAction } from 'redux';
 import { combineEpics, Epic, ofType, StateObservable } from 'redux-observable';
 import { from, Observable } from 'rxjs';
 import { delay, map, mergeMap, withLatestFrom } from 'rxjs/operators';
-import { StandupFormValues } from 'src/components/StandupForm';
 import config from 'src/config';
-import standupDuck from 'src/ducks/standup';
+import standupDuck, { NewStandup, Standup } from 'src/ducks/standup';
 import fetchWithAuth from 'src/lib/fetchWithAuth';
 import { State } from 'src/reducer';
-import duck, { SaveStandupPayload } from './duck';
+import duck, { SaveStandupPayload, CreateStandupPayload, DeleteStandupPayload } from './duck';
 
-const saveStandup = (token: string) => (
-  ecode: string,
-  day: Dayjs,
-  project: string,
-  values: StandupFormValues,
-) => {
-  const url = `${config.urls.core}/event/RECEIVED_STANDUP_UPDATE`;
+interface SaveStandupApiPayload extends NewStandup {
+  id?: string;
+}
 
-  const standups = [
-    { ecode, date: day.format('YYYY-MM-DD'), type: 'delivered', standup: values.delivered },
-    { ecode, date: day.format('YYYY-MM-DD'), type: 'committed', standup: values.committed },
-    { ecode, date: day.format('YYYY-MM-DD'), type: 'impediment', standup: values.impediment },
-  ].filter((s) => Boolean(s.standup));
+const saveStandup = (token: string) => async (standup: SaveStandupApiPayload) => {
+  let url = `${config.urls.core}/standup`;
+  let method = 'POST';
+
+  if (standup.id) {
+    url = `${url}/${standup.id}`;
+    method = 'PUT';
+  }
 
   const fetch = fetchWithAuth(token);
+  const payload = {
+    ...standup,
+    date: standup.date.format('YYYY-MM-DD'),
+  };
 
-  return Promise.all(
-    standups.map(async (standup) => {
-      const event = {
-        payload: {
-          ...standup,
-          project,
-        },
-        version: 'v1',
-      };
+  const response = await fetch(url, {
+    body: JSON.stringify(payload),
+    headers: {
+      'content-type': 'application/json',
+    },
+    method,
+  });
 
-      const response = await fetch(url, {
-        body: JSON.stringify(event),
-        headers: {
-          'content-type': 'application/json',
-        },
-        method: 'POST',
-      });
+  return response;
+};
 
-      return event;
-    }),
-  );
+const deleteStandup = (token: string) => async (standup: Standup) => {
+  let url = `${config.urls.core}/standup/${standup.id}`;
+  let method = 'DELETE';
+
+  const fetch = fetchWithAuth(token);
+  const response = await fetch(url, {
+    headers: {
+      'content-type': 'application/json',
+    },
+    method,
+  });
+
+  return response;
 };
 
 const { actions } = duck;
+
+const createStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
+  action$.pipe(
+    ofType(actions.createStandupStart),
+    withLatestFrom(state$),
+    mergeMap(async ([{ payload }, state]) => {
+      const { data, helpers } = payload as CreateStandupPayload;
+
+      if (!state.standupMeeting.selectedEmployee) {
+        return [actions.createStandupFail(new Error('No Employee Selected'))];
+      }
+
+      const standup: NewStandup = {
+        ecode: state.standupMeeting.selectedEmployee,
+        project: state.standupMeeting.selectedProject,
+        standup: data.standup,
+        isDelivered: false,
+        priority: 0,
+        date: state.standupMeeting.selectedDay,
+      };
+      const token = (state.user.session && state.user.session.accessToken) || '';
+
+      try {
+        helpers.setSubmitting(true);
+        await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
+
+        helpers.resetForm();
+
+        return [actions.createStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
+      } catch (err) {
+        const errors = Array.isArray(err) ? err : [err];
+
+        helpers.setFieldError('standup', errors[0]);
+        return [actions.createStandupFail(errors)];
+      }
+    }),
+    mergeMap((arr) => from(arr)),
+  );
 
 const saveStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
   action$.pipe(
     ofType(actions.saveStandupStart),
     withLatestFrom(state$),
     mergeMap(async ([{ payload }, state]) => {
-      const { ecode, standup, project, helpers, day } = payload as SaveStandupPayload;
+      const { data, helpers } = payload as SaveStandupPayload;
+      const standup = data.standup;
       const token = (state.user.session && state.user.session.accessToken) || '';
 
-      helpers.setSubmitting(true);
-
       try {
-        const responses = await saveStandup(token)(ecode, day, project, standup);
-        const toasts: AnyAction[] = responses.map((r) =>
-          actions.showToast({
-            body: `${r.payload.type} for ${r.payload.ecode}`,
-            header: 'Standup saved successfully!',
-            key: `${r.payload.type}-${r.payload.ecode}`,
-          }),
-        );
+        helpers.setSubmitting(true);
+        await saveStandup(token)(standup).finally(() => helpers.setSubmitting(false));
 
-        return toasts.concat([actions.saveStandupSuccess(), standupDuck.actions.fetchStart(ecode)]);
+        return [actions.saveStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
       } catch (err) {
         const errors = Array.isArray(err) ? err : [err];
 
-        const toasts: AnyAction[] = errors.map((e) =>
-          actions.showToast({
-            body: `${e.name}`,
-            header: 'Failed to save standup',
-            key: new Date().getTime(),
-          }),
-        );
+        helpers.setFieldError('standup', errors[0]);
+        return [actions.saveStandupFail()];
+      }
+    }),
+    mergeMap((arr) => from(arr)),
+  );
 
-        return toasts.concat([actions.saveStandupFail(errors)]);
-      } finally {
-        helpers.setSubmitting(false);
+const deleteStandupEpic = (action$: Observable<AnyAction>, state$: StateObservable<State>) =>
+  action$.pipe(
+    ofType(actions.deleteStandupStart),
+    withLatestFrom(state$),
+    mergeMap(async ([{ payload }, state]) => {
+      const { standup, helpers } = payload as DeleteStandupPayload;
+      const token = (state.user.session && state.user.session.accessToken) || '';
+
+      try {
+        helpers.setSubmitting(true);
+        await deleteStandup(token)(standup).finally(() => helpers.setSubmitting(false));
+
+        return [actions.deleteStandupSuccess(), standupDuck.actions.fetchStart(standup.ecode)];
+      } catch (err) {
+        const errors = Array.isArray(err) ? err : [err];
+
+        helpers.setFieldError('standup', errors[0]);
+        return [actions.deleteStandupFail()];
       }
     }),
     mergeMap((arr) => from(arr)),
@@ -117,23 +166,15 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
             .filter((s) => s.ecode === employee.ecode)
             .sort((s1, s2) => (s1.date.isBefore(s2.date) ? 1 : -1));
 
-          const yesterday = standup.find(
-            (s) => s.standupType === 'delivered' && s.date.isBefore(selectedDay, 'day'),
-          );
-          const today = standup.find(
-            (s) => s.standupType === 'committed' && s.date.isSame(selectedDay, 'day'),
-          );
-          const impediment = standup.find(
-            (s) => s.standupType === 'impediment' && s.date.isSame(selectedDay, 'day'),
-          );
+          const yesterday = standup.find((s) => s.date.isBefore(selectedDay, 'day'));
+          const today = standup.find((s) => s.date.isSame(selectedDay, 'day'));
 
-          if (!yesterday && !today && !impediment) {
+          if (!yesterday && !today) {
             return null;
           }
 
           return {
             employee,
-            impediment,
             today,
             yesterday,
           };
@@ -145,8 +186,10 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
   );
 
 export default combineEpics(
+  createStandupEpic,
   saveStandupEpic,
   fetchEmployeeStandupEpic,
   autoHideToastEpic,
   createReportEpic,
+  deleteStandupEpic,
 );

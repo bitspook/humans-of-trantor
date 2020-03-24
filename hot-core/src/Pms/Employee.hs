@@ -3,7 +3,7 @@
 
 module Pms.Employee
   ( API
-  , server
+  , api
   )
 where
 
@@ -35,6 +35,6 @@ getEmployees project = do
         Nothing -> query conn baseQuery' ()
   liftIO $ withResource pool queryEmployees
 
-server :: ServerT (API auth) App
-server (Authenticated _) = getEmployees
-server _                 = \_ -> throwM err401
+api :: ServerT (API auth) App
+api (Authenticated _) = getEmployees
+api _                 = \_ -> throwM err401
