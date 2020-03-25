@@ -88,10 +88,10 @@ module.exports = {
       const standupRows = await db.any(sql`
         SELECT date, standup
         FROM standup
-        WHERE ecode = '${employee.ecode}'
+        WHERE ecode = ${employee.ecode}
           AND isDelivered = true
-          AND date_part('month', date::Timestamp) = '${month}'
-          AND date_part('year', date::Timestamp) = '${year}'
+          AND date_part('month', date::Timestamp) = ${month}
+          AND date_part('year', date::Timestamp) = ${year}
         ORDER BY created_at DESC
         `);
       spinner.succeed(
@@ -180,9 +180,9 @@ const buildGSheetUpdatePayload = ({
       return [];
     }
 
-    const standup = standupRows.find(
+    const standup = standupRows.filter(
       ({ date: d }) => d === format(date, 'YYYY-MM-DD'),
-    );
+    ).map((s) => s.standup).join('\n');
 
     if (!standup) {
       toolbox.print.colors.dim(`Could not find standup for date: ${date}`);
@@ -191,7 +191,7 @@ const buildGSheetUpdatePayload = ({
     }
 
     const valuesRow = [];
-    valuesRow[taskColIndex] = cols[taskColIndex] ? null : standup.standup;
+    valuesRow[taskColIndex] = cols[taskColIndex] ? null : standup;
     valuesRow[isBillableColIndex] = cols[isBillableColIndex] ? null : 'Billable';
     valuesRow[hoursColIndex] = cols[hoursColIndex] ? null : employee.hoursSpent;
 
