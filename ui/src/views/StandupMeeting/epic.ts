@@ -135,9 +135,11 @@ const createReportEpic: Epic = (action$, state$: StateObservable<State>) =>
             return null;
           }
 
-          const dayBeforeSelectedDay = yesterday.reduce((accum, s) => {
-            return accum.date.isAfter(s.date, 'day') ? accum : s;
-          }).date;
+          const dayBeforeSelectedDay = yesterday.length
+            ? yesterday.reduce((accum, s) => {
+              return accum.date.isAfter(s.date, 'day') ? accum : s;
+            }).date
+            : new Date();
 
           yesterday = yesterday.filter((s) => s.date.isSame(dayBeforeSelectedDay));
 
