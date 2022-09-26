@@ -1,6 +1,10 @@
 #+TITLE: Humans of Trantor
 
 #+BEGIN_QUOTE
+This old piece is archived because I am no longer working on it. I am open-sourcing it as a showcase, and for reference to some interesting stuff it has.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
 A history of events happening with [H]umans [o]f [T]rantor Software Private Ltd
 #+END_QUOTE
 
@@ -16,9 +20,6 @@ around with data.
 
 HoT itself just keeps track of all the events that happen with humans of
 Trantor.
-
-A version of =develop= branch is deployed on my [[https://lab.channikhabra.com/humans-of-trantor][lab]]. You can find the
-documentation at https://lab.channikhabra.com/humans-of-trantor/docs
 
 ** Getting started
 
